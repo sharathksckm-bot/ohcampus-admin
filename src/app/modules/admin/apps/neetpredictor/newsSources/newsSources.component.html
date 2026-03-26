@@ -1,0 +1,242 @@
+<div class="sm:col-span-2 md:col-span-4 flex flex-col flex-auto bg-card m-6 rounded-2xl overflow-hidden shadow">
+    <!-- Cron Control Panel -->
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-4" *ngIf="showCronPanel">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="bg-white/20 rounded-full p-3">
+                    <mat-icon class="text-white">schedule</mat-icon>
+                </div>
+                <div>
+                    <h3 class="text-white font-semibold text-lg">Automated News Scraper</h3>
+                    <p class="text-white/70 text-sm">AI-powered counseling updates with Gemini</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <!-- Status Badge -->
+                <div class="flex items-center gap-2 bg-white/10 rounded-full px-4 py-2">
+                    <span class="w-3 h-3 rounded-full" 
+                          [ngClass]="{
+                            'bg-green-400 animate-pulse': isCronEnabled(),
+                            'bg-gray-400': !isCronEnabled()
+                          }"></span>
+                    <span class="text-white text-sm font-medium">{{isCronEnabled() ? 'Running' : 'Stopped'}}</span>
+                </div>
+                
+                <!-- Start/Stop Button -->
+                <button mat-flat-button 
+                        [color]="isCronEnabled() ? 'warn' : 'primary'"
+                        (click)="toggleCron()"
+                        class="!rounded-full">
+                    <mat-icon>{{isCronEnabled() ? 'stop' : 'play_arrow'}}</mat-icon>
+                    {{isCronEnabled() ? 'Stop Scraper' : 'Start Scraper'}}
+                </button>
+                
+                <!-- Run Now Button -->
+                <button mat-stroked-button 
+                        class="!text-white !border-white/50 !rounded-full"
+                        (click)="runNow()">
+                    <mat-icon>bolt</mat-icon>
+                    Run Now
+                </button>
+            </div>
+        </div>
+        
+        <!-- Cron Stats Row -->
+        <div class="flex items-center gap-6 mt-4 text-white/80 text-sm" *ngIf="cronSettings">
+            <div class="flex items-center gap-2">
+                <mat-icon class="text-lg">timer</mat-icon>
+                <span>Interval:</span>
+                <mat-select [(ngModel)]="cronSettings.interval_minutes" 
+                            (selectionChange)="updateInterval($event.value)"
+                            class="!text-white bg-white/10 rounded px-2 py-1 min-w-[140px]">
+                    <mat-option *ngFor="let opt of intervalOptions" [value]="opt.value">{{opt.label}}</mat-option>
+                </mat-select>
+            </div>
+            <div class="flex items-center gap-2" *ngIf="cronSettings.last_run_at">
+                <mat-icon class="text-lg">history</mat-icon>
+                <span>Last Run: {{cronSettings.last_run_at | date:'short'}}</span>
+            </div>
+            <div class="flex items-center gap-2" *ngIf="cronSettings.next_run_at && isCronEnabled()">
+                <mat-icon class="text-lg">schedule</mat-icon>
+                <span>Next Run: {{cronSettings.next_run_at | date:'short'}}</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <mat-icon class="text-lg">check_circle</mat-icon>
+                <span>Total Runs: {{cronSettings.run_count || 0}}</span>
+            </div>
+            <button mat-button class="!text-white/70 !text-sm" (click)="loadCronLogs()">
+                <mat-icon class="text-lg">article</mat-icon>
+                {{showLogs ? 'Hide' : 'View'}} Logs
+            </button>
+        </div>
+        
+        <!-- Logs Panel -->
+        <div *ngIf="showLogs && cronLogs.length > 0" class="mt-4 bg-black/20 rounded-lg p-3 max-h-48 overflow-y-auto">
+            <div *ngFor="let log of cronLogs" class="text-white/80 text-xs py-1 border-b border-white/10 last:border-0">
+                <span class="text-white/50">{{log.created_at}}</span> - 
+                <span [ngClass]="{'text-green-400': log.status === 'success', 'text-red-400': log.status === 'failed'}">{{log.status}}</span> - 
+                Items: {{log.items_processed}}, Alerts: {{log.alerts_created}}, Time: {{log.execution_time}}
+            </div>
+        </div>
+    </div>
+
+    <!-- News Sources Header -->
+    <div class="bg-primary p-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-xl text-white font-semibold">Counseling News Sources</h2>
+            <div class="flex gap-2">
+                <mat-form-field class="w-48" appearance="outline">
+                    <mat-label>Filter by Type</mat-label>
+                    <mat-select [(ngModel)]="filterType" (selectionChange)="loadSources()">
+                        <mat-option value="">All Types</mat-option>
+                        <mat-option *ngFor="let type of predictorTypes" [value]="type.code">
+                            {{type.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button class="rounded bg-white text-primary" mat-stroked-button (click)="openForm()">
+                    <mat-icon>add</mat-icon>
+                    Add News Source
+                </button>
+            </div>
+        </div>
+        <p class="text-white/70 text-sm mt-1">Configure URLs to monitor for counseling notifications and updates</p>
+    </div>
+
+    <div class="p-4">
+        <div *ngIf="loading" class="flex justify-center p-8">
+            <mat-spinner diameter="40"></mat-spinner>
+        </div>
+
+        <table mat-table [dataSource]="sources" class="w-full" *ngIf="!loading && sources.length > 0">
+            <ng-container matColumnDef="predictor_type">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">Predictor Type</th>
+                <td mat-cell *matCellDef="let element">
+                    <span class="px-2 py-1 rounded text-xs font-medium"
+                          [ngClass]="{
+                            'bg-blue-100 text-blue-800': element.predictor_type === 'KCET',
+                            'bg-green-100 text-green-800': element.predictor_type === 'NEET',
+                            'bg-purple-100 text-purple-800': element.predictor_type === 'JEE',
+                            'bg-orange-100 text-orange-800': element.predictor_type === 'COMEDK',
+                            'bg-red-100 text-red-800': element.predictor_type === 'MCC',
+                            'bg-gray-100 text-gray-800': element.predictor_type === 'STATE_COUNSELING'
+                          }">
+                        {{getPredictorTypeName(element.predictor_type)}}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="source_name">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">Source Name</th>
+                <td mat-cell *matCellDef="let element">{{element.source_name}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="source_url">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">URL</th>
+                <td mat-cell *matCellDef="let element">
+                    <a [href]="element.source_url" target="_blank" class="text-blue-600 hover:underline truncate max-w-xs block">
+                        {{element.source_url}}
+                    </a>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="is_active">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">Status</th>
+                <td mat-cell *matCellDef="let element">
+                    <mat-slide-toggle 
+                        [checked]="element.is_active === '1' || element.is_active === 1"
+                        (change)="toggleActive(element)"
+                        color="primary">
+                    </mat-slide-toggle>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="last_scraped_at">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">Last Scraped</th>
+                <td mat-cell *matCellDef="let element">
+                    <span *ngIf="element.last_scraped_at">{{element.last_scraped_at | date:'short'}}</span>
+                    <span *ngIf="!element.last_scraped_at" class="text-gray-400">Never</span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">Actions</th>
+                <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button color="primary" (click)="openForm(element)" matTooltip="Edit">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="deleteSource(element)" matTooltip="Delete">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <div *ngIf="!loading && sources.length === 0" class="text-center py-12 text-gray-500">
+            <mat-icon class="text-6xl text-gray-300">rss_feed</mat-icon>
+            <p class="mt-4">No news sources configured yet</p>
+            <p class="text-sm">Click "Add News Source" to get started</p>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Form Dialog -->
+<div *ngIf="showForm" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" (click)="closeForm()">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+        <div class="bg-primary p-4 rounded-t-xl">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-white">{{editMode ? 'Edit' : 'Add'}} News Source</h3>
+                <button mat-icon-button (click)="closeForm()">
+                    <mat-icon class="text-white">close</mat-icon>
+                </button>
+            </div>
+        </div>
+        
+        <form [formGroup]="form" class="p-6">
+            <mat-form-field class="w-full mb-4" appearance="outline">
+                <mat-label>Predictor Type</mat-label>
+                <mat-select formControlName="predictor_type" required>
+                    <mat-option *ngFor="let type of predictorTypes" [value]="type.code">
+                        {{type.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="w-full mb-4" appearance="outline">
+                <mat-label>Source Name</mat-label>
+                <input matInput formControlName="source_name" placeholder="e.g., Karnataka Examinations Authority" required>
+            </mat-form-field>
+
+            <mat-form-field class="w-full mb-4" appearance="outline">
+                <mat-label>Source URL</mat-label>
+                <input matInput formControlName="source_url" placeholder="https://kea.kar.nic.in/" required>
+                <mat-hint>Enter the URL of the notifications page</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field class="w-full mb-4" appearance="outline">
+                <mat-label>CSS Selector (Optional)</mat-label>
+                <input matInput formControlName="scrape_selector" placeholder=".notification-list">
+                <mat-hint>CSS selector to target specific content on the page</mat-hint>
+            </mat-form-field>
+
+            <div class="flex items-center mb-4">
+                <mat-slide-toggle formControlName="is_active" color="primary">
+                    Active
+                </mat-slide-toggle>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-6">
+                <button mat-stroked-button type="button" (click)="closeForm()">Cancel</button>
+                <button mat-flat-button color="primary" type="button" (click)="saveSource()" [disabled]="loading">
+                    <mat-icon *ngIf="loading">
+                        <mat-spinner diameter="20"></mat-spinner>
+                    </mat-icon>
+                    {{editMode ? 'Update' : 'Save'}} Source
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

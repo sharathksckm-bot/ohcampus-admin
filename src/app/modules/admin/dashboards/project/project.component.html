@@ -1,0 +1,707 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="flex-auto border-t -mt-px pt-4 sm:pt-6">
+        <div class="w-full p-6 mx-auto">
+            <form [formGroup]="dashboard">
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 w-full min-w-0 mb-4"
+                >
+                    <div class="flex justify-end text-center gap-6">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="-full">
+                                <input
+                                    matInput
+                                    [matDatepicker]="date"
+                                    (dateChange)="fromDateChange($event)"
+                                    (focus)="date.open()"
+                                    formControlName="fromdate"
+                                    [min]="eventMinDate"
+                                    [max]="eventMaxDate"
+                                    placeholder="Form Date"
+                                    (dateChange)="applyFilter()"
+                                />
+                                <mat-icon
+                                    *ngIf="dashboard.value.fromdate != ''"
+                                    class="red"
+                                    svgIcon="mat_outline:close"
+                                    (click)="removeForm()"
+                                ></mat-icon>
+                                <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="date"
+                                    *ngIf="dashboard.value.fromdate == ''"
+                                ></mat-datepicker-toggle>
+                                <mat-datepicker #date></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <input
+                                    matInput
+                                    [matDatepicker]="date2"
+                                    (focus)="date2.open()"
+                                    formControlName="todate"
+                                    [min]="eventMinDate"
+                                    [max]="eventMaxDate"
+                                    placeholder="To Date"
+                                    (dateChange)="applyFilter()"
+                                />
+                                <mat-icon
+                                    *ngIf="dashboard.value.todate != ''"
+                                    class="red"
+                                    svgIcon="mat_outline:close"
+                                    (click)="removeTo()"
+                                ></mat-icon>
+                                <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="date2"
+                                    *ngIf="dashboard.value.todate == ''"
+                                ></mat-datepicker-toggle>
+                                <mat-datepicker #date2></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div
+                class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full min-w-0"
+            >
+                <div
+                    class="flex flex-row flex-wrap flex-auto p-4 shadow rounded-2xl overflow-hidden relative"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"
+                >
+                    <div class="cardImg self-center mx-3">
+                        <img src="assets/images/icons/colleges.png" />
+                    </div>
+                    <div class="bgOpacity ml-3 lg:ml-6 md:ml-6">
+                        <div class="flex items-start">
+                            <div
+                                class="text-lg font-semibold tracking-tight truncate z-20 text-white"
+                            >
+                                ALL COLLEGES
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <div
+                                class="text-5xl h-8 font-bold tracking-tight leading-none z-20 my-4 text-white"
+                            >
+                                {{ collegeCount }}
+                            </div>
+
+                            <button
+                                class="min-h-0 max-h-8 h-32 text-lg flex items-center font-medium text-left text-white/80 hover:text-white"
+                                type="button"
+                                [disabled]="type === 'ContentWriter'"
+                                routerLink="/apps/college/colleges"
+                            >
+                                View More
+                                <mat-icon
+                                    svgIcon="mat_solid:arrow_forward_ios"
+                                    class="ml-1 icon-size-4 text-white/80"
+                                ></mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="flex flex-row flex-wrap flex-auto p-4 shadow rounded-2xl overflow-hidden relative"
+                    style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"
+                >
+                    <div class="cardImg self-center mx-3">
+                        <img src="assets/images/icons/users.png" />
+                    </div>
+                    <div class="bgOpacity ml-3 lg:ml-6 md:ml-6">
+                        <div class="flex items-start">
+                            <div
+                                class="text-lg font-semibold tracking-tight truncate z-20 text-white"
+                            >
+                                USERS
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <div
+                                class="text-5xl h-8 font-bold tracking-tight leading-none z-20 my-4 text-white"
+                            >
+                                {{ userCount }}
+                            </div>
+
+                            <button
+                                class="min-h-0 max-h-8 h-32 text-lg flex items-center font-medium text-left text-white/80 hover:text-white"
+                                type="button"
+                                [disabled]="
+                                    type === 'ContentWriter' ||
+                                    type === 'College'
+                                "
+                                routerLink="/apps/user/alluser"
+                            >
+                                View More
+                                <mat-icon
+                                    svgIcon="mat_solid:arrow_forward_ios"
+                                    class="ml-1 icon-size-4 text-white/80"
+                                ></mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="flex flex-row flex-wrap flex-auto p-4 shadow rounded-2xl overflow-hidden relative"
+                    style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"
+                >
+                    <div class="cardImg self-center mx-3">
+                        <img src="assets/images/icons/event.png" />
+                    </div>
+                    <div class="bgOpacity ml-3 lg:ml-6 md:ml-6">
+                        <div class="flex items-start">
+                            <div
+                                class="text-lg font-semibold tracking-tight truncate z-20 text-white"
+                            >
+                                EVENTS
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <div
+                                class="text-5xl h-8 font-bold tracking-tight leading-none z-20 my-4 text-white"
+                            >
+                                {{ eventCount }}
+                            </div>
+
+                            <button
+                                class="min-h-0 max-h-8 h-32 text-lg flex items-center font-medium text-left text-white/80 hover:text-white"
+                                type="button"
+                                [disabled]="
+                                    type === 'ContentWriter' ||
+                                    type === 'College'
+                                "
+                                routerLink="/apps/event/viewevents"
+                            >
+                                View More
+                                <mat-icon
+                                    svgIcon="mat_solid:arrow_forward_ios"
+                                    class="ml-1 icon-size-4"
+                                    [style.color]="
+                                   ( type === 'ContentWriter' ||
+                                    type === 'College')
+                                        ? 'black'
+                                        : 'blue'
+                                "
+                                ></mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="flex flex-row flex-wrap flex-auto p-4 bg-card shadow rounded-2xl overflow-hidden card4 relative"
+                >
+                    <div class="cardImg self-center mx-3">
+                        <img src="assets/images/icons/article.png" />
+                    </div>
+                    <div class="bgOpacity ml-3 lg:ml-6 md:ml-6">
+                        <div class="flex items-start">
+                            <div
+                                class="text-lg font-semibold tracking-tight truncate z-20"
+                            >
+                                ARTICLES
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <div
+                                class="text-5xl h-8 font-bold tracking-tight leading-none text-green-500 z-20 my-4"
+                            >
+                                {{ blogsCount }}
+                            </div>
+                            <button
+                                class="min-h-0 max-h-8 h-32 text-lg flex items-center font-medium text-left"
+                                [style.color]="
+                                   ( type === 'College') ? 'black' : 'blue'
+                                "
+                                [style.cursor]="(type === 'College') ? 'no-drop' : 'pointer'"
+                                type="button"
+                                [disabled]="type === 'College'"
+                                routerLink="/apps/blog/viewblogs"
+                            >
+                                View More
+                                <mat-icon
+                                    svgIcon="mat_solid:arrow_forward_ios"
+                                    class="ml-1 icon-size-4"
+                                    [style.color]="
+                                    ( type === 'College') ? 'black' : 'blue'
+                                    "
+                                    
+                                ></mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="flex flex-row flex-wrap flex-auto p-4 bg-card shadow rounded-2xl overflow-hidden card4 relative"
+                >
+                    <div class="cardImg self-center mx-3">
+                        <img src="assets/images/icons/course.png" />
+                    </div>
+                    <div class="bgOpacity ml-3 lg:ml-6 md:ml-6">
+                        <div class="flex items-start">
+                            <div
+                                class="text-lg font-semibold tracking-tight truncate z-20"
+                            >
+                                COURSES
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <div
+                                class="text-5xl h-8 font-bold tracking-tight leading-none text-teal-400 z-20 my-4"
+                            >
+                                {{ coursesCount }}
+                            </div>
+
+                            <button
+                                class="min-h-0 max-h-8 h-32 text-lg flex items-center font-medium text-left"
+                                [style.color]="
+                                ( type === 'ContentWriter' ||
+                                  type === 'ContentManager' ||
+                                  type === 'College') ? 'black' : 'blue'"
+                                [style.cursor]="(type === 'ContentWriter' ||
+                                type === 'ContentManager' ||
+                                type === 'College') ? 'no-drop' : 'pointer'"
+                                type="button"
+                                [disabled]="
+                                    type === 'ContentWriter' ||
+                                    type === 'ContentManager' ||
+                                    type === 'College'
+                                "
+                                routerLink="/apps/course/viewcourse"
+                            >
+                                View More
+                                <mat-icon
+                                    svgIcon="mat_solid:arrow_forward_ios"
+                                    class="ml-1 blue icon-size-4"
+                                    [style.color]="
+                                ( type === 'ContentWriter' ||
+                                  type === 'ContentManager' ||
+                                  type === 'College') ? 'black' : 'blue'"
+                                ></mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="flex flex-row flex-wrap flex-auto p-4 bg-card shadow rounded-2xl overflow-hidden card4 relative"
+                >
+                    <div class="cardImg self-center mx-3">
+                        <img src="assets/images/icons/courseenquiry.png" />
+                    </div>
+                    <div class="bgOpacity ml-3 lg:ml-6 md:ml-6">
+                        <div class="flex items-start">
+                            <div
+                                class="text-lg font-semibold tracking-tight truncate z-20"
+                            >
+                                COURSE ENQUIRIES
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <div
+                                class="text-5xl h-8 font-bold tracking-tight leading-none text-amber-700 z-20 my-4"
+                            >
+                                {{ courseEnquiryCount }}
+                            </div>
+
+                            <button
+                                class="min-h-0 max-h-8 h-32 text-lg flex items-center font-medium text-left"
+                                [style.color]="
+                                ( type === 'ContentWriter' ||
+                                  type === 'ContentManager' ||
+                                  type === 'College') ? 'black' : 'blue'"
+                                [style.cursor]="
+                                (type === 'ContentWriter' ||
+                                type === 'ContentManager' ||
+                                type === 'College') ? 'no-drop' : 'pointer'"
+                                type="button"
+                                [disabled]="
+                                    type === 'ContentWriter' ||
+                                    type === 'ContentManager' ||
+                                    type === 'College'
+                                "
+                                routerLink="/apps/courseenquiry/courseenquirylist"
+                            >
+                                View More
+                                <mat-icon
+                                    svgIcon="mat_solid:arrow_forward_ios"
+                                    class="ml-1 blue icon-size-4"
+                                    [style.color]="
+                                ( type === 'ContentWriter' ||
+                                  type === 'ContentManager' ||
+                                  type === 'College') ? 'black' : 'blue'"
+                                ></mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="flex flex-row flex-wrap flex-auto p-4 bg-card shadow rounded-2xl overflow-hidden card4 relative"
+                >
+                    <div class="cardImg self-center mx-3">
+                        <img src="assets/images/icons/enquiry.png" />
+                    </div>
+                    <div class="bgOpacity ml-3 lg:ml-6 md:ml-6">
+                        <div class="flex items-start">
+                            <div
+                                class="text-lg font-semibold tracking-tight truncate z-20"
+                            >
+                                ENQUIRIES
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <div
+                                class="text-5xl h-8 font-bold tracking-tight leading-none text-pink-500 z-20 my-4"
+                            >
+                                {{ enquiryCount }}
+                            </div>
+
+                            <button
+                                class="min-h-0 max-h-8 h-32 text-lg flex items-center font-medium text-left"
+                                [style.color]="
+                                ( type === 'ContentWriter' ||
+                                  type === 'ContentManager' ||
+                                  type === 'College') ? 'black' : 'blue'"
+                                [style.cursor]="
+                                (type === 'ContentWriter' ||
+                                type === 'ContentManager' ||
+                                type === 'College') ? 'no-drop' : 'pointer'"
+                                type="button"
+                                [disabled]="
+                                    type === 'ContentWriter' ||
+                                    type === 'ContentManager' ||
+                                    type === 'College'
+                                "
+                                routerLink="/apps/enquiry/enquirylist"
+                            >
+                                View More
+                                <mat-icon
+                                    svgIcon="mat_solid:arrow_forward_ios"
+                                    class="ml-1 blue icon-size-4"
+                                    [style.color]="
+                                ( type === 'ContentWriter' ||
+                                  type === 'ContentManager' ||
+                                  type === 'College') ? 'black' : 'blue'"
+                                ></mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="flex flex-row flex-wrap flex-auto p-4 bg-card shadow rounded-2xl overflow-hidden card4 relative"
+                >
+                    <div class="cardImg self-center mx-3">
+                        <img src="assets/images/icons/application.png" />
+                    </div>
+                    <div class="bgOpacity ml-3 lg:ml-6 md:ml-6">
+                        <div class="flex items-start">
+                            <div
+                                class="text-lg font-semibold tracking-tight truncate z-20"
+                            >
+                                APPLICATIONS
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col">
+                            <div
+                                class="text-5xl h-8 font-bold tracking-tight leading-none text-purple-500 z-20 my-4"
+                            >
+                                {{ applicationCount }}
+                            </div>
+
+                            <button
+                                class="min-h-0 max-h-8 h-32 text-lg flex items-center font-medium text-left"
+                                [style.color]="
+                                ( type === 'ContentWriter' ||
+                                  type === 'ContentManager' ||
+                                  type === 'College') ? 'black' : 'blue'"
+                                [style.cursor]="
+                                (type === 'ContentWriter' ||
+                                type === 'ContentManager' ||
+                                type === 'College') ? 'no-drop' : 'pointer'"
+                                type="button"
+                                [disabled]="
+                                    type === 'ContentWriter' ||
+                                    type === 'ContentManager' ||
+                                    type === 'College'
+                                "
+                                routerLink="/apps/application/applicationlist"
+                            >
+                                View More
+                                <mat-icon
+                                    svgIcon="mat_solid:arrow_forward_ios"
+                                    class="ml-1 icon-size-4"
+                                    [style.color]="
+                                ( type === 'ContentWriter' ||
+                                  type === 'ContentManager' ||
+                                  type === 'College') ? 'black' : 'blue'"
+                                ></mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Statistics Section -->
+            <div class="mt-8 mb-6">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+                    <mat-icon class="mr-2 text-indigo-600">analytics</mat-icon>
+                    Advanced Statistics
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <!-- Study Abroad Card -->
+                    <div class="relative overflow-hidden rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-8 -mt-8"></div>
+                        <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-6 -mb-6"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-3">
+                                <mat-icon class="text-white/90 text-3xl">flight_takeoff</mat-icon>
+                                <span class="text-white/70 text-xs font-medium bg-white/20 px-2 py-1 rounded-full">STUDY ABROAD</span>
+                            </div>
+                            <div class="text-4xl font-bold text-white mb-1">{{ studyAbroadCount }}</div>
+                            <div class="text-white/80 text-sm">Total Enquiries</div>
+                            <button class="mt-3 text-white/90 text-xs flex items-center hover:text-white" routerLink="/apps/studyabroad/enquiries">
+                                View Details <mat-icon class="ml-1 icon-size-4">arrow_forward</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mock Tests Card -->
+                    <div class="relative overflow-hidden rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" style="background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%);">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-8 -mt-8"></div>
+                        <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-6 -mb-6"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-3">
+                                <mat-icon class="text-white/90 text-3xl">quiz</mat-icon>
+                                <span class="text-white/70 text-xs font-medium bg-white/20 px-2 py-1 rounded-full">MOCK TESTS</span>
+                            </div>
+                            <div class="text-4xl font-bold text-white mb-1">{{ mockTestsCount }}</div>
+                            <div class="text-white/80 text-sm">Active Tests</div>
+                            <button class="mt-3 text-white/90 text-xs flex items-center hover:text-white" routerLink="/apps/mocktests/testlist">
+                                View Details <mat-icon class="ml-1 icon-size-4">arrow_forward</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Test Attempts Card -->
+                    <div class="relative overflow-hidden rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" style="background: linear-gradient(135deg, #0575E6 0%, #021B79 100%);">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-8 -mt-8"></div>
+                        <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-6 -mb-6"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-3">
+                                <mat-icon class="text-white/90 text-3xl">school</mat-icon>
+                                <span class="text-white/70 text-xs font-medium bg-white/20 px-2 py-1 rounded-full">ATTEMPTS</span>
+                            </div>
+                            <div class="text-4xl font-bold text-white mb-1">{{ testAttemptsCount }}</div>
+                            <div class="text-white/80 text-sm">Test Attempts</div>
+                            <button class="mt-3 text-white/90 text-xs flex items-center hover:text-white" routerLink="/apps/mocktests/results">
+                                View Details <mat-icon class="ml-1 icon-size-4">arrow_forward</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Rank Predictor Card -->
+                    <div class="relative overflow-hidden rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" style="background: linear-gradient(135deg, #FF512F 0%, #F09819 100%);">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-8 -mt-8"></div>
+                        <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-6 -mb-6"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-3">
+                                <mat-icon class="text-white/90 text-3xl">trending_up</mat-icon>
+                                <span class="text-white/70 text-xs font-medium bg-white/20 px-2 py-1 rounded-full">PREDICTOR</span>
+                            </div>
+                            <div class="text-4xl font-bold text-white mb-1">{{ rankPredictorCount }}</div>
+                            <div class="text-white/80 text-sm">Exams Configured</div>
+                            <button class="mt-3 text-white/90 text-xs flex items-center hover:text-white" routerLink="/apps/rankpredictor/examlist">
+                                View Details <mat-icon class="ml-1 icon-size-4">arrow_forward</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Exam Alerts Card -->
+                    <div class="relative overflow-hidden rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" style="background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-8 -mt-8"></div>
+                        <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-6 -mb-6"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-3">
+                                <mat-icon class="text-white/90 text-3xl">notifications_active</mat-icon>
+                                <span class="text-white/70 text-xs font-medium bg-white/20 px-2 py-1 rounded-full">ALERTS</span>
+                            </div>
+                            <div class="text-4xl font-bold text-white mb-1">{{ alertsCount }}</div>
+                            <div class="text-white/80 text-sm">Active Alerts</div>
+                            <button class="mt-3 text-white/90 text-xs flex items-center hover:text-white" routerLink="/apps/alerts/alertlist">
+                                View Details <mat-icon class="ml-1 icon-size-4">arrow_forward</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pending Enquiries Card -->
+                    <div class="relative overflow-hidden rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" style="background: linear-gradient(135deg, #c31432 0%, #240b36 100%);">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-8 -mt-8"></div>
+                        <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-6 -mb-6"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-3">
+                                <mat-icon class="text-white/90 text-3xl">pending_actions</mat-icon>
+                                <span class="text-white/70 text-xs font-medium bg-white/20 px-2 py-1 rounded-full">PENDING</span>
+                            </div>
+                            <div class="text-4xl font-bold text-white mb-1">{{ pendingEnquiriesCount }}</div>
+                            <div class="text-white/80 text-sm">Pending Enquiries</div>
+                            <button class="mt-3 text-white/90 text-xs flex items-center hover:text-white" routerLink="/apps/studyabroad/enquiries">
+                                View Details <mat-icon class="ml-1 icon-size-4">arrow_forward</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-2 w-full min-w-0 ng-star-inserted"
+            >
+                <div
+                    class="text-center bg-card rounded-2xl shadow p-6 m-6 mx-0"
+                >
+                    <div class="flex items-start bg-gray-800 mb-1 py-2">
+                        <img
+                            src="assets/images/icons/colleges.png"
+                            class="flex self-center w-8 h-8 pl-1"
+                        />
+                        <div class="flex self-center text-white font-bold ml-2">
+                            TRENDING COLLEGE
+                        </div>
+                    </div>
+                    <table mat-table [dataSource]="usersData" matSort>
+                        <ng-container matColumnDef="srNumber">
+                            <th mat-header-cell *matHeaderCellDef class="w-12">
+                                Sr. No
+                            </th>
+                            <td
+                                mat-cell
+                                *matCellDef="let college; let i = index"
+                                class="w-12"
+                            >
+                                {{ currentPage * pageSize + i + 1 }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="title">
+                            <th
+                                mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header
+                            >
+                                Name
+                            </th>
+                            <td mat-cell *matCellDef="let college">
+                                {{ college.title }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="views">
+                            <th
+                                mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header
+                            >
+                                Views
+                            </th>
+                            <td mat-cell *matCellDef="let college">
+                                {{ college.views }}
+                            </td>
+                        </ng-container>
+                        <tr
+                            mat-header-row
+                            *matHeaderRowDef="['srNumber', 'title', 'views']"
+                        ></tr>
+                        <tr
+                            mat-row
+                            *matRowDef="
+                                let row;
+                                columns: ['srNumber', 'title', 'views']
+                            "
+                        ></tr>
+                    </table>
+                </div>
+
+                <div
+                    class="text-center bg-card rounded-2xl shadow p-6 m-6 mx-0"
+                >
+                    <div class="flex items-start bg-gray-800 mb-1 py-2">
+                        <img
+                            src="assets/images/icons/course.png"
+                            class="flex self-center w-8 h-8 pl-1"
+                        />
+                        <div class="flex self-center text-white font-bold ml-2">
+                            TRENDING COURSE
+                        </div>
+                    </div>
+
+                    <table mat-table [dataSource]="courseData" matSort>
+                        <ng-container matColumnDef="srNumber">
+                            <th mat-header-cell *matHeaderCellDef class="w-12">
+                                Sr. No
+                            </th>
+                            <td
+                                mat-cell
+                                *matCellDef="let course; let i = index"
+                                class="w-12"
+                            >
+                                {{ currentPage * pageSize + i + 1 }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="name">
+                            <th
+                                mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header
+                            >
+                                Name
+                            </th>
+                            <td mat-cell *matCellDef="let course">
+                                {{ course.name }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="views">
+                            <th
+                                mat-header-cell
+                                *matHeaderCellDef
+                                mat-sort-header
+                            >
+                                Views
+                            </th>
+                            <td mat-cell *matCellDef="let course">
+                                {{ course.views }}
+                            </td>
+                        </ng-container>
+                        <tr
+                            mat-header-row
+                            *matHeaderRowDef="['srNumber', 'name', 'views']"
+                        ></tr>
+                        <tr
+                            mat-row
+                            *matRowDef="
+                                let row;
+                                columns: ['srNumber', 'name', 'views']
+                            "
+                        ></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="text-center bg-card rounded-2xl shadow p-6 mb-6">
+                <apx-chart
+                [series]="chartOptions.series"
+                [chart]="chartOptions.chart"
+            
+                [title]="chartOptions.title"
+                [colors]="chartOptions.colors"
+                [tooltip]="chartOptions.tooltip"
+                ></apx-chart>
+            </div>
+            <!-- [xaxis]="chartOptions.xaxis" -->
+             
+            <!-- </ng-template>
+
+
+                </mat-tab>
+            </mat-tab-group> -->
+        </div>
+        <div></div>
+    </div>
+</div>

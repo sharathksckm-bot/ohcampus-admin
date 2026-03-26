@@ -1,0 +1,334 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <form [formGroup]="reviewForm" >
+                <div class=" bg-card shadow rounded-2xl">
+                    <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                        <span class="text-white font-medium" style="font-size: 17px;">Review Information</span>
+                        <button  class="rounded  bg-white" mat-stroked-button (click)="back()">Back</button>
+                    </div>
+                    <div class="grid grid-cols-1 gap-6 p-6 gap-y-0 w-full min-w-0">
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="mat_outline:message" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox" >
+                                    <div class="font-bold">Review Title</div>
+                                </div>
+                                <div class="py-2 px-5 h-8" >
+                                    <div class="font-bold">{{retriveData.title}}</div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="mat_outline:star" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="flex" >
+                                    <div class="font-bold py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox">Placements & Internship</div>
+                                    <div class="flex font-bold py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox ml-2 flex items-center">
+                                        <span class="mr-2">{{retriveData.placement_rate}}</span>
+                                        <div *ngFor="let star of numbers; let i = index">
+                                            <mat-icon *ngIf="i+1 <= retriveData.placement_rate" svgIcon="mat_outline:star" class="flex icon-size-5 text-yellow-500 min-h-0 self-center"></mat-icon>
+                                            <mat-icon *ngIf="i+1 > retriveData.placement_rate" svgIcon="mat_outline:star_outline" class="flex icon-size-5  min-h-0 self-center"></mat-icon>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="py-2 px-5 h-8" >
+                                    <div class="font-bold">{{retriveData.placement_desc}}</div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="mat_outline:star" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="flex" >
+                                    <div class="font-bold py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox">Infrastructure</div>
+                                    <div class="font-bold py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox ml-2  flex items-center">
+                                        <span class="mr-2">{{retriveData.infrastructure_rate}}</span>
+                                        <div *ngFor="let star of numbers; let i = index">
+                                            <mat-icon *ngIf="i+1 <= retriveData.infrastructure_rate" svgIcon="mat_outline:star" class="flex icon-size-5 text-yellow-500 min-h-0 self-center"></mat-icon>
+                                            <mat-icon *ngIf="i+1 > retriveData.infrastructure_rate" svgIcon="mat_outline:star_outline" class=" flex icon-size-5  min-h-0 self-center"></mat-icon>
+                                        </div>                  
+                                    </div>
+                                </div>
+                                <div class="py-2 px-5 h-8" >
+                                    <div class="font-bold">{{retriveData.infrastructure_desc}}</div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="mat_outline:star" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="flex" >
+                                    <div class="font-bold py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox">Faculty & Teaching Quality</div>
+                                    <div class="font-bold py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox ml-2  flex items-center">
+                                        <span class="mr-2">{{retriveData.faculty_rate}}</span>
+                                        <div *ngFor="let star of numbers; let i = index">
+                                            <mat-icon *ngIf="i+1 <= retriveData.faculty_rate" svgIcon="mat_outline:star" class="flex icon-size-5 text-yellow-500 min-h-0 self-center"></mat-icon>
+                                            <mat-icon *ngIf="i+1 > retriveData.faculty_rate" svgIcon="mat_outline:star_outline" class="flex icon-size-5  min-h-0 self-center"></mat-icon>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="py-2 px-5 h-8" >
+                                    <div class="font-bold">{{retriveData.faculty_desc}}</div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="mat_outline:star" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="flex" >
+                                    <div class="font-bold py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox">Hostel & Food</div>
+                                    <div class="font-bold py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox ml-2  flex items-center">
+                                        <span class="mr-2">{{retriveData.hostel_rate}}</span>
+                                        <div *ngFor="let star of numbers; let i = index">
+                                            <mat-icon *ngIf="i+1 <= retriveData.hostel_rate" svgIcon="mat_outline:star" class="flex icon-size-5 text-yellow-500 min-h-0 self-center"></mat-icon>
+                                            <mat-icon *ngIf="i+1 > retriveData.hostel_rate" svgIcon="mat_outline:star_outline" class="flex icon-size-5  min-h-0 self-center"></mat-icon>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="py-2 px-5 h-8" >
+                                    <div class="font-bold">{{retriveData.hostel_desc}}</div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="mat_outline:star" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="flex" >
+                                    <div class="font-bold py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox">Campus Life</div>
+                                    <div class="font-bold py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox ml-2  flex items-center">
+                                        <span class="mr-2">{{retriveData.campus_rate}}</span>
+                                        <div *ngFor="let star of numbers; let i = index">
+                                            <mat-icon *ngIf="i+1 <= retriveData.campus_rate" svgIcon="mat_outline:star" class="flex icon-size-5 text-yellow-500 min-h-0 self-center"></mat-icon>
+                                            <mat-icon *ngIf="i+1 > retriveData.campus_rate" svgIcon="mat_outline:star_outline" class="flex icon-size-5  min-h-0 self-center"></mat-icon>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="py-2 px-5 h-8" >
+                                    <div class="font-bold">{{retriveData.campus_desc}}</div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="mat_outline:star" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="flex" >
+                                    <div class="font-bold py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox">Value for Money</div>
+                                    <div class="font-bold py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox ml-2  flex items-center">
+                                        <span class="mr-2">{{retriveData.money_rate}}</span>
+                                        <div *ngFor="let star of numbers; let i = index">
+                                            <mat-icon *ngIf="i+1 <= retriveData.money_rate" svgIcon="mat_outline:star" class="flex icon-size-5 text-yellow-500 min-h-0 self-center"></mat-icon>
+                                            <mat-icon *ngIf="i+1 > retriveData.money_rate" svgIcon="mat_outline:star_outline" class="flex icon-size-5  min-h-0 self-center"></mat-icon>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="py-2 px-5 h-8" >
+                                    <div class="font-bold">{{retriveData.money_desc}}</div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="heroicons_outline:user-circle" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox" >
+                                    <div class="font-bold">Reviewer Name</div>
+                                </div>
+                                <div class="py-2 px-5 h-8" >
+                                    <div class="font-bold"></div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="mat_outline:email" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox" >
+                                    <div class="font-bold">Reviewer Email </div>
+                                </div>
+                                <div class="py-1 px-5  h-8" >
+                                    <div class="font-bold"></div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="mat_outline:home_work" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox" >
+                                    <div class="font-bold">College Name</div>
+                                </div>
+                                <div class="py-1 px-5" >
+                                    <div class="font-bold">{{retriveData.collegeName}}</div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="mat_outline:note" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox" >
+                                    <div class="font-bold">Course Name</div>
+                                </div>
+                                <div class="py-1 px-5" >
+                                    <div class="font-bold">{{retriveData.coursesName}}</div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="mat_outline:thumb_up" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox" >
+                                    <div class="font-bold">Likes</div>
+                                </div>
+                                <div class="py-1 px-5" >
+                                    <div class="font-bold">0</div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                        <ol>
+                            <li class="relative flex py-1">
+                            <div class="absolute  left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600"></div>
+                            <div class="relative flex flex-auto">
+                                <div class="flex shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-100">
+                                    <mat-icon svgIcon="mat_outline:thumb_down" class="success"></mat-icon>
+                            </div>
+                            <div class="flex flex-col flex-auto items-start">
+                                <div class="py-1 px-5 rounded-lg bg-gray-200 dark:bg-gray-800 msgBox" >
+                                    <div class="font-bold">Dislikes</div>
+                                </div>
+                                <div class="py-1 px-5" >
+                                    <div class="font-bold">0</div>
+                                </div>
+                            </div>
+                            </div>
+                            </li>
+                        </ol>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2  gap-6 px-6  gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Status<span class="red">*</span></mat-label>
+                                <mat-select formControlName="status">
+                                    <mat-option *ngFor="let status of status" [value]="status.id">
+                                        {{status.name}}
+                                      </mat-option>
+                                </mat-select>
+                              <mat-error *ngIf="reviewForm.get('status').hasError('required')">Please select 
+                                status</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1  gap-6 p-6 pt-0 gap-y-0 w-full min-w-0">
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded " mat-flat-button (click)="reviewUpdateStatus()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded " mat-flat-button (click)="reviewUpdateStatus()">
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    </div>   
+            </form>
+         </div>
+    </div>
+</div>
+

@@ -1,0 +1,141 @@
+<div class="add-seat-container">
+    <div class="header-section">
+        <button mat-icon-button class="back-btn" (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="title-area">
+            <h1>{{isEditMode ? 'Edit' : 'Add'}} Seat Availability</h1>
+            <p class="subtitle">{{isEditMode ? 'Update seat data' : 'Add new seat availability entry'}}</p>
+        </div>
+    </div>
+
+    <div class="loading-container" *ngIf="isLoading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading data...</p>
+    </div>
+
+    <form [formGroup]="seatForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+        <div class="form-container">
+            <!-- Basic Info -->
+            <mat-card class="form-card">
+                <mat-card-header>
+                    <mat-card-title><mat-icon>info</mat-icon> Basic Information</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="form-row">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Year</mat-label>
+                            <mat-select formControlName="year" required>
+                                <mat-option *ngFor="let year of years" [value]="year">{{year}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>State</mat-label>
+                            <mat-select formControlName="state" required>
+                                <mat-option *ngFor="let state of states" [value]="state">{{state}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>Counseling Type</mat-label>
+                            <mat-select formControlName="counseling_type" required>
+                                <mat-option *ngFor="let type of counselingTypes" [value]="type">{{type}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+            <!-- College Info -->
+            <mat-card class="form-card">
+                <mat-card-header>
+                    <mat-card-title><mat-icon>school</mat-icon> College & Course</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>College Name</mat-label>
+                            <input matInput formControlName="college_name" required>
+                        </mat-form-field>
+                    </div>
+                    <div class="form-row">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Course</mat-label>
+                            <mat-select formControlName="course" required>
+                                <mat-option *ngFor="let course of courses" [value]="course">{{course}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>Round</mat-label>
+                            <mat-select formControlName="round" required>
+                                <mat-option *ngFor="let round of rounds" [value]="round">{{round}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>Category</mat-label>
+                            <mat-select formControlName="category" required>
+                                <mat-option *ngFor="let cat of categories" [value]="cat">{{cat}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+            <!-- Seat Numbers -->
+            <mat-card class="form-card seats-card">
+                <mat-card-header>
+                    <mat-card-title><mat-icon>event_seat</mat-icon> Seat Information</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="form-row seats-row">
+                        <mat-form-field appearance="outline" class="seat-field">
+                            <mat-label>Total Seats</mat-label>
+                            <input matInput type="number" formControlName="total_seats" required min="1">
+                            <mat-hint>Total seats available</mat-hint>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="seat-field">
+                            <mat-label>Filled Seats</mat-label>
+                            <input matInput type="number" formControlName="filled_seats" required min="0">
+                            <mat-hint>Seats already allotted</mat-hint>
+                            <mat-error *ngIf="seatForm.get('filled_seats').hasError('exceedsTotal')">
+                                Cannot exceed total seats
+                            </mat-error>
+                        </mat-form-field>
+
+                        <div class="available-seats-display">
+                            <span class="label">Available Seats</span>
+                            <span class="value" [ngClass]="{'low': getAvailableSeats() <= 5}">
+                                {{getAvailableSeats()}}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Status</mat-label>
+                            <mat-select formControlName="status" required>
+                                <mat-option *ngFor="let status of statuses" [value]="status">{{status}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+            <!-- Actions -->
+            <div class="form-actions">
+                <button mat-button type="button" (click)="goBack()" [disabled]="isSubmitting">Cancel</button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="isSubmitting">
+                    <mat-spinner diameter="20" *ngIf="isSubmitting"></mat-spinner>
+                    <span *ngIf="!isSubmitting">
+                        <mat-icon>{{isEditMode ? 'save' : 'add'}}</mat-icon>
+                        {{isEditMode ? 'Update' : 'Add'}} Entry
+                    </span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

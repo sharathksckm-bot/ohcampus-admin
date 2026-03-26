@@ -1,0 +1,83 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <div class=" bg-card shadow rounded-2xl">
+                <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                    <span class="text-white font-medium" style="font-size: 17px;">Course Eligibility Form</span>
+                    <button  class="rounded bg-white" mat-stroked-button (click)="back()">Back</button>
+                </div>
+                <form [formGroup]="eligibilityForm" > 
+                    <div formArrayName="eligibility">
+                        <div *ngFor="let eligibility of eligibility().controls; let eligibilityIndex = index ">
+                            <div [formGroupName]="eligibilityIndex">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pt-6 pb-0 gap-y-0 w-full min-w-0">
+                                    <div class="hidden">
+                                        <mat-form-field class="w-full">
+                                           <input matInput formControlName="id">
+                                        </mat-form-field> 
+                                    </div>
+                                    <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-form-field class="w-full">
+                                            <mat-label>Qualification<span class="red">*</span></mat-label>
+                                            <input matInput formControlName="qualification"  (keypress)="addMember()">
+                                            <mat-error *ngIf="eligibility.get('qualification').hasError('required')">Please enter
+                                                qualification</mat-error>
+                                        </mat-form-field>
+                                    </div> 
+                                    <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-form-field class="w-full">
+                                            <mat-label>Cut-off<span class="red">*</span></mat-label>
+                                            <input matInput formControlName="cut_off"  (keypress)="addMember()">
+                                            <mat-error *ngIf="eligibility.get('cut_off').hasError('required')">Please enter
+                                                cut-off</mat-error>
+                                            </mat-form-field>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 gap-6 px-6 gap-y-0 w-full min-w-0">
+                                    <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-label class="mb-1 normallabel" >Other Eligibility</mat-label>
+                                        <angular-editor  formControlName="other_eligibility" [config]="config"></angular-editor>
+                                    </div>
+                                </div>
+                                       
+                                <button *ngIf="eligibilityIndex >= 1" class=" ml-6 mt-2" mat-icon-button  (click)="removeItem(eligibility,eligibilityIndex)"><mat-icon  class="icon-size-5 text-red-600">delete</mat-icon></button>
+                                </div>
+                            
+                            </div>
+                        </div>
+                </form>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pt-6 gap-y-0 w-full min-w-0">
+                        <div class="flex  items-center flex-auto overflow-hidden justify-start ">
+                            <button class="fuse-mat-button-rounded mr-3" mat-flat-button [color]="'primary'"  [disabled]="!showAddButton"
+                            (click)="addItem()">Add More
+                        </button>
+                        </div>
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updateEligibilityDetails()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updateEligibilityDetails()">
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                </div>
+            </div> 
+         </div>
+    </div>
+</div>

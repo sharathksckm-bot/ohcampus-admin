@@ -1,0 +1,75 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+   
+    <!-- Main -->
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+    <div class="w-full p-6 mx-auto">
+    <form [formGroup]="newCollegeType">
+    <div class=" bg-card shadow rounded-2xl">
+    <!-- <div class="flex col-span-2  text-white bg-gray-800 p-3 rounded flex-row items-center flex-auto text-lg font-semibold leading-tight tit-border">
+        <img src="../../../../../../assets/images/icons/person.png" class="w-8 h-8 p-0.5 mr-2"> College Type Form</div> -->
+        <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+            <span class="text-white font-medium" style="font-size: 17px;">College Type Form</span>
+            <button  class="rounded  bg-white" mat-stroked-button (click)="back()">Back</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pb-0 gap-y-0 w-full min-w-0">
+    
+        <div class="flex flex-col flex-auto overflow-hidden">
+            <mat-form-field class="w-full">
+                <mat-label>Type<span class="red">*</span></mat-label>
+                <input matInput formControlName="type" (keypress)="checkValidInputData($event,7)" min="3">
+                <mat-error *ngIf="newCollegeType.get('type').hasError('required')">Please enter
+                    type</mat-error>
+                <mat-error *ngIf="newCollegeType.get('type').hasError('pattern')">Enter valid
+                    type</mat-error>
+                <mat-error *ngIf="newCollegeType.get('type').hasError('minlength')">Enter minimum 3 character
+                    type</mat-error>
+            </mat-form-field>
+        </div>
+        <div class="flex flex-col flex-auto overflow-hidden">
+            <mat-form-field class="w-full">
+                <mat-label>Status<span class="red">*</span></mat-label>
+                <mat-select formControlName="status">
+                    <mat-option *ngFor="let type of status" [value]="type.id">
+                        {{type.name}}
+                      </mat-option>
+                </mat-select>
+                <mat-error *ngIf="newCollegeType.get('status').hasError('required')">Please select
+                    status</mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+        <div class="flex  items-center flex-auto overflow-hidden justify-start px-6 pb-3 ">
+            <button *ngIf="!updateButton" class="fuse-mat-button-rounded mr-3" mat-flat-button (click)="insertClgTypeDetails()">
+                <span  *ngIf="!showLoader">Submit</span>
+                <div *ngIf="showLoader" class="wrapper-loader">
+                    <img class="img-fluid"
+                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                </div>
+            </button>
+            <button *ngIf="updateButton" class="fuse-mat-button-rounded mr-3" mat-flat-button (click)="updatetClgTypeDetails()">
+                <span  *ngIf="!showLoader">Update</span>
+                <div *ngIf="showLoader" class="wrapper-loader">
+                    <img class="img-fluid"
+                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                </div>
+            </button>
+        </div>
+   
+    </div>   
+    </form>
+</div>
+</div>
+</div>
+
+
+
+

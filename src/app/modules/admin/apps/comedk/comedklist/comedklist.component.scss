@@ -1,0 +1,31 @@
+@media only screen and (max-width: 600px) {
+    .h60vh{
+        height:60vh;
+    }
+}
+.upload-btn-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: block;
+   // cursor: pointer;
+  }
+
+  .btnupload {
+    border: 1px solid #68da44;
+    color: white;
+    background-color: #88d834;
+    padding: 5px 12px;
+    font-size: 13px;
+    margin: 0px 12px 10px 6px;
+    //cursor: pointer;
+  }
+
+  .upload-btn-wrapper input[type=file] {
+    font-size: 20px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100px;
+  }

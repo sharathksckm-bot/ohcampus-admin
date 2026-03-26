@@ -1,0 +1,104 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <div class=" bg-card shadow rounded-2xl">
+                <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                    <span class="text-white font-medium" style="font-size: 17px;">College Fee Structure</span>
+                    <button  class="rounded bg-white" mat-stroked-button (click)="back()">Back</button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pb-0  gap-y-0 w-full min-w-0">
+                    <div class="flex flex-col flex-auto overflow-hidden">
+                        <!-- <mat-label class="normallabel">Fee Structure</mat-label> -->
+                    </div>
+                </div>
+                <form [formGroup]="feeStructureForm" class="bg-card">
+                    <div formArrayName="feeStructure">
+                        <div *ngFor="let feeStructure of feeStructure().controls; let feeStructureIndex = index ">
+                            <div [formGroupName]="feeStructureIndex">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 mx-6 mb-6 pt-3 gap-y-0  min-w-0 pb-0 border">
+                                    <div class="hidden">
+                                        <mat-form-field class="w-full">
+                                           <input matInput formControlName="id">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-form-field class="w-full">
+                                            <mat-label>Course</mat-label>
+                                            <mat-select formControlName="course_id" placeholder="Course" (ngModelChange)="addMember(feeStructureIndex)" >
+                                                <mat-option >
+                                                    <ngx-mat-select-search noEntriesFoundLabel="College not found, please enter valid college name"
+                                                    formControlName="searchCrsValue" placeholderLabel="search course ..." (input)="getCourseUsingClgId(feeStructureIndex)">
+                                                    </ngx-mat-select-search>
+                                                </mat-option>
+                                                <mat-option *ngFor="let item of courses" [value]="item.courseid">
+                                                    {{item.name}}
+                                                </mat-option>
+                                                <mat-option *ngIf="courses == null" value="0" >
+                                                    <span class="red">Course not found, please enter valid course name</span>
+                                                 </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="flex flex-col flex-auto overflow-hidden">
+                                            <mat-form-field class="w-full">
+                                                <mat-label class="normallabel">Details</mat-label>
+
+                                                <input matInput formControlName="details" placeholder="Fee Details"  (keyup)="addMember(feeStructureIndex)">
+                                                <mat-error *ngIf="feeStructure.get('details').hasError('required')">Please enter
+                                                    fee details</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="flex flex-col flex-auto overflow-hidden w-full">
+                                            <mat-form-field class="">
+                                                <mat-label class="normallabel">Amount</mat-label>
+                                                <input matInput formControlName="amount" placeholder="Amount" (keyup)="addMember(feeStructureIndex)" (keypress)="checkValidInputData($event,1)">
+                                                <mat-error *ngIf="feeStructure.get('amount').hasError('required')">Please enter
+                                                    amount</mat-error>
+                                            </mat-form-field>
+                                        </div>
+
+                                        <div class="flex flex-col flex-auto overflow-hidden self-center">
+                                            <button  class="ml-2" mat-icon-button  (click)="removeItem(feeStructure,feeStructureIndex)">
+                                                <mat-icon  class="icon-size-5 text-red-600">delete</mat-icon>
+                                            </button>
+                                        </div>
+                                </div>
+                            </div>
+                            </div>
+                    </div>
+                </form>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pt-0 gap-y-0 w-full min-w-0">
+                        <div class="flex  items-center flex-auto overflow-hidden justify-start ">
+                            <button class="fuse-mat-button-rounded mr-3" mat-flat-button [color]="'primary'"  [disabled]="!showAddButton"
+                            (click)="addItem()">Add More
+                        </button>
+                        </div>
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="insertUpdateFeeStructure()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="insertUpdateFeeStructure()" >
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

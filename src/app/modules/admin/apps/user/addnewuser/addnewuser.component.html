@@ -1,0 +1,228 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+   
+
+    <!-- Main -->
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <form [formGroup]="newUser" >
+                <div class=" bg-card shadow rounded-2xl">
+                    <!-- <div class="flex col-span-2  text-white bg-gray-800 p-3 rounded flex-row items-center flex-auto text-lg font-semibold leading-tight tit-border">
+                        User Form</div> -->
+                        <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                            <span class="text-white font-medium" style="font-size: 17px;">User Form</span>
+                            <button  class="rounded  bg-white" mat-stroked-button (click)="back()">Back</button>
+                        </div>
+                       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pb-0 gap-y-0 w-full min-w-0">
+                    
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>First Name<span class="red">*</span></mat-label>
+                                <input matInput formControlName="firstName" (keypress)="checkValidInputData($event,7)" min="3">
+                                <mat-error *ngIf="newUser.get('firstName').hasError('required')">Please enter
+                                    user name</mat-error>
+                                <mat-error *ngIf="newUser.get('firstName').hasError('pattern')">Enter valid
+                                     name</mat-error>
+                                <mat-error *ngIf="newUser.get('firstName').hasError('minlength')">Enter minimum 3 character
+                                    name</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Last Name<span class="red">*</span></mat-label>
+                                <input matInput formControlName="lastName" (keypress)="checkValidInputData($event,7)" min="3" >
+                                <mat-error *ngIf="newUser.get('lastName').hasError('required')">Please enter
+                                    user name</mat-error>
+                                <mat-error *ngIf="newUser.get('lastName').hasError('pattern')">Enter valid
+                                     name</mat-error>
+                                <mat-error *ngIf="newUser.get('lastName').hasError('minlength')">Enter minimum 3 character
+                                    name</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Email Address <span class="red">*</span></mat-label>
+                                <input matInput formControlName="emailAddress">
+                                <mat-error *ngIf="newUser.get('emailAddress').hasError('required')">Please
+                                    enter email address</mat-error>
+                                <mat-error *ngIf="newUser.get('emailAddress').hasError('pattern')"> Enter
+                                    valid email address</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Mobile Number <span class="red">*</span></mat-label>
+                                <input matInput formControlName="mobileNumber" minlength="10" maxlength="10" (keypress)="checkValidInputData($event,1)">
+                        <mat-error *ngIf="newUser.get('mobileNumber').hasError('required')">Please
+                            enter mobile number</mat-error>
+                        <mat-error *ngIf="newUser.get('mobileNumber').hasError('pattern')"> Enter
+                            valid mobile number</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Type<span class="red">*</span></mat-label>
+                                <mat-select formControlName="userType">
+                                    <mat-option *ngFor="let type of userTypeListData" [value]="type.id">
+                                        {{type.name}}
+                                      </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="newUser.get('userType').hasError('required')">Please select
+                                    user type</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Status<span class="red">*</span></mat-label>
+                                <mat-select formControlName="userStatus">
+                                    <mat-option *ngFor="let status of userStatusListData" [value]="status.id">
+                                        {{status.name}}
+                                      </mat-option>
+                                </mat-select>
+                              <mat-error *ngIf="newUser.get('userStatus').hasError('required')">Please select 
+                                user status</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div *ngIf="!hidePass" class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Password<span class="red">*</span></mat-label>
+                                <input matInput formControlName="password" type="password" #passwordField min="8">
+                                <button
+                                mat-icon-button
+                                type="button"
+                                (click)="passwordField.type === 'password' ? passwordField.type = 'text' : passwordField.type = 'password'"
+                                matSuffix>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    *ngIf="passwordField.type === 'password'"
+                                    [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    *ngIf="passwordField.type === 'text'"
+                                    [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
+                            </button>
+                            <mat-error *ngIf="newUser.get('password').hasError('required')">
+                                Password  is required
+                            </mat-error>
+                            <mat-error *ngIf="newUser.get('password').hasError('pattern')">
+                                Password must contain 1 upper case letter , 1 number and 1 special character
+                            </mat-error>
+                            <mat-error *ngIf="newUser.get('password').hasError('minlength')" >
+                                Password must contain more than 8 characters
+                            </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div *ngIf="!hidePass" class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Confirm Password<span class="red">*</span></mat-label>
+                                <input matInput formControlName="passwordConfirm" type="password" #passwordConfirmField>
+                                <button
+                                mat-icon-button
+                                type="button"
+                                (click)="passwordConfirmField.type === 'password' ? passwordConfirmField.type = 'text' : passwordConfirmField.type = 'password'"
+                                matSuffix>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    *ngIf="passwordConfirmField.type === 'password'"
+                                    [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    *ngIf="passwordConfirmField.type === 'text'"
+                                    [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
+                            </button>
+                            <mat-error *ngIf="newUser.get('passwordConfirm').hasError('required')">
+                                Password confirmation is required
+                            </mat-error>
+                            <mat-error *ngIf="newUser.get('passwordConfirm').hasError('mustMatch')">
+                                Passwords must match
+                            </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                        <div class="grid grid-cols-1 gap-6 px-6 py-3  gap-y-0 w-full min-w-0">
+                            <div>
+                                <span class="red">Note: Image must be in png or jpg format with dimension 200px x 300px and must be within 100kb</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pt-0 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-row items-center flex-auto overflow-hidden">
+                           
+                            <div>
+                                <input id="image-file-input1"
+                                    class="absolute h-0 w-0 opacity-0 invisible pointer-events-none bg-white"
+                                    (change)="onFileChange2($event,'userDocument',$event.target.files)"
+                                    type="file" [multiple]="false"
+                                    [accept]="'image/jpeg, image/png'" #imageFileInput1 />
+                                <label
+                                    class="flex items-center justify-center w-28 h-10 text-black rounded cursor-pointer uplodBtn"
+                                    for="image-file-input1" matRipple>
+                                    <mat-icon svgIcon="mat_outline:add_photo_alternate"
+                                        class="text-black w-4 h-4 min-w-0"></mat-icon>
+                                    <span class="ml-1 mr-1 black">Upload<span class="red">*</span></span>
+                                </label>
+                            </div>
+                            <div *ngIf="showLoader" class="wrapper-loader ml-6">
+                                <img class="img-fluid"
+                                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                            </div>  
+                            <div *ngIf="!showLoader" class="ml-4">
+                                <div class="border rounded bg-gray-50"
+                                    *ngIf="newUser.value.userDocument_FrontFilePath !=''">
+                                    <img class="position-relative shadow-sm maxwh cursorpointer cover"
+                                        style="object-fit: contain; height: 50px;"
+                                        (click)="openImgDialog(newUser.value.userDocument_FrontFilePath)"
+                                        src="{{newUser.value.userDocument_FrontFilePath}}"
+                                        accept="image" />
+                                </div>
+                            </div>
+                            </div>
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded mr-3" mat-flat-button (click)="addUser()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded mr-3" mat-flat-button (click)="updateUser()">
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    </div>   
+            </form>
+         </div>
+    </div>
+</div>
+<div class="popcenter">
+    <ng-template #callAPIDialog>
+        <div class="flex flex-auto justify-between overflow-hidden relative"
+            *ngIf="showAllDocImg == 1 && ImagedocumentType=='alldocOpenImage'">
+            <h2 matDialogTitle class="font-medium text-xl">viewImage</h2>
+        </div>
+        <div class="p-6 overflow-hidden max-w-full" style="width: 50vw;">
+            <mat-icon svgIcon="mat_outline:close"
+                style="color: red; cursor: pointer; position: absolute; z-index: 111; top: 25%; left: 74%;"
+                matDialogClose="yes" (click)="close()"></mat-icon>
+            <div class="max-w-10xl">
+                <img style="height: 270px;"
+                    class="position-relative maxwh cursorpointer" title=""
+                    src="{{image}} " accept="image" />
+            </div>
+        </div>
+    </ng-template>
+</div>
+

@@ -1,0 +1,109 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+        <div class=" bg-card shadow rounded-2xl">
+            <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                <span class="text-white font-medium" style="font-size: 17px;">College Rank</span>
+                <button  class="rounded bg-white" mat-stroked-button (click)="back()">Back</button>
+            </div>
+            <form [formGroup]="rankForm" >
+                <div formArrayName="rankArrayData">
+                    <div *ngFor="let rankArrayData of rankArrayData().controls; let rankIndex = index ">
+                        <div [formGroupName]="rankIndex">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6  gap-y-0 w-full min-w-0 pb-0">
+                                <td class="hidden">
+                                    <mat-form-field class="w-full">
+                                       <input matInput formControlName="id">
+                                    </mat-form-field>
+                                </td>
+                                <div class="flex flex-col flex-auto overflow-hidden">
+                                    <mat-form-field class="w-full">
+                                        <mat-label class="labelcss">Rank</mat-label>
+                                        <input matInput formControlName="rank" (keyup)="addMember(rankIndex)" (keypress)="checkValidInputData($event,1)">
+                                        <mat-error *ngIf="rankArrayData.get('rank').hasError('required')">Please enter
+                                            rank</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex flex-col flex-auto overflow-hidden">
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Category</mat-label>
+                                        <mat-select formControlName="category_id" (ngModelChange)="addMember(rankIndex)">
+                                            <mat-option *ngFor="let item of getCategoryListData" [value]="item.category_id">
+                                                {{item.title}}
+                                              </mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="rankArrayData.get('category_id').hasError('required')">Please select
+                                            category</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex flex-col flex-auto overflow-hidden">
+                                    <mat-form-field class="w-full">
+                                        <mat-label class="labelcss">Display Order</mat-label>
+                                        <input matInput formControlName="display_order" (keyup)="addMember(rankIndex)" (keypress)="checkValidInputData($event,1)">
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex flex-col flex-auto overflow-hidden">
+                                    <mat-form-field class="w-full">
+                                        <mat-label>Rank Year</mat-label>
+                                        <mat-select formControlName="year" (ngModelChange)="addMember(rankIndex)">
+                                            <mat-option *ngFor="let year of years" [value]="year">
+                                                {{year}}
+                                              </mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="rankArrayData.get('year').hasError('required')">Please select
+                                            Year</mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1  gap-6 px-6 gap-y-0 w-full min-w-0">
+                                <div class="flex flex-col flex-auto overflow-hidden">
+                                    <mat-label class="mb-1 normallabel" >Description</mat-label>
+                                    <angular-editor  formControlName="description" (keyup)="addMember()" [config]="config"></angular-editor>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1  gap-6 px-6 pt-1 gap-y-0 w-full min-w-0 pb-0">
+                                <div class="flex overflow-hidden justify-end">
+                                    <button *ngIf="rankIndex >= 0" class=" ml-2 " mat-icon-button  (click)="removeItem(rankArrayData,rankIndex)">
+                                        <mat-icon  class="icon-size-5 text-red-600">delete</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 gap-y-0 w-full min-w-0">
+                    <div class="flex  items-center flex-auto overflow-hidden justify-start ">
+                        <button class="fuse-mat-button-rounded mr-3" mat-flat-button [color]="'primary'"  [disabled]="!showAddButton"
+                        (click)="addItem()">Add More
+                    </button>
+                    </div>
+                    <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                        <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="insertUpdateRankdetails()">
+                            <span  *ngIf="!addLoader">Submit</span>
+                            <div *ngIf="addLoader" class="wrapper-loader">
+                                <img class="img-fluid"
+                                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                            </div>
+                        </button>
+                        <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="insertUpdateRankdetails()">
+                            <span  *ngIf="!updateLoader">Update</span>
+                            <div *ngIf="updateLoader" class="wrapper-loader">
+                                <img class="img-fluid"
+                                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                            </div>
+                        </button>
+                    </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+

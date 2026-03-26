@@ -1,0 +1,46 @@
+.mat-column-name, .mat-cell{
+    border-right: 1px solid #e2e8f0 !important;
+    border-left: 1px solid #e2e8f0 !important;
+    align-self: stretch !important;
+    text-align: center
+    }
+
+    .mat-column-position{
+    border-right: 1px solid #e2e8f0 !important;
+    border-left: 1px solid #e2e8f0 !important;
+    align-self: stretch !important;
+    text-align: center !important;
+
+    }
+    .mat-column-weight{
+    border-right: 1px solid #e2e8f0 !important;
+    border-left: 1px solid #e2e8f0 !important;
+    align-self: stretch !important;
+    text-align: center !important;
+
+}
+.active-status {
+    background-color: green !important;
+    color: white !important;
+    border-radius: 25px;
+    width: 100px;
+}
+
+.inactive-status {
+
+
+    background-color: red !important;
+    color: white !important;
+    border-radius: 25px;
+    width: 100px;
+}
+
+.other-status {
+    background-color: yellow !important;
+    color: black !important;
+    border-radius: 25px;
+    width: 100px;
+}
+
+
+

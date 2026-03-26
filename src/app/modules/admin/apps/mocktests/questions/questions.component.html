@@ -1,0 +1,226 @@
+<div class="flex flex-col flex-auto">
+    <!-- Header -->
+    <div class="flex flex-wrap items-center p-6 sm:p-8 w-full">
+        <div class="flex items-center">
+            <button mat-icon-button (click)="goBack()" class="mr-2">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <div>
+                <h2 class="text-2xl font-semibold">{{ testDetails.title || 'Mock Test' }} - Questions</h2>
+                <p class="text-sm text-gray-500">Manage questions for this test</p>
+            </div>
+        </div>
+        <div class="flex flex-wrap items-center ml-auto gap-2">
+            <button mat-stroked-button color="primary" (click)="downloadTemplate()">
+                <mat-icon class="mr-1">download</mat-icon>
+                Download Template
+            </button>
+            <button mat-stroked-button color="accent" (click)="openUploadDialog()">
+                <mat-icon class="mr-1">upload_file</mat-icon>
+                Upload Excel
+            </button>
+            <button mat-raised-button color="primary" (click)="addNewQuestion()">
+                <mat-icon class="mr-1">add</mat-icon>
+                Add Question
+            </button>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6 sm:p-8 pt-0">
+        <div class="bg-card shadow rounded-2xl">
+            <!-- Loader -->
+            <div *ngIf="listLoader" class="flex justify-center items-center p-8">
+                <mat-spinner diameter="40"></mat-spinner>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto" *ngIf="!listLoader">
+                <table mat-table [dataSource]="dataSource" class="w-full">
+
+                    <!-- Sr.No Column -->
+                    <ng-container matColumnDef="Sr.No">
+                        <th mat-header-cell *matHeaderCellDef> # </th>
+                        <td mat-cell *matCellDef="let element; let i = index"> {{ startNum + i + 1 }} </td>
+                    </ng-container>
+
+                    <!-- Question Column -->
+                    <ng-container matColumnDef="question">
+                        <th mat-header-cell *matHeaderCellDef> Question </th>
+                        <td mat-cell *matCellDef="let element" class="max-w-xs">
+                            <span [title]="element.question">{{ truncateText(element.question, 60) }}</span>
+                        </td>
+                    </ng-container>
+
+                    <!-- Option A Column -->
+                    <ng-container matColumnDef="option_a">
+                        <th mat-header-cell *matHeaderCellDef> A </th>
+                        <td mat-cell *matCellDef="let element"> {{ truncateText(element.option_a, 20) }} </td>
+                    </ng-container>
+
+                    <!-- Option B Column -->
+                    <ng-container matColumnDef="option_b">
+                        <th mat-header-cell *matHeaderCellDef> B </th>
+                        <td mat-cell *matCellDef="let element"> {{ truncateText(element.option_b, 20) }} </td>
+                    </ng-container>
+
+                    <!-- Option C Column -->
+                    <ng-container matColumnDef="option_c">
+                        <th mat-header-cell *matHeaderCellDef> C </th>
+                        <td mat-cell *matCellDef="let element"> {{ truncateText(element.option_c, 20) }} </td>
+                    </ng-container>
+
+                    <!-- Option D Column -->
+                    <ng-container matColumnDef="option_d">
+                        <th mat-header-cell *matHeaderCellDef> D </th>
+                        <td mat-cell *matCellDef="let element"> {{ truncateText(element.option_d, 20) }} </td>
+                    </ng-container>
+
+                    <!-- Correct Answer Column -->
+                    <ng-container matColumnDef="correct_answer">
+                        <th mat-header-cell *matHeaderCellDef> Answer </th>
+                        <td mat-cell *matCellDef="let element">
+                            <span class="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
+                                {{ element.correct_answer || '-' }}
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <!-- Marks Column -->
+                    <ng-container matColumnDef="marks">
+                        <th mat-header-cell *matHeaderCellDef> Marks </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.marks || 4 }} </td>
+                    </ng-container>
+
+                    <!-- Actions Column -->
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef> Actions </th>
+                        <td mat-cell *matCellDef="let element">
+                            <button mat-icon-button color="primary" matTooltip="Edit Question" (click)="editQuestion(element)">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button color="warn" matTooltip="Delete" (click)="deleteQuestion(element.id)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                    <!-- No Data Row -->
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell text-center p-4" [attr.colspan]="displayedColumns.length">
+                            No questions found. Click "Add Question" or "Upload Excel" to add questions.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Paginator -->
+            <mat-paginator [length]="recordsTotal" [pageSize]="pageSize" [pageSizeOptions]="[10, 25, 50, 100]" (page)="onPageChange($event)" showFirstLastButtons></mat-paginator>
+        </div>
+    </div>
+</div>
+
+<!-- Edit/Add Question Dialog -->
+<ng-template #editQuestionDialog>
+    <h2 mat-dialog-title>{{ currentQuestionId ? 'Edit Question' : 'Add New Question' }}</h2>
+    <mat-dialog-content>
+        <form [formGroup]="editForm" class="grid grid-cols-2 gap-4">
+            <mat-form-field class="col-span-2" appearance="outline">
+                <mat-label>Question</mat-label>
+                <textarea matInput formControlName="question" rows="3" placeholder="Enter the question"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Option A</mat-label>
+                <input matInput formControlName="option_a" placeholder="Option A">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Option B</mat-label>
+                <input matInput formControlName="option_b" placeholder="Option B">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Option C</mat-label>
+                <input matInput formControlName="option_c" placeholder="Option C">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Option D</mat-label>
+                <input matInput formControlName="option_d" placeholder="Option D">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Correct Answer</mat-label>
+                <mat-select formControlName="correct_answer">
+                    <mat-option *ngFor="let ans of correctAnswers" [value]="ans.id">{{ ans.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Marks</mat-label>
+                <input matInput type="number" formControlName="marks">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Subject</mat-label>
+                <input matInput formControlName="subject" placeholder="e.g. Physics, Chemistry">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Topic</mat-label>
+                <input matInput formControlName="topic" placeholder="e.g. Mechanics, Organic">
+            </mat-form-field>
+
+            <mat-form-field class="col-span-2" appearance="outline">
+                <mat-label>Explanation</mat-label>
+                <textarea matInput formControlName="explanation" rows="2" placeholder="Explanation for the answer"></textarea>
+            </mat-form-field>
+        </form>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="close()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="saveQuestion()" [disabled]="editLoader">
+            <mat-spinner *ngIf="editLoader" diameter="20" class="mr-2"></mat-spinner>
+            {{ currentQuestionId ? 'Update' : 'Add' }}
+        </button>
+    </mat-dialog-actions>
+</ng-template>
+
+<!-- Upload Excel Dialog -->
+<ng-template #uploadDialog>
+    <h2 mat-dialog-title>Upload Questions (Excel)</h2>
+    <mat-dialog-content>
+        <div class="mb-4">
+            <p class="text-sm text-gray-600 mb-2">Upload an Excel file with the following columns:</p>
+            <ul class="text-sm text-gray-500 list-disc list-inside mb-4">
+                <li><strong>Question</strong> - The question text</li>
+                <li><strong>Option A, B, C, D</strong> - Four options</li>
+                <li><strong>Correct Answer</strong> - A, B, C, or D</li>
+                <li><strong>Marks</strong> - Marks for correct answer</li>
+                <li><strong>Negative Marks</strong> - Marks deducted for wrong answer</li>
+                <li><strong>Subject, Topic</strong> - Optional categorization</li>
+                <li><strong>Explanation</strong> - Optional explanation</li>
+            </ul>
+        </div>
+        
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <input type="file" #fileInput accept=".xlsx,.xls" (change)="onFileSelected($event)" class="hidden">
+            <button mat-stroked-button (click)="fileInput.click()">
+                <mat-icon class="mr-2">cloud_upload</mat-icon>
+                {{ selectedFile ? selectedFile.name : 'Select Excel File' }}
+            </button>
+            <p class="text-xs text-gray-500 mt-2" *ngIf="selectedFile">{{ (selectedFile.size / 1024).toFixed(2) }} KB</p>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="close()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="uploadExcel()" [disabled]="uploadLoader || !selectedFile">
+            <mat-spinner *ngIf="uploadLoader" diameter="20" class="mr-2"></mat-spinner>
+            Upload
+        </button>
+    </mat-dialog-actions>
+</ng-template>

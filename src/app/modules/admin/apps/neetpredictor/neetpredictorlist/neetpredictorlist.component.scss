@@ -1,0 +1,78 @@
+// Badge styles
+.year-badge {
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.counseling-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+
+    &.state-quota {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    &.aiq {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    &.deemed {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+}
+
+.course-badge {
+    background: #fce4ec;
+    color: #c2185b;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.category-badge {
+    background: #e0f2f1;
+    color: #00695c;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.type-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+
+    &.govt-badge {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    &.private-badge {
+        background: #fce4ec;
+        color: #c2185b;
+    }
+}
+
+// Table
+table {
+    width: 100%;
+}
+
+// Wrapper loader
+.wrapper-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

@@ -1,0 +1,37 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div  class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+                <div class=" bg-card shadow rounded-2xl">
+                    <div class=" flex  pt-2 px-6" style="align-items: center;">
+                        <span class="font-bold text-4xl" >{{this.course_data.name}}</span>
+                    </div>
+                    <!-- <div class=" flex flex-wrap py-2 px-6">
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(0), 'bg-warm': !isSelected(0), 'text-black': isSelected(0)}" mat-stroked-button (click)="indexNumber(0)" [disabled]="indexNum != 0"><mat-icon svgIcon="mat_outline:highlight" class="mr-1"></mat-icon>Highlight</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(1), 'bg-warm': !isSelected(1), 'text-black': isSelected(1)}" mat-stroked-button (click)="indexNumber(1)" [disabled]="indexNum != 1"><mat-icon svgIcon="mat_outline:check" class="mr-1"></mat-icon>Eligibility</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(2), 'bg-warm': !isSelected(2), 'text-black': isSelected(2)}" mat-stroked-button (click)="indexNumber(2)" [disabled]="indexNum != 2"><mat-icon svgIcon="mat_outline:edit" class="mr-1"></mat-icon>Enterance Exam</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(3), 'bg-warm': !isSelected(3), 'text-black': isSelected(3)}" mat-stroked-button (click)="indexNumber(3)" [disabled]="indexNum != 3"><mat-icon svgIcon="mat_outline:featured_play_list" class="mr-1"></mat-icon>Placement</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(4), 'bg-warm': !isSelected(4), 'text-black': isSelected(4)}" mat-stroked-button (click)="indexNumber(4)" [disabled]="indexNum != 4"><mat-icon svgIcon="mat_outline:menu_book" class="mr-1"></mat-icon>Broucher</button>
+                    </div> -->
+                    <div class=" flex flex-wrap py-2 px-6">
+                        <button  class="rounded m-2 ml-0" [ngClass]="{'bg-blue-300': isSelected(0), 'bg-warm': !isSelected(0), 'text-black': isSelected(0)}" mat-stroked-button (click)="indexNumber(0)" ><mat-icon svgIcon="mat_outline:highlight" class="mr-1"></mat-icon>Highlight</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(1), 'bg-warm': !isSelected(1), 'text-black': isSelected(1)}" mat-stroked-button (click)="indexNumber(1)" ><mat-icon svgIcon="mat_outline:check" class="mr-1"></mat-icon>Eligibility</button>
+                        <!-- <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(2), 'bg-warm': !isSelected(2), 'text-black': isSelected(2)}" mat-stroked-button (click)="indexNumber(2)" ><mat-icon svgIcon="mat_outline:edit" class="mr-1"></mat-icon>Entrance Exam</button> -->
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(2), 'bg-warm': !isSelected(2), 'text-black': isSelected(2)}" mat-stroked-button (click)="indexNumber(2)" ><mat-icon svgIcon="mat_outline:featured_play_list" class="mr-1"></mat-icon>Placement</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(3), 'bg-warm': !isSelected(3), 'text-black': isSelected(3)}" mat-stroked-button (click)="indexNumber(3)" ><mat-icon svgIcon="mat_outline:menu_book" class="mr-1"></mat-icon>Brochure</button>
+                    </div>
+                    <div *ngIf="!getData" class="wrapper-loader mx-auto mt-6">
+                        <img class="wrapper-loader mx-auto"
+                            style="width: 100px; margin-left: auto; margin-right: auto;"
+                            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                    </div>
+                    <div *ngIf="getData">
+                        <app-coursehighlight [courseDetails]="course_data" (valueChanged)="onValueChanged($event)" *ngIf="indexNum == 0"></app-coursehighlight>
+                        <app-courseeligibility [courseDetails]="course_data" (valueChanged)="onValueChanged($event)"  *ngIf="indexNum == 1" ></app-courseeligibility>
+                        <!-- <app-enteranceexam [courseDetails]="course_data"  (valueChanged)="onValueChanged($event)"  *ngIf="indexNum == 2" ></app-enteranceexam> -->
+                        <app-courseplacement [courseDetails]="course_data"  (valueChanged)="onValueChanged($event)"  *ngIf="indexNum == 2" ></app-courseplacement>
+                        <app-coursebroucher [courseDetails]="course_data"   (valueChanged)="onValueChanged($event)"  *ngIf="indexNum == 3" ></app-coursebroucher>
+                    </div>
+                </div>
+         </div>
+    </div>
+</div>

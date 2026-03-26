@@ -1,0 +1,263 @@
+<div class="flex flex-col flex-auto min-w-0">
+  <!-- Loader Section -->
+  <div *ngIf="Loader" class="wrapper-loader mx-auto mt-6">
+    <img class="w-30 rounded-full mx-auto" src="assets/images/icons/page_loader_default5.gif" alt="Loading..."
+      style="width: 100px;" />
+  </div>
+
+  <!-- Main Form Section -->
+  <div *ngIf="!Loader" class="flex-auto">
+    <div class="w-full p-6 mx-auto">
+      <div class="bg-card shadow rounded-2xl">
+        <div class="flex justify-between bg-gray-800 p-2 px-6 items-center">
+          <span class="text-white font-medium" style="font-size: 17px;">Entrance Exam</span>
+          <button class="rounded bg-white" mat-stroked-button (click)="back()">Back</button>
+        </div>
+
+        <form [formGroup]="examForm">
+          <div class="border m-6 mb-0">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 gap-y-6">
+              <div class="flex flex-col flex-auto overflow-hidden">
+                <mat-form-field class="w-full">
+                  <mat-label>Subcategory <span class="red">*</span></mat-label>
+                  <mat-select formControlName="subcat" aria-placeholder="please select category.."
+                    (selectionChange)="getExamsList($event.value)">
+                    <mat-option *ngFor="let item of subcatlist" [value]="item.id">
+                      {{ item.name }} ({{ item.catname }})
+                    </mat-option>
+                    <mat-option *ngIf="subcatlist == null" value="0">
+                      <span class="red">Exam not found, please enter valid exam</span>
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+
+              <div class="flex flex-col flex-auto overflow-hidden">
+                <mat-form-field class="w-full">
+                  <mat-label>Exams <span class="red">*</span></mat-label>
+
+
+
+                  <mat-select multiple formControlName="examids" (selectionChange)="onExamSelect($event.value)">
+                    <mat-option>
+                    <ngx-mat-select-search noEntriesFoundLabel="Exam not found, please enter valid exam name" [formControl]="searchControl"
+                      placeholderLabel="Search Exams..." (keyup)="searchExams()"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let item of filteredExams" [value]="item.exams_id">
+                      {{ item.title }}
+                    </mat-option>
+                  </mat-select>
+
+                  <div *ngIf="isLoading" class="wrapper-loader">
+                    <img class="img-fluid" style="width: 30px; margin: auto;"
+                      src="assets/images/icons/page_loader_default5.gif" alt="Loading..." />
+                  </div>
+
+                  <mat-error *ngIf="examForm.get('examids').hasError('required')">Please select Exams</mat-error>
+                </mat-form-field>
+                <div *ngIf="selectTakeExam.length !== 0" class="rounded-lg bg-gray-200 p-6 mt-6">
+                  <mat-label class="font-bold">Selected Exams :</mat-label>
+                  <div class="flex flex-col" *ngFor="let item of selectTakeExam; let i = index">
+                    <mat-label class="flex items-center justify-between">
+                      {{ i + 1 }}: {{ item.title }}
+                      <div class="flex">
+                        <mat-icon class="icon-size-5 text-red-500 ml-5" svgIcon="mat_outline:close"
+                          (click)="removeTakeExam(i, item.exams_id)" matTooltip="Remove Exam"
+                          matTooltipPosition="above"></mat-icon>
+                      </div>
+                    </mat-label>
+                  </div>
+                </div>
+
+              </div>
+
+
+
+
+            </div>
+          </div>
+        </form>
+
+        <!-- Submit Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 gap-y-0 w-full min-w-0">
+          <div class="flex items-center flex-auto overflow-hidden justify-start">
+          </div>
+          <div class="flex items-center flex-auto overflow-hidden justify-end">
+            <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="addExamdetails()">
+              <span *ngIf="!addLoader">Submit</span>
+              <div *ngIf="addLoader" class="wrapper-loader">
+                <img class="img-fluid" style="width: 30px; margin: auto;"
+                  src="assets/images/icons/page_loader_default5.gif" alt="Loading..." />
+              </div>
+            </button>
+            <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="addExamdetails()">
+              <span *ngIf="!updateLoader">Submit</span>
+              <div *ngIf="updateLoader" class="wrapper-loader">
+                <img class="img-fluid" style="width: 30px; margin: auto;"
+                  src="assets/images/icons/page_loader_default5.gif" alt="Loading..." />
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selected Subcategories and Exams Section -->
+  <div class="w-full p-6 mx-auto mt-1">
+    <div class="bg-card shadow rounded-2xl p-6">
+      <div class="flex justify-between bg-gray-800 p-2 px-6">
+        <span class="text-lg font-medium text-white" style="font-size: 17px;">Selected Subcategories and Exams</span>
+      </div>
+
+      <!-- Table to Display Selected Exams and Subcategories -->
+      <table class="min-w-full mt-4" *ngIf="!tblLoader">
+        <thead>
+          <tr class="border-b">
+            <th class="px-6 py-3 text-left text-sm font-medium text-dark-600">Subcategory</th>
+            <th class="px-6 py-3 text-left text-sm font-medium text-dark-600">Exams</th>
+            <th class="px-6 py-3 text-left text-sm font-medium text-dark-600">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="border-b">
+          <tr *ngFor="let item of staticData;" class="border-b">
+            <td class="px-6 py-3 text-left text-sm font-medium text-gray-600" style="border: 1px solid #e2e8f0 !important;">
+              {{ item.sub_categoryname }} ({{item.catname}})
+            </td>
+            <td class="px-6 py-3 text-left text-sm font-medium text-gray-600" style="border: 1px solid #e2e8f0 !important;">
+              {{ item.exams }}
+            </td>
+            <td class="px-6 py-3 text-left text-sm font-medium text-gray-600 flex">
+              <button mat-icon-button (click)="editItem( item.categoryid)">
+                <mat-icon class="text-blue-600">edit</mat-icon>
+              </button>
+              <button mat-icon-button (click)="deleteItem(item.categoryid)">
+                <mat-icon class="text-red-600">delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="tblLoader" class="wrapper-loader mx-auto mt-6">
+        <img class="w-30 rounded-full mx-auto" src="assets/images/icons/page_loader_default5.gif" alt="Loading..."
+          style="width: 100px;" />
+      </div>
+      <!-- <div *ngIf="staticData.length == 0" class="wrapper-loader mx-auto mt-6">
+        <h3>NO Data Found</h3>
+      </div> -->
+
+    </div>
+
+  </div>
+</div>
+
+
+<div class="popcenter">
+  <ng-template #callAPIDialog let-data="data" style="padding-top: 45px">
+    
+
+
+    <div class="flex flex-col justify-between items-center p-4 bg-black rounded-t-2xl"
+      style="max-height: 90vh; width: 50vw; position:relative">
+      <mat-icon svgIcon="mat_outline:close"
+        style="color: red; cursor: pointer; position: absolute; z-index: 111; top: -25px; right: 2px"
+        matDialogClose="yes" (click)="close()"></mat-icon>
+      <span class="text-white font-semibold text-lg">Update Entrance Exam </span>
+    </div>
+
+
+
+
+
+    <div *ngIf="editLoader" class="wrapper-loader mx-auto mt-6">
+
+      <img class="w-30 rounded-full mx-auto" src="assets/images/icons/page_loader_default5.gif" alt="Loading..."
+        style="width: 100px;" />
+    </div>
+
+    <div class="w-full p-8 mx-auto" *ngIf="!editLoader">
+      <form [formGroup]="subcatExamForm">
+        <div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 gap-y-6">
+            <!-- Subcategory Selection -->
+            <div class="flex flex-col flex-auto overflow-hidden">
+              <mat-form-field class="w-full">
+                <mat-label>Subcategory <span class="red">*</span></mat-label>
+                <mat-select formControlName="subcat" aria-placeholder="please select category.."
+                  (selectionChange)="getExamsList($event.value)" disabled="true">
+                  <mat-option *ngFor="let item of subcatlist" [value]="item.id">
+                    {{ item.name }} ({{ item.catname }})
+                  </mat-option>
+                  <mat-option *ngIf="subcatlist == null" value="0">
+                    <span class="red">Exam not found, please enter valid exam</span>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="flex flex-col flex-auto overflow-hidden">
+              <mat-form-field class="w-full">
+                <mat-label>Exams <span class="red">*</span></mat-label>
+
+
+
+                <mat-select multiple formControlName="examids" (selectionChange)="onExamUpdateSelect($event.value)">
+                  <ngx-mat-select-search [formControl]="searchControl1"
+                    placeholderLabel="Search Exams..."></ngx-mat-select-search>
+                  <mat-option *ngFor="let item of filteredExams" [value]="item.exams_id">
+                    {{ item.title }}
+                  </mat-option>
+                </mat-select>
+                <!-- <div *ngIf="!isLoading" class="wrapper-loader">
+                  <img class="img-fluid" style="width: 30px; margin: auto;"
+                    src="assets/images/icons/page_loader_default5.gif" alt="Loading..." />
+                </div> -->
+                <mat-error *ngIf="examForm.get('examids').hasError('required')">Please select Exams</mat-error>
+              </mat-form-field>
+
+              <div *ngIf="selectUpadteTakeExam.length !== 0" class="rounded-lg bg-gray-200 p-6 mt-6">
+                <mat-label class="font-bold">Selected Exams :</mat-label>
+                <div class="flex flex-col" *ngFor="let item of selectUpadteTakeExam; let i = index">
+                  <mat-label class="flex items-center justify-between">
+                    {{ i + 1 }}: {{ item.title }}
+                    <div class="flex">
+                      <mat-icon class="icon-size-5 text-red-500 ml-5" svgIcon="mat_outline:close"
+                        (click)="removeUpdateTakeExam(i, item.exams_id)" matTooltip="Remove Exam"
+                        matTooltipPosition="above"></mat-icon>
+                    </div>
+                  </mat-label>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 gap-y-0 w-full min-w-0">
+            <div class="flex items-center flex-auto overflow-hidden justify-start">
+            </div>
+            <div class="flex items-center flex-auto overflow-hidden justify-end">
+              <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updateExamDetails()">
+                <span *ngIf="!addLoader">Update</span>
+                <div *ngIf="addLoader" class="wrapper-loader">
+                  <img class="img-fluid" style="width: 30px; margin: auto;"
+                    src="assets/images/icons/page_loader_default5.gif" alt="Loading..." />
+                </div>
+              </button>
+              <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updateExamDetails()">
+                <span *ngIf="!updateLoader">Update</span>
+                <div *ngIf="updateLoader" class="wrapper-loader">
+                  <img class="img-fluid" style="width: 30px; margin: auto;"
+                    src="assets/images/icons/page_loader_default5.gif" alt="Loading..." />
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+     
+    </div>
+    
+  </ng-template>
+</div>

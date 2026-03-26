@@ -1,0 +1,142 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader" class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto" style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <form [formGroup]="comedkForm">
+                <div class=" bg-card shadow rounded-2xl">
+                    <div class=" flex justify-between  bg-gray-800 p-1 px-6" style="align-items: center;">
+                        <span class="text-white font-medium" style="font-size: 17px;">COMEDK CutOff</span>
+                        <button class="rounded bg-white" mat-stroked-button (click)="back()">Back</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-3 pb-0 gap-y-0 w-full min-w-0 ">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>College<span class="red">*</span></mat-label>
+                                <mat-select formControlName="collegeid" (ngModelChange)="getCollegeCourses(id)">
+                                    <mat-option>
+                                        <ngx-mat-select-search class="dropsearch m-1"
+                                            noEntriesFoundLabel="College not found, please enter valid college name"
+                                            formControlName="search" placeholderLabel="search college name here..."
+                                            (input)="searchValue($event.target.value)">
+                                        </ngx-mat-select-search>
+                                    </mat-option>
+                                    <mat-option *ngFor="let item of collegeListData" [value]="item.id">
+                                        {{item.title}}
+                                    </mat-option>
+                                    <mat-option *ngIf="collegeListData == null" value="0">
+                                        <span class="red">College not found, please enter valid college name</span>
+                                    </mat-option>
+                                </mat-select>
+                                <div *ngIf="stateLoader1" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                                <mat-error *ngIf="comedkForm.get('collegeid').hasError('required')">Please select
+                                    college</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Course</mat-label>
+                                <mat-select formControlName="course">
+                                    <mat-option *ngFor="let item of collegecourseListData" [value]="item.courseid">
+                                        {{ item.coursename }}
+                                    </mat-option>
+                                </mat-select>
+                                <div *ngIf="subLoader2" class="wrapper-loader ml-6">
+                                    <img class="img-fluid" style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt=""
+                                        class="w30 rounded-full" />
+                                </div>
+                                <!-- <mat-error *ngIf="comedkForm.get('course').hasError('required')">Please select course</mat-error> -->
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Category</mat-label>
+                                <mat-select formControlName="category">
+                                    <!-- Static options -->
+                                    <mat-option value="KKR">KKR</mat-option>
+                                    <mat-option value="GM">GM</mat-option>
+                                </mat-select>
+                                <!-- Display error message if 'rounded' field is required -->
+                                <mat-error *ngIf="comedkForm.get('category').hasError('required')">Please select
+                                    category</mat-error>
+                            </mat-form-field>
+                        </div>
+
+
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Round</mat-label>
+                                <mat-select formControlName="rounded">
+                                    <!-- Static options -->
+                                    <mat-option value="1">Round 1</mat-option>
+                                    <mat-option value="2">Round 2</mat-option>
+                                    <mat-option value="3">Round 3</mat-option>
+
+                                </mat-select>
+                                <!-- Display error message if 'rounded' field is required -->
+                                <mat-error *ngIf="comedkForm.get('rounded').hasError('required')">Please select
+                                    rounded</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label> Year </mat-label>
+                                <mat-select formControlName="year">
+                                    <mat-option *ngFor="let year of years" [value]="year">
+                                        {{ year }}
+                                    </mat-option>
+                                </mat-select>
+                                <div *ngIf="subLoader3" class="wrapper-loader ml-6">
+                                    <img class="img-fluid" style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt=""
+                                        class="w30 rounded-full" />
+                                </div>
+                                <mat-error *ngIf="comedkForm.get('year').hasError('required')">Please select
+                                    year</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                                <mat-form-field class="w-full">
+                                    <mat-label>Rank<span class="red">*</span></mat-label>
+                                    <input matInput formControlName="rank" (keypress)="checkValidInputData($event,1)">
+                                     <mat-error *ngIf="comedkForm.get('rank').hasError('required')">Please enter Rank</mat-error>
+                             </mat-form-field>
+                           </div>
+                        </div>
+                    <div class="grid grid-cols-1 gap-6 p-8 pt-6 gap-y-0 w-full min-w-0">
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button
+                                (click)="summittableDetails()">
+                                <span *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid" style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt=""
+                                        class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button
+                                (click)="updatetableDetails()">
+                                <span *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid" style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt=""
+                                        class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

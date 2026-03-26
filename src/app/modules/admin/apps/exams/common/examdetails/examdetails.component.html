@@ -1,0 +1,205 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <form [formGroup]="examForm" >
+                <div class=" bg-card shadow rounded-2xl">
+                        <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                            <span class="text-white font-medium" style="font-size: 17px;">Exam Form</span>
+                            <button  class="rounded  bg-white" mat-stroked-button (click)="back()">Back</button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pb-0 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Name<span class="red">*</span></mat-label>
+                                <input matInput formControlName="name"  min="3">
+                                <mat-error *ngIf="examForm.get('name').hasError('required')">Please enter
+                                    name</mat-error>
+                                <mat-error *ngIf="examForm.get('name').hasError('minlength')">Enter minimum 3 character
+                                    name</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Category Type<span class="red">*</span></mat-label>
+                                <mat-select multiple formControlName="category" (selectionChange)="changeSelection(examForm.value.category,'category')">
+                                    <mat-option *ngFor="let type of categoryList" [value]="type">
+                                        {{type.catname}}
+                                      </mat-option>
+                                      <mat-option *ngIf="categoryList == undefined">
+                                        <span class="red">Please select content Category List</span>
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="examForm.get('category').hasError('required')">Please select
+                                    category type</mat-error>
+                            </mat-form-field>
+                            <div *ngIf="selectedContent?.length != 0" class="rounded-lg bg-gray-200 p-6 mb-2">
+                                <mat-label class="font-bold">Selected Category :</mat-label>
+                                <div class="flex flex-col flex-auto overflow-hidden"  *ngFor="let item of selectedContent; let i = index"  >
+                                    <mat-label  class="flex items-center  justify-between">{{i+1}} :  {{item.catname}}
+                                    <div  class="flex">
+                                        <mat-icon class="icon-size-5 text-red-500 ml-5" svgIcon="mat_outline:close" (click)="removeCategory(i , item.id,'category')"  matTooltip="Remove Category" matTooltipPosition="above"></mat-icon>
+                                    </div>
+                                    </mat-label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Status<span class="red">*</span></mat-label>
+                                <mat-select formControlName="status">
+                                    <mat-option *ngFor="let status of status" [value]="status.id">
+                                        {{status.name}}
+                                      </mat-option>
+                                </mat-select>
+                              <mat-error *ngIf="examForm.get('status').hasError('required')">Please select
+                                exam status</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Course<span class="red">*</span></mat-label>
+                                <mat-select formControlName="courseLevel" >
+                                    <mat-option *ngFor="let course of courseList" [value]="course.category_id">
+                                        {{ course.name }}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="examForm.get('courseLevel').hasError('required')">
+                                    Please select course level
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        
+
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Exam Level<span class="red">*</span></mat-label>
+                                <mat-select formControlName="examLevel" (selectionChange)="changeExam($event.value)">
+                                    <mat-option *ngFor="let exam of examList" [value]="exam.id" >
+                                        {{exam.name}}
+                                      </mat-option>
+                                </mat-select>
+                              <mat-error *ngIf="examForm.get('examLevel').hasError('required')">Please select
+                                exam level</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex flex-col flex-auto overflow-hidden" *ngIf="examForm.value.examLevel == 1">
+                            <mat-form-field class="w-full">
+                                <mat-label>State<span class="red">*</span></mat-label>
+                                <mat-select multiple formControlName="state" (selectionChange)="changeSelection(examForm.value.state,'state')">
+                                    <mat-option *ngFor="let state of stateList" [value]="state">
+                                        {{state.statename}}
+                                      </mat-option>
+                                </mat-select>
+                              <mat-error *ngIf="examForm.get('state').hasError('required')">Please select
+                                state</mat-error>
+                            </mat-form-field>
+                            <div *ngIf="stateSelectedContent?.length != 0"
+                            class="rounded-lg bg-gray-200 p-6 mb-2">
+                                <mat-label class="font-bold">Selected States :</mat-label>
+                                <div class="flex flex-col flex-auto overflow-hidden" *ngFor="let item of stateSelectedContent; let i = index">
+                                     <mat-label class="flex items-center justify-between">{{i+1}} :  {{item.statename}}
+                                        <div class="flex">
+                                              <mat-icon class="icon-size-5 text-red-500 ml-5" svgIcon="mat_outline:close" (click)="removeCategory(i,item.id,'state')" matTooltip="Remove Category" matTooltipPosition="above"></mat-icon>
+                                        </div>
+                                     </mat-label>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="example-full-width">
+                                <mat-label class="labelcss">From Date</mat-label>
+                                <input matInput [matDatepicker]="date" (dateChange)="fromDateChange($event)"
+                                    (focus)="date.open()" formControlName="fromdate"
+                                    [min]="eventMinDate"
+                                    [max]="eventMaxDate">
+                                <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                                <mat-datepicker #date></mat-datepicker>
+                                <mat-error *ngIf="examForm.get('fromdate').hasError('required')">Please enter from
+                                    date</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="example-full-width">
+                                <mat-label class="labelcss">To Date</mat-label>
+                                <input matInput [matDatepicker]="date2" (focus)="date2.open()" formControlName="todate"
+                                [min]="eventMinDate"
+                                [max]="eventMaxDate">
+                                <mat-datepicker-toggle matSuffix [for]="date2"></mat-datepicker-toggle>
+                                <mat-datepicker #date2></mat-datepicker>
+                                <mat-error *ngIf="examForm.get('todate').hasError('required')">Please enter to
+                                    date</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden my-7">
+                            <mat-checkbox formControlName="menu" (change)="updateTopMenuValue($event)">
+                              <mat-label>Top Menu</mat-label>
+                            </mat-checkbox>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1  gap-6 px-6 pb-3 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-label class="mb-1 normallabel" >Criteria<span class="red">*</span></mat-label>
+                            <angular-editor  formControlName="criteria" [config]="config"></angular-editor>
+                        </div>
+                    </div> <div class="grid grid-cols-1  gap-6 px-6 pb-3 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-label class="mb-1 normallabel" >Process<span class="red">*</span></mat-label>
+                            <angular-editor  formControlName="process" [config]="config"></angular-editor>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1  gap-6 px-6 pb-3 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-label class="mb-1 normallabel" >Pattern<span class="red">*</span></mat-label>
+                            <angular-editor  formControlName="pattern" [config]="config"></angular-editor>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1  gap-6 px-6  pb-3 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-label class="mb-1 normallabel" >Notification<span class="red">*</span></mat-label>
+                            <angular-editor  formControlName="notification" [config]="config"></angular-editor>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1  gap-6 px-6 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-label class="mb-1 normallabel">Description<span class="red">*</span></mat-label>
+                            <angular-editor  formControlName="description" [config]="config"></angular-editor>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-6 p-6 gap-y-0 w-full min-w-0">
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="insertExamDetails()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updateExamDetails()">
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+            </form>
+         </div>
+    </div>
+</div>
+
+

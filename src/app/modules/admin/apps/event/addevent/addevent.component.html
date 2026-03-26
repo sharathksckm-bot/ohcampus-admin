@@ -1,0 +1,23 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div  class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+                <div class=" bg-card shadow rounded-2xl">
+                    <div class=" flex flex-wrap py-2 px-6">
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(0), 'bg-warm': !isSelected(0), 'text-black': isSelected(0)}" mat-stroked-button (click)="indexNumber(0)" ><mat-icon svgIcon="mat_outline:edit" class="mr-1"></mat-icon>Details</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(1), 'bg-warm': !isSelected(1), 'text-black': isSelected(1)}" mat-stroked-button (click)="indexNumber(1)" ><mat-icon svgIcon="mat_outline:image" class="mr-1"></mat-icon>Images</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(2), 'bg-warm': !isSelected(2), 'text-black': isSelected(2)}" mat-stroked-button (click)="indexNumber(2)" ><mat-icon svgIcon="mat_outline:category" class="mr-1"></mat-icon>Category</button>
+                    </div>
+                        <div *ngIf="!getData" class="wrapper-loader mx-auto mt-6">
+                            <img class="wrapper-loader mx-auto"
+                                style="width: 100px; margin-left: auto; margin-right: auto;"
+                                src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                        </div>
+                        <div *ngIf="getData">
+                            <app-eventdetails [eventDetails]="Event_data" (valueChanged)="onValueChanged($event)" *ngIf="indexNum == 0"></app-eventdetails>
+                            <app-eventimages [eventDetails]="Event_data"  [imageDetails]="image_data" (valueChanged)="onValueChanged($event)"  *ngIf="indexNum == 1" ></app-eventimages>
+                            <app-commoneventcategory [eventDetails]="Event_data"  [categoryDetails]="category_data" (valueChanged)="onValueChanged($event)"  *ngIf="indexNum == 2" ></app-commoneventcategory> 
+                        </div>
+                </div>  
+         </div>
+    </div>
+</div>

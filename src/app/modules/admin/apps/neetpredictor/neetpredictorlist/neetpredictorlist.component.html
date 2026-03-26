@@ -1,0 +1,306 @@
+<div class="sm:col-span-2 md:col-span-4 flex flex-col flex-auto bg-card m-6 shadow rounded-1xl overflow-hidden">
+    <div class="xl:col-span-2 flex flex-col flex-auto">
+        
+        <!-- Loader -->
+        <div *ngIf="listLoader" class="wrapper-loader mx-auto mt-6">
+            <img class="wrapper-loader mx-auto"
+                style="width: 100px; margin-left: auto; margin-right: auto;"
+                src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+        </div>
+
+        <div *ngIf="!listLoader">
+            <!-- Header -->
+            <div class="flex justify-between bg-blue-800 p-2 px-6" style="align-items: center;">
+                <div>
+                    <span class="text-white font-medium" style="font-size: 17px;">NEET College Predictor - Cutoff Data</span>
+                    <span class="text-white ml-4" style="font-size: 13px; opacity: 0.8;">Total: {{recordsTotal || 0}} records</span>
+                </div>
+                <div class="flex gap-2">
+                    <button class="rounded bg-green-500 text-white" mat-stroked-button (click)="fileInput.click()">
+                        <mat-icon class="text-white">upload_file</mat-icon>
+                        Import CSV
+                    </button>
+                    <input #fileInput type="file" accept=".csv" (change)="importNeetCsv($event)" style="display: none;">
+                    
+                    <button class="rounded bg-purple-600 text-white" mat-stroked-button (click)="exportToExcel()">
+                        <mat-icon class="text-white">file_download</mat-icon>
+                        Export
+                    </button>
+                    <button class="rounded bg-yellow-500 text-white" mat-stroked-button (click)="downloadSampleCSV()">
+                        <mat-icon class="text-white">download</mat-icon>
+                        Sample CSV
+                    </button>
+                    <button class="rounded bg-red-600 text-white" mat-stroked-button (click)="openClearDataDialog()">
+                        <mat-icon class="text-white">delete_sweep</mat-icon>
+                        Clear Data
+                    </button>
+                    <button class="rounded bg-white" mat-stroked-button (click)="addCutoff()">
+                        <mat-icon>add</mat-icon>
+                        Add Cutoff
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Row -->
+            <div class="flex justify-between mt-2 px-6" style="align-items: center; flex-wrap: wrap; gap: 16px;">
+                <mat-form-field class="example-full-width" style="width: 350px;">
+                    <input matInput type="search" [formControl]="searchForm.get('search')" 
+                           placeholder="Search by college, state, category..." 
+                           (keyup)="applyFilter($event.target.value)">
+                    <div *ngIf="searchLoader" class="wrapper-loader">
+                        <img class="img-fluid"
+                            style="width: 30px; margin-left: auto; margin-right: auto;"
+                            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                    </div>
+                </mat-form-field>
+            </div>
+
+            <!-- Data Table -->
+            <div class="mat-elevation-z8 mx-6 mb-6 mt-4" style="overflow-x: auto;">
+                <div *ngIf="neetCutoffList?.length != 0">
+                    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)">
+                        
+                        <!-- Sr.No Column -->
+                        <ng-container matColumnDef="Sr.No">
+                            <th mat-header-cell *matHeaderCellDef> # </th>
+                            <td mat-cell *matCellDef="let element; let i = index" style="width: 50px;">
+                                {{startNum + i + 1}}
+                            </td>
+                        </ng-container>
+
+                        <!-- Year Column -->
+                        <ng-container matColumnDef="year">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Year </th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="year-badge">{{element.year}}</span>
+                            </td>
+                        </ng-container>
+
+                        <!-- State Column -->
+                        <ng-container matColumnDef="state">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> State </th>
+                            <td mat-cell *matCellDef="let element"> {{element.state}} </td>
+                        </ng-container>
+
+                        <!-- Counseling Type Column -->
+                        <ng-container matColumnDef="counseling_type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Counseling </th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="counseling-badge" [ngClass]="{
+                                    'state-quota': element.counseling_type === 'State Quota',
+                                    'aiq': element.counseling_type === 'All India Quota',
+                                    'deemed': element.counseling_type === 'Deemed Universities'
+                                }">
+                                    {{element.counseling_type}}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- College Name Column -->
+                        <ng-container matColumnDef="college_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> College </th>
+                            <td mat-cell *matCellDef="let element" style="max-width: 250px;">
+                                <span [matTooltip]="element.college_name">
+                                    {{element.college_name | slice:0:35}}{{element.college_name?.length > 35 ? '...' : ''}}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Course Column -->
+                        <ng-container matColumnDef="course">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Course </th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="course-badge">{{element.course}}</span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Category Column -->
+                        <ng-container matColumnDef="category">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Category </th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="category-badge">{{element.category}}</span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Closing Rank Column -->
+                        <ng-container matColumnDef="closing_rank">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Closing Rank </th>
+                            <td mat-cell *matCellDef="let element" class="font-semibold text-blue-700">
+                                {{element.closing_rank | number}}
+                            </td>
+                        </ng-container>
+
+                        <!-- College Type Column -->
+                        <ng-container matColumnDef="college_type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="type-badge" [ngClass]="getCollegeTypeClass(element.college_type)">
+                                    {{element.college_type}}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Annual Fee Column -->
+                        <ng-container matColumnDef="annual_fee">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Fee </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{formatFee(element.annual_fee)}}
+                            </td>
+                        </ng-container>
+
+                        <!-- Actions Column -->
+                        <ng-container matColumnDef="action">
+                            <th mat-header-cell *matHeaderCellDef> Actions </th>
+                            <td mat-cell *matCellDef="let element">
+                                <button mat-icon-button color="primary" matTooltip="View" (click)="viewMore(element)">
+                                    <mat-icon>visibility</mat-icon>
+                                </button>
+                                <button mat-icon-button color="accent" matTooltip="Edit" (click)="editCutoff(element.id)">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                                <button mat-icon-button color="warn" matTooltip="Delete" (click)="deleteCutoff(element.id)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+
+                    <mat-paginator [length]="recordsFiltered"
+                                   [pageSize]="pageSize"
+                                   [pageSizeOptions]="[10, 25, 50, 100]"
+                                   (page)="onPageChange($event)"
+                                   showFirstLastButtons>
+                    </mat-paginator>
+                </div>
+
+                <!-- Empty State -->
+                <div *ngIf="!neetCutoffList || neetCutoffList.length === 0" class="text-center p-12">
+                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: #ccc;">school</mat-icon>
+                    <h3 class="text-lg font-semibold mt-4">No NEET Cutoff Data Found</h3>
+                    <p class="text-gray-500 mt-2">Start by importing a CSV file or adding cutoff data manually.</p>
+                    <button mat-raised-button color="primary" class="mt-4" (click)="addCutoff()">
+                        <mat-icon>add</mat-icon> Add First Cutoff
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View More Dialog -->
+<ng-template #viewMoreDialog>
+    <div *ngIf="selectedCutoff">
+        <h2 mat-dialog-title>Cutoff Details</h2>
+        <mat-dialog-content style="min-width: 500px;">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col">
+                    <label class="text-xs text-gray-500">Year</label>
+                    <span class="font-medium">{{selectedCutoff.year}}</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs text-gray-500">State</label>
+                    <span>{{selectedCutoff.state}}</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs text-gray-500">Counseling Type</label>
+                    <span>{{selectedCutoff.counseling_type}}</span>
+                </div>
+                <div class="flex flex-col col-span-2">
+                    <label class="text-xs text-gray-500">College Name</label>
+                    <span class="font-medium">{{selectedCutoff.college_name}}</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs text-gray-500">Course</label>
+                    <span>{{selectedCutoff.course}}</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs text-gray-500">Category</label>
+                    <span>{{selectedCutoff.category}}</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs text-gray-500">Round</label>
+                    <span>{{selectedCutoff.round}}</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs text-gray-500">College Type</label>
+                    <span>{{selectedCutoff.college_type}}</span>
+                </div>
+                <div class="flex flex-col bg-blue-50 p-3 rounded">
+                    <label class="text-xs text-gray-500">Opening Rank</label>
+                    <span class="font-bold text-blue-700 text-lg">{{selectedCutoff.opening_rank | number}}</span>
+                </div>
+                <div class="flex flex-col bg-green-50 p-3 rounded">
+                    <label class="text-xs text-gray-500">Closing Rank</label>
+                    <span class="font-bold text-green-700 text-lg">{{selectedCutoff.closing_rank | number}}</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs text-gray-500">Annual Fee</label>
+                    <span>{{formatFee(selectedCutoff.annual_fee)}}</span>
+                </div>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions align="end">
+            <button mat-raised-button color="primary" (click)="editCutoff(selectedCutoff.id); closeDialog()">
+                <mat-icon>edit</mat-icon> Edit
+            </button>
+            <button mat-button (click)="closeDialog()">Close</button>
+        </mat-dialog-actions>
+    </div>
+</ng-template>
+
+<!-- Clear Data Dialog -->
+<ng-template #clearDataDialog>
+    <div class="p-4">
+        <h2 mat-dialog-title class="text-red-600 flex items-center gap-2">
+            <mat-icon>warning</mat-icon> Clear NEET Cutoff Data
+        </h2>
+        <mat-dialog-content>
+            <div class="mb-4 p-4 bg-red-50 rounded border border-red-200">
+                <p class="text-red-700 font-medium">Warning: This action cannot be undone!</p>
+                <p class="text-gray-600 mt-2">You are about to delete cutoff data. Apply filters below to limit deletion or leave empty to delete ALL data.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-4 mb-4">
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Filter by Year (Optional)</mat-label>
+                    <mat-select [(ngModel)]="clearDataYear">
+                        <mat-option value="">All Years</mat-option>
+                        <mat-option *ngFor="let year of availableYears" [value]="year">{{year}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Filter by State (Optional)</mat-label>
+                    <input matInput [(ngModel)]="clearDataState" placeholder="e.g., Karnataka">
+                </mat-form-field>
+                
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Filter by Counseling Type (Optional)</mat-label>
+                    <mat-select [(ngModel)]="clearDataCounseling">
+                        <mat-option value="">All Types</mat-option>
+                        <mat-option value="State Quota">State Quota</mat-option>
+                        <mat-option value="All India Quota">All India Quota</mat-option>
+                        <mat-option value="Deemed Universities">Deemed Universities</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            
+            <div class="mt-4 p-4 bg-gray-100 rounded">
+                <p class="font-medium text-gray-700">To confirm deletion, type <strong class="text-red-600">DELETE</strong> below:</p>
+                <mat-form-field appearance="outline" class="w-full mt-2">
+                    <input matInput [(ngModel)]="clearDataConfirmation" placeholder="Type DELETE to confirm">
+                </mat-form-field>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions align="end">
+            <button mat-button mat-dialog-close>Cancel</button>
+            <button mat-raised-button color="warn" [mat-dialog-close]="true" 
+                    [disabled]="clearDataConfirmation !== 'DELETE'">
+                Clear Data
+            </button>
+        </mat-dialog-actions>
+    </div>
+</ng-template>

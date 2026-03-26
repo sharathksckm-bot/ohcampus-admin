@@ -1,0 +1,42 @@
+ /* Custom styles for mat-accordion */
+ .custom-accordion {
+    width: 100%;
+  }
+
+  /* Style for the panel header */
+  .mat-expansion-panel-header {
+    background-color: #f5f5f5; /* Set background color */
+    padding: 12px 16px; /* Adjust padding */
+    border-bottom: 1px solid #ddd; /* Add bottom border */
+  }
+
+  /* Style for the panel title */
+  .mat-expansion-panel-header .mat-expansion-panel-header-title {
+    font-weight: bold; /* Make the title bold */
+    font-size: 16px; /* Increase font size */
+  }
+
+  /* Style for the panel description */
+  .mat-expansion-panel-header .mat-expansion-panel-header-description {
+    font-size: 14px; /* Adjust font size */
+    color: #666; /* Set text color */
+    text-align: center; /* Center-align the text */
+  }
+
+  /* Style for the expanded panel */
+  .mat-expansion-panel.mat-expanded {
+    background-color: #fff; /* Set background color */
+    border-bottom: none; /* Remove bottom border */
+  }
+
+  /* Style for the panel content */
+  .mat-expansion-panel-content {
+    padding: 16px; /* Adjust padding */
+    border-top: 1px solid #ddd; /* Add top border */
+  }
+  .placeholder-option {
+    color: red; /* Set the color to red */
+    /* Add any other styles you want to apply */
+}
+
+

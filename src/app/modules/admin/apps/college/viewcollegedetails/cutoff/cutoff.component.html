@@ -1,0 +1,525 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+             <form [formGroup]="cutoffForm" >
+                <div class=" bg-card shadow rounded-2xl">
+                        <div class=" flex justify-between  bg-gray-800 p-1 px-6" style="align-items: center;">
+                            <span class="text-white font-medium" style="font-size: 17px;">KCET CutOff</span>
+                            <button  class="rounded bg-white" mat-stroked-button (click)="back()">Back</button>
+                        </div>
+                        <div class="grid grid-cols-1 gap-6 p-6 pt-0 pb-0 gap-y-0 w-full min-w-0 mt-8">
+                            <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                                <!-- <button   class="fuse-mat-button-rounded" mat-flat-button (click)="addApplicationResponse(element)">
+                                    <span  >Open</span>
+                                </button> -->
+                                <button type="button" class="fuse-mat-button-rounded" mat-flat-button (click)="addApplicationResponse(element)">
+                                    <span>Import CSV</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-3 pb-0 gap-y-0 w-full min-w-0 ">
+                            <!-- <div class="flex flex-col flex-auto overflow-hidden">
+                                <mat-form-field class="w-full">
+                                    <mat-label>College Name<span class="red">*</span></mat-label>
+                                    <input matInput formControlName="collegeName"  min="3">
+                                    <mat-error *ngIf="cutoffForm.get('collegeName').hasError('required')">Please enter
+                                        college name</mat-error>
+                                    <mat-error *ngIf="cutoffForm.get('collegeName').hasError('minlength')">Enter minimum 3 character
+                                        name</mat-error>
+                                </mat-form-field>
+                            </div> -->
+
+                            <div class="flex flex-col flex-auto overflow-hidden">
+                                <mat-form-field class="clggg">
+                                    <mat-label>College<span class="red">*</span></mat-label>
+                                    <mat-select formControlName="collegeid" >
+                                        <mat-option >
+                                            <ngx-mat-select-search class="dropsearch m-1" noEntriesFoundLabel="College not found, please enter valid college name"
+                                            formControlName="search" placeholderLabel="search college name here..."  (keypress)="searchValue()">
+                                            </ngx-mat-select-search>
+                                        </mat-option>
+                                        <mat-option *ngFor="let item of collegeListData" [value]="item.id">
+                                            {{item?.title}} , {{item?.cityname}}, {{item?.statename}}
+                                        </mat-option>
+                                        <mat-option *ngIf="collegeListData == ''" value="0" >
+                                            <span class="red">College not found, please enter valid college name</span>
+                                         </mat-option>
+                                    </mat-select>
+                                  <mat-error *ngIf="cutoffForm.get('collegeid').hasError('required')">Please select
+                                    college</mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="flex flex-col flex-auto overflow-hidden">
+
+                                <mat-form-field class="w-full">
+                                    <mat-label>Category</mat-label>
+                                    <mat-select formControlName="contentcategory" (ngModelChange)="getCollegeCourses()">
+                                        <mat-option *ngFor="let item of getCategoryListData" [value]="item" >
+                                            {{item.catname}}
+                                          </mat-option>
+                                    </mat-select>
+                                    <!-- Display error message if contentcategory is required -->
+                                    <mat-error *ngIf="cutoffForm.get('contentcategory').hasError('required')">Please select a category</mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <!-- <div class="flex flex-col flex-auto overflow-hidden">
+                                <mat-form-field class="w-full">
+                                    <mat-label>Course</mat-label>
+                                    <mat-select formControlName="course">
+                                        <mat-option *ngFor="let item of collegecourseListData" [value]="item" >
+                                            {{item.coursename}}
+                                          </mat-option>
+                                    </mat-select>
+                                     <mat-error *ngIf="cutoffForm.get('course').hasError('required')">Please select course</mat-error>
+                                </mat-form-field>
+                            </div> -->
+                            <div class="flex flex-col flex-auto overflow-hidden">
+                                <mat-form-field class="w-full">
+                                    <mat-label>Course</mat-label>
+                                    <mat-select formControlName="course">
+                                         <mat-option disabled *ngIf="!collegecourseListData || collegecourseListData.length === 0" style="color: red;">
+                                            Data is not available
+                                        </mat-option>
+                                         <mat-option *ngFor="let item of collegecourseListData" [value]="item">
+                                            {{ item.coursename }}
+                                        </mat-option>
+                                    </mat-select>
+                                     <!-- <mat-error *ngIf="cutoffForm.get('course').hasError('required')">Please select course</mat-error> -->
+                                </mat-form-field>
+                            </div>
+
+
+                            <div class="flex flex-col flex-auto overflow-hidden">
+                                <mat-form-field class="w-full">
+                                    <mat-label>Round</mat-label>
+                                    <mat-select formControlName="rounded">
+                                        <!-- Static options -->
+                                        <mat-option value="1">Rounded 1</mat-option>
+                                        <mat-option value="2">Rounded 2</mat-option>
+                                        <mat-option value="3">Rounded 3</mat-option>
+
+                                    </mat-select>
+                                    <!-- Display error message if 'rounded' field is required -->
+                                    <mat-error *ngIf="cutoffForm.get('rounded').hasError('required')">Please select rounded</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <mat-accordion class="custom-accordion mt-4">
+                                <mat-expansion-panel (opened)="panelOpenState = true"
+                                                     (closed)="panelOpenState = false">
+                                  <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                     Category 1
+                                    </mat-panel-title>
+
+                                  </mat-expansion-panel-header>
+                                  <mat-form-field class="w-full mt-4">
+                                    <mat-label>1G</mat-label>
+                                    <input matInput formControlName="oneG" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>1H</mat-label>
+                                    <input matInput formControlName="oneH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>1K</mat-label>
+                                    <input matInput formControlName="oneK">
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>1KH</mat-label>
+                                    <input matInput  formControlName="oneKH">
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>1R</mat-label>
+                                    <input matInput formControlName="oneR" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>1RH</mat-label>
+                                    <input matInput formControlName="oneRH" >
+                                </mat-form-field>
+                                </mat-expansion-panel>
+                              </mat-accordion>
+                              <mat-accordion class="custom-accordion mt-4">
+                                <mat-expansion-panel (opened)="panelOpenState = true"
+                                                     (closed)="panelOpenState = false">
+                                  <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                     Category 2A
+                                    </mat-panel-title>
+
+                                  </mat-expansion-panel-header>
+                                  <mat-form-field class="w-full mt-4">
+                                    <mat-label>2AG</mat-label>
+                                    <input matInput formControlName="twoAG" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>2AH</mat-label>
+                                    <input matInput formControlName="twoAH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>2AK</mat-label>
+                                    <input matInput formControlName="twoAK" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>2AKH</mat-label>
+                                    <input matInput formControlName="twoAKH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>2AR</mat-label>
+                                    <input matInput formControlName="twoAR" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>2ARH</mat-label>
+                                    <input matInput  formControlName="twoARH" >
+                                </mat-form-field>
+
+                                </mat-expansion-panel>
+                              </mat-accordion>
+                              <mat-accordion class="custom-accordion mt-4">
+
+                                <mat-expansion-panel (opened)="panelOpenState = true"
+                                                     (closed)="panelOpenState = false">
+                                  <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                     Category 2B
+                                    </mat-panel-title>
+
+                                  </mat-expansion-panel-header>
+                                  <mat-form-field class="w-full mt-4">
+                                    <mat-label>2BG</mat-label>
+                                    <input matInput  formControlName="twoBG" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>2BH</mat-label>
+                                    <input matInput formControlName="twoBH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>2BK</mat-label>
+                                    <input matInput  formControlName="twoBK" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>2BKH</mat-label>
+                                    <input matInput formControlName="twoBKH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>2BR</mat-label>
+                                    <input matInput formControlName="twoBR" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>2BRH</mat-label>
+                                    <input matInput formControlName="twoBRH" >
+                                </mat-form-field>
+                                </mat-expansion-panel>
+
+                              </mat-accordion>
+                              <mat-accordion class="custom-accordion mt-4">
+
+                                <mat-expansion-panel (opened)="panelOpenState = true"
+                                                     (closed)="panelOpenState = false">
+                                  <mat-expansion-panel-header>
+                                    <mat-panel-title >
+                                     Category 3A
+                                    </mat-panel-title>
+
+                                  </mat-expansion-panel-header>
+                                  <mat-form-field class="w-full mt-4">
+                                    <mat-label>3AG</mat-label>
+                                    <input matInput formControlName="treeAG" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>3AH</mat-label>
+                                    <input matInput formControlName="treeAH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>3AK</mat-label>
+                                    <input matInput formControlName="treeAK" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>3AKH</mat-label>
+                                    <input matInput formControlName="treeAKH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>3AR</mat-label>
+                                    <input matInput formControlName="treeAR" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>3ARH</mat-label>
+                                    <input matInput formControlName="treeARH">
+                                </mat-form-field>
+                                </mat-expansion-panel>
+
+                              </mat-accordion>
+                              <mat-accordion class="custom-accordion mt-4">
+                                <mat-expansion-panel (opened)="panelOpenState = true"
+                                                     (closed)="panelOpenState = false">
+                                  <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                     Category 3B
+                                    </mat-panel-title>
+
+                                  </mat-expansion-panel-header>
+                                  <mat-form-field class="w-full mt-4">
+                                    <mat-label>3BG</mat-label>
+                                    <input matInput formControlName="treeBG" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>3BH</mat-label>
+                                    <input matInput  formControlName="treeBH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>3BK</mat-label>
+                                    <input matInput formControlName="treeBK" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>3BKH</mat-label>
+                                    <input matInput formControlName="treeBKH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>3BR</mat-label>
+                                    <input matInput formControlName="treeBR" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>3BRH</mat-label>
+                                    <input matInput  formControlName="treeBRH" >
+                                </mat-form-field>
+                                </mat-expansion-panel>
+
+                              </mat-accordion>
+
+                              <mat-accordion class="custom-accordion mt-4">
+                                <mat-expansion-panel (opened)="panelOpenState = true"
+                                                     (closed)="panelOpenState = false">
+                                  <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                     Category 3GM
+                                    </mat-panel-title>
+
+                                  </mat-expansion-panel-header>
+                                  <mat-form-field class="w-full mt-4">
+                                    <mat-label>GM</mat-label>
+                                    <input matInput  formControlName="GM" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>GMH</mat-label>
+                                    <input matInput formControlName="GMH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>GMK</mat-label>
+                                    <input matInput  formControlName="GMK">
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>GMKH</mat-label>
+                                    <input matInput formControlName="GMKH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>GMR</mat-label>
+                                    <input matInput formControlName="GMR" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>GMRH</mat-label>
+                                    <input matInput formControlName="GMRH" >
+                                </mat-form-field>
+                                </mat-expansion-panel>
+
+                              </mat-accordion>
+                              <mat-accordion class="custom-accordion mt-4">
+
+                                <mat-expansion-panel (opened)="panelOpenState = true"
+                                                     (closed)="panelOpenState = false">
+                                  <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                     Category SC
+                                    </mat-panel-title>
+
+                                  </mat-expansion-panel-header>
+                                  <mat-form-field class="w-full mt-4">
+                                    <mat-label>SCG</mat-label>
+                                    <input matInput formControlName="SCG" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>SCH</mat-label>
+                                    <input matInput  formControlName="SCH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>SCK</mat-label>
+                                    <input matInput  formControlName="SCK" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>SCKH</mat-label>
+                                    <input matInput  formControlName="SCKH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>SCR</mat-label>
+                                    <input matInput  formControlName="SCR">
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>SCRH</mat-label>
+                                    <input matInput formControlName="SCRH" >
+                                </mat-form-field>
+                                </mat-expansion-panel>
+
+                              </mat-accordion>
+                              <mat-accordion class="custom-accordion mt-4">
+                                <mat-expansion-panel (opened)="panelOpenState = true"
+                                                     (closed)="panelOpenState = false">
+                                  <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                     Category ST
+                                    </mat-panel-title>
+
+                                  </mat-expansion-panel-header>
+                                  <mat-form-field class="w-full mt-4">
+                                    <mat-label>STG</mat-label>
+                                    <input matInput formControlName="STG" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>STH</mat-label>
+                                    <input matInput formControlName="STH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>STK</mat-label>
+                                    <input matInput  formControlName="STK"  >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>STKH</mat-label>
+                                    <input matInput formControlName="STKH" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>STR</mat-label>
+                                    <input matInput  formControlName="STR" >
+                                </mat-form-field>
+                                <mat-form-field class="w-full">
+                                    <mat-label>STRH</mat-label>
+                                    <input matInput formControlName="STRH" >
+                                </mat-form-field>
+                                </mat-expansion-panel>
+
+                              </mat-accordion>
+
+                        </div>
+
+                    <div class="grid grid-cols-1 gap-6 p-8 pt-6 gap-y-0 w-full min-w-0">
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updatetableDetails()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updatetableDetails()">
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+            </form>
+         </div>
+    </div>
+</div>
+<div class="popcenter">
+    <ng-template #callAPIDialog>
+        <div class="p-6 overflow-hidden max-w-full relative" style="width: 50vw;">
+            <mat-icon svgIcon="mat_outline:close"
+                style="color: red; cursor: pointer; position: absolute; z-index: 111; top: 17px; right:17px"
+                matDialogClose="yes" (click)="close()"></mat-icon>
+            <div class="max-w-10xl">
+                <div class="flex-auto ">
+                    <div class="w-full p-6 mx-auto">
+
+                        <h5>Work in Progress</h5>
+                        <!-- <form [formGroup]="responseForm" >
+                            <div class=" bg-card shadow rounded-2xl">
+                                    <div class=" flex justify-between  border-b p-2 px-6" style="align-items: center;">
+                                        <span class="flex text-black font-medium self-center" style="font-size: 17px;">
+                                          <mat-icon svgIcon="mat_solid:person" class="w-4 h-4 mr-1" style="color:#3290d6;"></mat-icon>
+                                          Predict Addmission Response Form
+                                        </span>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pb-0 gap-y-0 w-full min-w-0">
+                                      <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-form-field class="w-full">
+                                            <mat-label>Name</mat-label>
+                                            <input matInput formControlName="name" required  readonly class="pointer">
+                                        </mat-form-field>
+                                      </div>
+                                      <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-form-field class="w-full">
+                                            <mat-label>Email Address</mat-label>
+                                            <input matInput formControlName="emailAddress" required  readonly class="pointer">
+                                        </mat-form-field>
+                                      </div>
+                                      <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-form-field class="w-full">
+                                            <mat-label>College</mat-label>
+                                            <input matInput formControlName="college" required  readonly class="pointer">
+                                        </mat-form-field>
+                                      </div>
+                                      <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-form-field class="w-full">
+                                            <mat-label>Course</mat-label>
+                                            <input matInput formControlName="course" required  readonly class="pointer">
+                                        </mat-form-field>
+                                      </div>
+                                      <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-form-field class="w-full">
+                                            <mat-label>Exam</mat-label>
+                                            <input matInput formControlName="exams" required  readonly class="pointer">
+                                        </mat-form-field>
+                                      </div>
+                                      <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-form-field class="w-full">
+                                            <mat-label>Rank</mat-label>
+                                            <input matInput formControlName="rank" required  readonly class="pointer">
+                                        </mat-form-field>
+                                      </div>
+                                      <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-form-field class="w-full">
+                                            <mat-label>Score</mat-label>
+                                            <input matInput formControlName="score" required  readonly class="pointer">
+                                        </mat-form-field>
+                                      </div>
+                                    </div>
+                                  <div class="grid grid-cols-1  gap-6 px-6  gap-y-0 w-full min-w-0">
+                                    <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-form-field class="w-full">
+                                            <mat-label>Response</mat-label>
+                                            <textarea matInput formControlName="response" rows="4" cols="30" min="3"></textarea>
+                                            <mat-error *ngIf="responseForm.get('response').hasError('required')">Please enter
+                                                job profile</mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 gap-6 p-6 pt-3 gap-y-0 w-full min-w-0">
+                                  <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                                      <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="SendCourseApplicationResponse()">
+                                          <span  *ngIf="!addLoader">Submit</span>
+                                          <div *ngIf="addLoader" class="wrapper-loader">
+                                              <img class="img-fluid"
+                                                  style="width: 30px; margin-left: auto; margin-right: auto;"
+                                                  src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                          </div>
+                                      </button>
+                                  </div>
+                              </div>
+                                </div>
+                        </form> -->
+                     </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+  </div>

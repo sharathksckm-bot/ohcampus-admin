@@ -1,0 +1,13 @@
+
+ ::ng-deep body.light .mat-datepicker-content{
+    box-shadow: none !important;
+    border: 1px solid #89a6ad !important;
+ }
+
+ ::ng-deep body.light .mat-primary .mat-option.mat-selected:not(.mat-option-disabled){
+   color: #3290d6;
+ }
+ .clggg{
+  white-space: wrap  !important; 
+  overflow: visible  !important;
+ }

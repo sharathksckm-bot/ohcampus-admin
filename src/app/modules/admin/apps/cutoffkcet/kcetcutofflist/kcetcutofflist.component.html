@@ -1,0 +1,181 @@
+
+<div class="sm:col-span-2 md:col-span-4 flex flex-col flex-auto bg-card m-6 shadow rounded-1xl overflow-hidden">
+    <div class="xl:col-span-2 flex flex-col flex-auto  overflow-hidden">
+
+      <div *ngIf="listLoader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+     </div>
+    <div  *ngIf="!listLoader" >
+      <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+        <span class="text-white font-medium" style="font-size: 17px;">KCET Cut-Off</span>
+        <button  class="rounded  bg-white" mat-stroked-button (click)="addcutoff()" >Add Cut-Off</button>
+      </div>
+      <form [formGroup]="faqsList"  >
+      <div class="flex justify-end mt-2" style="align-items: center;">
+        <button mat-flat-button color="accent" class="text-sm mb-3 px-3 min-h-0 h-8" (click)='exportToExcel()'><mat-icon svgIcon="mat_solid:download" class="icon-size-5"></mat-icon> Export</button>
+        <button mat-flat-button color="primary" class="text-sm mb-3 px-3 min-h-0 h-8 ml-2" (click)='downloadCSV()'><mat-icon svgIcon="mat_solid:download" class="icon-size-5"></mat-icon> Sample CSV</button>
+        <!-- <button mat-flat-button color="primary" class="text-sm mb-3 ml-1 mr-2 px-3 min-h-0 h-8 bg-green-500">Import CSV</button> -->
+        <div class="upload-btn-wrapper">
+          <button class="btnupload">Import CSV</button>
+          <input type="file" name="myfile"  (change)="importKCETcsv($event)" />
+        </div>
+
+        <mat-form-field class="example-full-width mr-6 " style="width: 200px;">
+            <input matInput type="search" formControlName="search" placeholder="Search" (keyup)="applyFilter($event.target.value)">
+            <div *ngIf="searchLoader" class="wrapper-loader">
+              <img class="img-fluid"
+                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+            </div>
+          </mat-form-field>
+
+      </div>
+      <div class="mat-elevation-z8 mx-6 mb-6" style="overflow-x: auto;">
+
+      <div *ngIf="faqsListData?.length != 0">
+      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)">
+
+        <ng-container matColumnDef="Sr.No">
+          <th mat-header-cell *matHeaderCellDef > Sr.No </th>
+          <td mat-cell *matCellDef="let element; let i = index" style="width: 80px;">
+              {{ (page - 1) * pageSize + i + 1 }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="round">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Round </th>
+            <td mat-cell *matCellDef="let element"> {{element.round}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="year">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Year </th>
+            <td mat-cell *matCellDef="let element"> {{element.year}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="collegename">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>College Name</th>
+            <td mat-cell *matCellDef="let element"> {{element.collegename}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
+            <td mat-cell *matCellDef="let element"> {{element.category}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="course">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Course </th>
+            <td mat-cell *matCellDef="let element"> {{element.course}} </td>
+        </ng-container>
+
+
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let element" style="width: 180px;">
+            <button  mat-icon-button (click)="viewMoreKCET(element.id)"> <mat-icon svgIcon="mat_outline:remove_red_eye" class="icon-size-5 text-yellow-500"></mat-icon></button>
+            <button  class="mx-1" mat-icon-button  (click)="getDetailsById(element.id)"><mat-icon class="icon-size-5 text-blue-500">edit</mat-icon></button>
+            <button mat-icon-button (click)="deleteKCET(element.id)" ><mat-icon class="icon-size-5 text-red-600">delete</mat-icon></button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns ; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <div class="flex justify-end" style="align-items: center;">
+        <mat-paginator [pageSize]="pageSize" (page)="onPageChange($event)" [pageSizeOptions]="[5,10,25,100]"  [length]="recordsFiltered"  showFirstLastButtons>
+        </mat-paginator>
+      </div>
+      </div>
+      <div *ngIf="faqsListData?.length === 0 " class="text-center py-3">No records found</div>
+    </div>
+    </form>
+    </div>
+      </div>
+</div>
+
+<!-- popup -->
+
+<div class="popcenter">
+    <ng-template #callAPIDialog>
+        <div class="p-6 overflow-y-auto max-w-full relative" style="width: 80vw;">
+            <mat-icon svgIcon="mat_outline:close" style="color: red; cursor: pointer; position: absolute; z-index: 111; top: 0px; right:2px"
+                matDialogClose="yes" (click)="close()"></mat-icon>
+            <div class="max-w-10xl">
+                <div class="flex-auto">
+                    <div class="w-full mx-auto">
+
+                    <div>
+                        <label><b>College Name :</b> <span class="ml-2">{{collegename}}</span></label>
+                    </div>
+                    <div>
+                        <label><b>Category :</b> <span class="ml-2">{{category}}</span></label>
+                    </div>
+                    <div>
+                        <label><b>Course Name :</b> <span class="ml-2">{{coursename}}</span></label>
+                    </div>
+
+                  <!-- <table *ngFor="let item of ViewMoreListData;let i = index">
+                      <tr>
+                          <th *ngFor="let val of item | slice:0:10">{{val.label}}</th>
+                      </tr>
+                      <tr>
+                        <td *ngFor="let val of item | slice:0:10">{{val.value}}</td>
+                      </tr>
+                  </table> -->
+             <div class="overflow-y-auto h60vh">
+                  <div class="grid grid-cols-1 sm:grid-cols-6 gap-6 w-full min-w-0 mt-4 " >
+                  <div class="flex flex-col border " *ngFor="let item of ViewMoreListData;let i = index">
+                     <div class="flex border-b p-2 " *ngFor="let val of item | slice:1:10">
+                      <h1 class="font-semibold block w-20 mr-2"> {{val.label}}</h1>
+                      <h1>: &nbsp;   {{val.value}}</h1>
+                     </div>
+                  </div>
+
+                  <div class="flex flex-col border " *ngFor="let item of ViewMoreListData;let i = index">
+                    <div class="flex border-b p-2 " *ngFor="let val of item | slice:10:20">
+                     <h1 class="font-semibold block w-20 mr-2"> {{val.label}}</h1>
+                     <h1>: &nbsp;   {{val.value}}</h1>
+                    </div>
+                 </div>
+
+                 <div class="flex flex-col border " *ngFor="let item of ViewMoreListData;let i = index">
+                  <div class="flex border-b p-2 " *ngFor="let val of item | slice:20:30">
+                   <h1 class="font-semibold block w-20 mr-2"> {{val.label}}</h1>
+                   <h1>: &nbsp;   {{val.value}}</h1>
+                  </div>
+               </div>
+
+               <div class="flex flex-col border " *ngFor="let item of ViewMoreListData;let i = index">
+                <div class="flex border-b p-2 " *ngFor="let val of item | slice:30:40">
+                 <h1 class="font-semibold block w-20 mr-2"> {{val.label}}</h1>
+                 <h1>: &nbsp;   {{val.value}}</h1>
+                </div>
+               </div>
+
+               <div class="flex flex-col border " *ngFor="let item of ViewMoreListData;let i = index">
+                <div class="flex border-b p-2 " *ngFor="let val of item | slice:40:50">
+                 <h1 class="font-semibold block w-20 mr-2"> {{val.label}}</h1>
+                 <h1>: &nbsp;   {{val.value}}</h1>
+                </div>
+               </div>
+
+               <div class="flex flex-col border " *ngFor="let item of ViewMoreListData;let i = index">
+                <div class="flex border-b p-2 " *ngFor="let val of item | slice:50:52">
+                 <h1 class="font-semibold block w-20 mr-2"> {{val.label}}</h1>
+                 <h1>: &nbsp;   {{val.value}}</h1>
+                </div>
+               </div>
+
+             </div>
+            </div>
+
+
+            </div>
+          </div>
+        </div>
+     </div>
+   </ng-template>
+</div>
+
+

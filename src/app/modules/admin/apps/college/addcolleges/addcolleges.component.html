@@ -1,0 +1,288 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <form [formGroup]="collegeForm" enctype="multipart/form-data">
+                <div class=" bg-card shadow rounded-2xl">
+                        <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                            <span class="text-white font-medium" style="font-size: 17px;">College Information Form</span>
+                            <button  class="rounded  bg-white" mat-stroked-button (click)="back()">Back</button>
+                        </div>
+                       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pb-0 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>College Name<span class="red">*</span></mat-label>
+                                <input matInput formControlName="collegeName"  min="3">
+                                <mat-error *ngIf="collegeForm.get('collegeName').hasError('required')">Please enter
+                                    college name</mat-error>
+                                <mat-error *ngIf="collegeForm.get('collegeName').hasError('minlength')">Enter minimum 3 character
+                                    name</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Country<span class="red">*</span></mat-label>
+                                <mat-select formControlName="country" (ngModelChange)="getStateDetailsByCntId()">
+                                    <mat-option *ngFor="let item of countryListData" [value]="item.id">
+                                        {{item.country}}
+                                      </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="collegeForm.get('country').hasError('required')">Please select
+                                    country</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>State<span class="red">*</span></mat-label>
+                                <mat-select formControlName="state" (ngModelChange)="getCityDetailsByStateId()">
+                                    <mat-option *ngFor="let item of stateListData" [value]="item.id">
+                                        {{item.statename}}
+                                    </mat-option>
+                                    <mat-option *ngIf="stateListData == undefined">
+                                        <span class="red" >State not found , please select valid country</span>
+                                    </mat-option>
+                                </mat-select>
+                                <div *ngIf="stateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                                <mat-error *ngIf="collegeForm.get('state').hasError('required')">Please select
+                                    state</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>City<span class="red">*</span></mat-label>
+                                <mat-select formControlName="city">
+                                    <mat-option *ngFor="let item of cityListData" [value]="item.id">
+                                        {{item.city}}
+                                    </mat-option>
+                                    <mat-option *ngIf="cityListData == undefined">
+                                        <span class="red" >City not found , please select valid state</span>
+                                    </mat-option>
+                                </mat-select>
+                                <div *ngIf="cityLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                                <mat-error *ngIf="collegeForm.get('city').hasError('required')">Please select
+                                    city</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>ESTD. Year Of College (i.e.2004)</mat-label>
+                                <mat-select formControlName="year">
+                                    <mat-option value="">NA</mat-option>
+                                    <mat-option *ngFor="let year of years" [value]="year">
+                                        {{ year }}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="collegeForm.get('year').hasError('required')">Please select
+                                    year</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Email Address <span class="red">*</span></mat-label>
+                                <input matInput formControlName="emailAddress">
+                                <mat-error *ngIf="collegeForm.get('emailAddress').hasError('required')">Please
+                                    enter email address</mat-error>
+                                <mat-error *ngIf="collegeForm.get('emailAddress').hasError('pattern')"> Enter
+                                    valid email address</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex flex-col flex-auto overflow-hidden col-span-2">
+                            <form [formGroup]="contactNum" >
+                                <div formArrayName="contactNumber" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 gap-y-0 w-full min-w-0">
+                                    <div *ngFor="let contactNumber of contactNumber().controls; let contactIndex = index ">
+                                        <div [formGroupName]="contactIndex" class="">
+                                            <mat-form-field class="w-full">
+                                                <mat-label>Contact Number <span *ngIf="contactIndex >= 1">{{contactIndex + 1}}</span><span class="red" *ngIf="contactIndex == 0">*</span></mat-label>
+                                                <input matInput formControlName="mobileNumber" minlength="10" maxlength="11" (keypress)="checkValidInputData($event,1)" (input)="addMember()">
+                                                <mat-error *ngIf="contactNumber.get('mobileNumber').hasError('required')">Please
+                                                    enter mobile number <span *ngIf="contactIndex >= 1">{{contactIndex + 1}} or delete</span></mat-error>
+                                                <mat-error *ngIf="contactNumber.get('mobileNumber').hasError('minlength')"> Enter
+                                                    valid mobile number</mat-error>
+                                                <button  mat-icon-button  (click)="addItem()" [disabled]="!showAddButton"><mat-icon svgIcon="mat_outline:add" class="icon-size-5 text-blue-600" matTooltip="Add Number"
+                                                    matTooltipPosition="above"></mat-icon></button>
+                                                <button *ngIf="contactIndex >= 1" mat-icon-button  (click)="removeItem(contactNumber,contactIndex)"><mat-icon  class="icon-size-5 text-red-600" matTooltip="delete"
+                                                    matTooltipPosition="above">delete</mat-icon></button>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Accreditation</mat-label>
+                                <input matInput formControlName="accreditation" min="3">
+                                <mat-error *ngIf="collegeForm.get('accreditation').hasError('required')">Please enter
+                                    accreditation</mat-error>
+                                <mat-error *ngIf="collegeForm.get('accreditation').hasError('minlength')">Enter minimum 3 character
+                                    accreditation</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Website<span class="red">*</span></mat-label>
+                                <input matInput formControlName="website" min="3">
+                                <mat-error *ngIf="collegeForm.get('website').hasError('required')">Please enter
+                                    website</mat-error>
+                                <mat-error *ngIf="collegeForm.get('website').hasError('minlength')">Enter minimum 3 character
+                                    website</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Map Location<span class="red">*</span></mat-label>
+                                <input matInput formControlName="maplocation" min="3">
+                                <mat-error *ngIf="collegeForm.get('maplocation').hasError('required')">Please enter
+                                    map location</mat-error>
+                                <mat-error *ngIf="collegeForm.get('maplocation').hasError('minlength')">Enter minimum 3 character
+                                    map location</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>College Type<span class="red">*</span></mat-label>
+                                <mat-select formControlName="clgType">
+                                    <mat-option *ngFor="let type of collegeTypslist" [value]="type.id">
+                                        {{type.name}}
+                                      </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="collegeForm.get('clgType').hasError('required')">Please select
+                                    college type</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Status<span class="red">*</span></mat-label>
+                                <mat-select formControlName="status">
+                                    <mat-option *ngFor="let status of status" [value]="status.id">
+                                        {{status.name}}
+                                      </mat-option>
+                                </mat-select>
+                              <mat-error *ngIf="collegeForm.get('status').hasError('required')">Please select
+                                status</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 gap-6 px-6 gap-y-0 w-full min-w-0">
+                        <ng-container>
+                            <div class="flex flex-col flex-auto overflow-hidden w-full mt-5" >
+                                <div class="normallabel">Registration Package Type<span class="red">*</span></div>
+                                <mat-radio-group formControlName="regPkgType" class="m-3" aria-label="Select a registration package type" (change)="packageUpadte(collegeForm.value.regPkgType)">
+                                  <mat-radio-button class="registration-radio" class="mr-6" value="free_listing">Free Listing</mat-radio-button>
+                                  <mat-radio-button class="registration-radio" value="feature_listing">Feature Listing</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex flex-col flex-auto overflow-hidden w-full mt-5" >
+                                <div class="mr-2 normallabel">Entrance Test To Link Predictor <span class="red">*</span></div>
+                                <mat-radio-group formControlName="entranceTest" class="m-3" aria-label="Select an option" >
+                                    <mat-radio-button class="ml-auto" class="mr-6" value="0">None</mat-radio-button> &nbsp;
+                                    <mat-radio-button class="ml-auto" class="mr-6" value="1">KCET</mat-radio-button> &nbsp;
+                                    <mat-radio-button class="ml-auto"  value="2">NEET</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex flex-col flex-auto overflow-hidden w-full mt-5" >
+                                <div class="mr-2 normallabel">Is Trending <span class="red">*</span></div>
+                                <mat-radio-group formControlName="is_trending" class="m-3" aria-label="Select an option" >
+                                    <mat-radio-button class="ml-auto" class="mr-6" value="1">Yes</mat-radio-button> &nbsp;
+                                    <mat-radio-button class="ml-auto" class="mr-6" value="0">No</mat-radio-button> &nbsp;
+                                </mat-radio-group>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div *ngIf="collegeForm.value.regPkgType == 'feature_listing'" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 px-6 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Notification</mat-label>
+                                <input matInput formControlName="notificaton" >
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Notification Link</mat-label>
+                                <input matInput formControlName="notificatonlink">
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Application Link</mat-label>
+                                <input matInput formControlName="application_link">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1  gap-6 px-6 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Address<span class="red">*</span></mat-label>
+                                <textarea matInput formControlName="address"  min="3" rows="5" cols="30" ></textarea>
+                                <mat-error *ngIf="collegeForm.get('address').hasError('required')">Please enter
+                                    address</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1  gap-6 px-6  gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-label class="mb-1 normallabel" >Description<span class="red">*</span></mat-label>
+                            <angular-editor  formControlName="description" [config]="config"></angular-editor>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1  gap-6 px-6 pt-6 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-label class="mb-1 normallabel" >What's New ?</mat-label>
+                            <angular-editor  formControlName="what_new" [config]="config"></angular-editor>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 px-6 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden mt-4">
+                            <mat-checkbox formControlName="menu" (change)="updateTopMenuValue($event)">
+                              <mat-label class="normallabel">Need to display on home page ?</mat-label>
+                            </mat-checkbox>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-6 p-6 gap-y-0 w-full min-w-0">
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="insertClgDetails()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updateClgDetails()">
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+            </form>
+         </div>
+    </div>
+</div>
+

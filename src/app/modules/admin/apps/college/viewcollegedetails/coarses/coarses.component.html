@@ -1,0 +1,267 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">  
+
+            <form [formGroup]="coursesForm" >
+                <div class=" bg-card shadow rounded-2xl">
+                        <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                            <span class="text-white font-medium" style="font-size: 17px;">College Courses</span>
+                            <button  class="rounded bg-white" mat-stroked-button (click)="back()">Back</button>
+                        </div>
+                       
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pb-0 gap-y-0 w-full min-w-0">
+                            <div class="flex flex-col flex-auto overflow-hidden">
+                                <mat-form-field class="w-full">
+                                  <mat-label>UG Courses </mat-label>
+                                  <mat-select multiple formControlName="ugcourse" (selectionChange)="changeUGSelection($event.value)" >
+                                    <mat-option >
+                                        <ngx-mat-select-search noEntriesFoundLabel="Course not found, please enter valid course name"
+                                        formControlName="searchUg" placeholderLabel="search ug course name ..." (keyup)="searchUGCourses()">
+                                        </ngx-mat-select-search>
+                                    </mat-option>
+                                    <mat-option *ngFor="let item of UGCourseslist" [value]="item">
+                                      {{ item.name }}
+                                    </mat-option>
+                                  </mat-select>
+
+                                 
+
+
+                                </mat-form-field>
+                                <div *ngIf="coursesForm.value?.ugcourse?.length != 0" class="rounded-lg bg-gray-200 p-6">
+                                  <mat-label class="font-bold ">Selected UG Courses:</mat-label>
+                                  <div class="flex flex-col flex-auto overflow-hidden" *ngFor="let item of coursesForm.value.ugcourse; let i = index">
+                                    <mat-label class="flex items-center justify-between">{{i+1}} : {{item.name}}
+                                        <div  class="flex">
+                                            <mat-icon class="icon-size-5 text-blue-500 ml-5 " svgIcon="mat_outline:remove_red_eye" (click)="viewCourse(item.id)" matTooltip="View Course Details" matTooltipPosition="above"></mat-icon>
+                                            <mat-icon class="icon-size-5 text-red-500 ml-5" svgIcon="mat_outline:close" (click)="removeUgCourse(i , item.id)"  matTooltip="Remove Course" matTooltipPosition="above"></mat-icon>
+                                        </div>
+                                    </mat-label>
+                                  </div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col flex-auto overflow-hidden" >
+                                <mat-form-field class="w-full">
+                                    <mat-label>PG Courses</mat-label>
+                                    <mat-select multiple formControlName="pgcourse" (selectionChange)="changePGSelection($event.value)">
+                                        <mat-option >
+                                            <ngx-mat-select-search noEntriesFoundLabel="Course not found, please enter valid course name"
+                                        formControlName="searchPg" placeholderLabel="search pg course name ..." (keyup)="searchPGCourses()" >
+                                        </ngx-mat-select-search>
+                                        </mat-option>
+
+                                        <mat-option *ngFor="let item of PGCourseslist" [value]="item">
+                                            {{item.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <div *ngIf="subLoader1" class="wrapper-loader ml-6">
+                                        <img class="img-fluid"
+                                            style="width: 30px; margin-left: auto; margin-right: auto;"
+                                            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                    </div>
+                                </mat-form-field>
+                                <div *ngIf="coursesForm.value?.pgcourse?.length != 0" class="rounded-lg bg-gray-200 p-6">
+                                    <mat-label class="font-bold">Selected PG Courses :</mat-label>
+                                    <div class="flex flex-col flex-auto overflow-hidden"  *ngFor="let item of coursesForm.value.pgcourse; let i = index">
+                                          <div>
+                                        <mat-label  class="flex items-center  justify-between">{{i+1}} : {{item.name}}
+                                            <div  class="flex">
+                                                <mat-icon class="icon-size-5 text-blue-500 ml-5" svgIcon="mat_outline:remove_red_eye" (click)="viewCourse(item.id)" matTooltip="View Course Details" matTooltipPosition="above"></mat-icon>
+                                            <mat-icon class="icon-size-5 text-red-500 ml-5" svgIcon="mat_outline:close" (click)="removePGCourse(i , item.id)"  matTooltip="Remove Course" matTooltipPosition="above"></mat-icon>
+                                            </div>
+                                        </mat-label>
+
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col flex-auto overflow-hidden mt-7" >
+                                <mat-form-field class="w-full">
+                                    <mat-label>Diploma Courses</mat-label>
+                                    <mat-select multiple formControlName="diplomacourse" (selectionChange)="changeDiplomaSelection($event.value)">
+                                        <mat-option>
+                                            <ngx-mat-select-search noEntriesFoundLabel="Course not found, please enter valid course name"
+                                            formControlName="searchDp" placeholderLabel="search diploma course name ..." (keyup)="searchDiplomaCourses()">
+                                            </ngx-mat-select-search>
+                                        </mat-option>
+                                        <mat-option *ngFor="let item of DiplomaCourseslist" [value]="item">
+                                            {{item.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <div *ngIf="coursesForm.value?.diplomacourse?.length != 0" class="rounded-lg bg-gray-200 p-6">
+                                    <mat-label class="font-bold">Selected Diploma Courses :</mat-label>
+                                    <div class="flex flex-col flex-auto overflow-hidden"  *ngFor="let item of coursesForm.value.diplomacourse; let i = index">
+                                        <div></div>
+                                        <mat-label class="flex items-center justify-between">{{i+1}} : {{item.name}}
+                                            <div  class="flex">
+                                                <mat-icon class="icon-size-5 text-blue-500 ml-5" svgIcon="mat_outline:remove_red_eye" (click)="viewCourse(item.id)" matTooltip="View Course Details" matTooltipPosition="above"></mat-icon>
+                                                <mat-icon class="icon-size-5 text-red-500 ml-5" svgIcon="mat_outline:close" (click)="removeDiplomaCourse(i , item.id)"  matTooltip="Remove Course" matTooltipPosition="above"></mat-icon>
+
+                                            </div>
+
+                                        </mat-label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="flex flex-col flex-auto overflow-hidden mt-7" >
+                                <mat-form-field class="w-full">
+                                    <mat-label>Doctorial Courses</mat-label>
+                                    <mat-select multiple formControlName="doctorialcourse" (selectionChange)="changeDoctorialSelection($event.value)">
+                                        <mat-option>
+                                            <ngx-mat-select-search noEntriesFoundLabel="Course not found, please enter valid course name"
+                                            formControlName="searchDoc" placeholderLabel="search doctorial course name ..." (keyup)="searchDocCourses()" >
+                                            </ngx-mat-select-search>
+                                        </mat-option>
+
+                                        <mat-option *ngFor="let item of DoctorialCourseslist" [value]="item">
+                                            {{item.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <div *ngIf="coursesForm.value?.doctorialcourse?.length != 0" class="rounded-lg bg-gray-200 p-6">
+                                    <mat-label class="font-bold">Selected Doctorial Courses :</mat-label>
+                                    <div class="flex flex-col flex-auto overflow-hidden"  *ngFor="let item of coursesForm.value.doctorialcourse; let i = index">
+
+                                        <mat-label class="flex items-center justify-between">{{i+1}} : {{item.name}}
+                                            <div  class="flex">
+                                                <mat-icon class="icon-size-5 text-blue-500 ml-5" svgIcon="mat_outline:remove_red_eye" (click)="viewCourse(item.id)"  matTooltip="View Course Details" matTooltipPosition="above"></mat-icon>
+                                                <mat-icon class="icon-size-5 text-red-500 ml-5" svgIcon="mat_outline:close" (click)="removeDoctorialCourses(i , item.id)"  matTooltip="Remove Course" matTooltipPosition="above"></mat-icon>
+
+                                            </div>
+
+
+                                        </mat-label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="flex flex-col flex-auto overflow-hidden mt-7" >
+                                <mat-form-field class="w-full">
+                                    <mat-label>Post Doctorial Courses</mat-label>
+                                    <mat-select multiple formControlName="postdoctorialcourse" (selectionChange)="changePostDocrSelection($event.value)">
+                                        <mat-option>
+                                            <ngx-mat-select-search noEntriesFoundLabel="Course not found, please enter valid course name"
+                                            formControlName="searcPostDoc" placeholderLabel="search post doctorial course name ..." (keyup)="searchPostDocCourses()" >
+                                            </ngx-mat-select-search>
+                                        </mat-option>
+                                        <mat-option *ngFor="let item of postCourseslist" [value]="item">
+                                            {{item.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <div *ngIf="coursesForm.value?.postdoctorialcourse?.length != 0" class="rounded-lg bg-gray-200 p-6">
+                                    <mat-label class="font-bold">Selected Post Doctorial Courses:</mat-label>
+                                    <div class="flex flex-col flex-auto overflow-hidden"  *ngFor="let item of coursesForm.value.postdoctorialcourse; let i = index">
+                                        <mat-label class="flex items-center justify-between">{{i+1}} : {{item.name}}
+                                            <div  class="flex">
+                                                <mat-icon class="icon-size-5 text-blue-500 ml-5" svgIcon="mat_outline:remove_red_eye" (click)="viewCourse(item.id)" matTooltip="View Course Details" matTooltipPosition="above"></mat-icon>
+                                                <mat-icon class="icon-size-5 text-red-500 ml-5" svgIcon="mat_outline:close" (click)="removePostDoctrialCourse(i , item.id)"  matTooltip="Remove Course" matTooltipPosition="above"></mat-icon>
+
+
+                                            </div>
+
+
+                                        </mat-label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="flex flex-col flex-auto overflow-hidden mt-7" >
+                                <mat-form-field class="w-full">
+                                    <mat-label>Advanced Masters Courses</mat-label>
+                                    <mat-select multiple formControlName="advancedmastercourse" (selectionChange)="changeAdvMasterSelection($event.value)">
+                                        <mat-option >
+                                            <ngx-mat-select-search noEntriesFoundLabel="Course not found, please enter valid course name"
+                                        formControlName="searcAdvMas" placeholderLabel="search advanced master course name ..." (keyup)="searchAdvMasterCourses()">
+                                        </ngx-mat-select-search>
+                                        </mat-option>
+                                        <mat-option *ngFor="let item of advMasteCourseslist" [value]="item">
+                                            {{item.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <div *ngIf="coursesForm.value?.advancedmastercourse?.length != 0" class="rounded-lg bg-gray-200 p-6">
+                                    <mat-label class="font-bold">Selected Advanced Masters Courses:</mat-label>
+                                    <div class="flex flex-col flex-auto overflow-hidden"  *ngFor="let item of coursesForm.value.advancedmastercourse; let i = index">
+                                        <mat-label class="flex items-center justify-between">{{i+1}} : {{item.name}}
+                                            <div  class="flex">
+                                                <mat-icon class="icon-size-5 text-blue-500 ml-5" svgIcon="mat_outline:remove_red_eye" (click)="viewCourse(item.id)" matTooltip="View Course Details" matTooltipPosition="above"></mat-icon>
+                                                <mat-icon class="icon-size-5 text-red-500 ml-5" svgIcon="mat_outline:close" (click)="removeAdvMasterCourses(i , item.id)"  matTooltip="Remove Course" matTooltipPosition="above"></mat-icon>
+                                            </div>
+
+
+                                        </mat-label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="flex flex-col flex-auto overflow-hidden mt-7" >
+                                <mat-form-field class="w-full">
+                                    <mat-label>Other Courses</mat-label>
+                                    <mat-select multiple formControlName="othercourse" (selectionChange)="changeOtherSelection($event.value)">
+                                        <mat-option >
+                                            <ngx-mat-select-search noEntriesFoundLabel="Course not found, please enter valid course name"
+                                        formControlName="searchOther" placeholderLabel="search other course name ..."  (keyup)="searchOtherCourses()">
+                                        </ngx-mat-select-search>
+                                        </mat-option>
+                                        <mat-option *ngFor="let item of OtherCourseslist" [value]="item">
+                                            {{item.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <div *ngIf="coursesForm.value?.othercourse?.length != 0" class="rounded-lg bg-gray-200 p-6">
+                                    <mat-label class="font-bold">Selected Other Courses :</mat-label>
+                                    <div class="flex flex-col flex-auto overflow-hidden"  *ngFor="let item of coursesForm.value.othercourse; let i = index">
+
+                                        <mat-label class="flex items-center justify-between">{{i+1}} : {{item.name}}
+                                            <div class="flex">
+                                            <mat-icon class="icon-size-5 text-blue-500 ml-5" svgIcon="mat_outline:remove_red_eye" (click)="viewCourse(item.id)" matTooltip="View Course Details" matTooltipPosition="above"></mat-icon>
+                                            <mat-icon class="icon-size-5 text-red-500 ml-5" svgIcon="mat_outline:close" (click)="removeOtherCourses(i , item.id)"  matTooltip="Remove Course" matTooltipPosition="above"></mat-icon>
+                                        </div>
+                                        </mat-label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <div class="grid grid-cols-1 gap-6 p-6 gap-y-0 w-full min-w-0">
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="insertCourseForClg()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updateCourseForClg()">
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+            </form>
+         </div>
+    </div>
+</div>

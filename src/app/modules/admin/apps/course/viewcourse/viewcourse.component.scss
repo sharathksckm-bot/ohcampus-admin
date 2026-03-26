@@ -1,0 +1,42 @@
+// .status-active {
+//  background-color: green !important;
+//     color: white !important;
+//     border-radius: 25px;
+//     width: 100px;
+
+// }
+
+// .status-inactive {
+//     background-color: red !important;
+//     color: white !important;
+//     border-radius: 25px;
+//     width: 100px;}
+
+// .status-unknown {
+//     background-color: yellow !important;
+//     color: black !important;
+//     border-radius: 25px;
+//     width: 100px;
+// }
+.active {
+    background-color: green !important;
+    color: white !important;
+    border-radius: 25px;
+    width: 100px;
+}
+
+.inactive {
+    background-color: red !important;
+    color: white !important;
+    border-radius: 25px;
+    width: 100px;
+}
+
+.unknown {
+    background-color: yellow !important;
+    color: rgb(6, 6, 6) !important;
+    border-radius: 25px;
+    width: 100px;
+}
+
+

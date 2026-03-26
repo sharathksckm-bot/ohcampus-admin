@@ -1,0 +1,93 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <div class=" bg-card shadow rounded-2xl">
+                <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                    <span class="text-white font-medium" style="font-size: 17px;">College FAQs</span>
+                    <button  class="rounded bg-white" mat-stroked-button (click)="back()">Back</button>
+                </div>
+                <form [formGroup]="faqsForm" >
+                    <div formArrayName="faqsArrayData">
+                        <div *ngFor="let faqsArrayData of faqsArrayData().controls; let faqsIndex = index ">
+                            <div [formGroupName]="faqsIndex" class="border  m-6 mb-0 ">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2  gap-6 p-6 gap-y-6">
+                                    <td class="hidden">
+                                        <mat-form-field class="w-full">
+                                           <input matInput formControlName="id">
+                                        </mat-form-field>
+                                    </td>
+                                    <div class="flex flex-col flex-auto overflow-hidden">
+                                        <mat-form-field class="w-full">
+                                          <mat-label>Category<span class="red">*</span></mat-label>
+                                          <mat-select formControlName="faqstype" (ngModelChange)="getAllfaqsForCollege(faqsArrayData.value.faqstype,faqsIndex)" (ngModelChange)="addMember(faqsIndex)">
+                                            <mat-option *ngFor="let item of categoryList" [value]="item.id">
+                                              {{ item.catname }}
+                                            </mat-option>
+                                          </mat-select>
+                                          <mat-error *ngIf="faqsArrayData.get('faqstype').hasError('required')">Please select FAQs category</mat-error>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <div class="flex flex-col flex-auto overflow-hidden" >
+                                        <mat-form-field class="w-full">
+                                            <mat-label>Frequently Asked Questions (FAQs)<span class="red">*</span></mat-label>
+                                            <mat-select multiple formControlName="faqs" (selectionChange)="changeSelection(faqsArrayData.value.faqs, faqsIndex)">
+                                                <mat-option *ngFor="let item of faqslist[faqsIndex]" [value]="item">
+                                                    {{ item.heading }}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-error *ngIf="faqsArrayData.get('faqs').hasError('required')">Please select FAQs</mat-error>
+                                        </mat-form-field>
+
+                                        <div *ngIf="selectedFaqs?.length != 0 " class="rounded-lg bg-gray-200 p-6">
+                                            <mat-label class="font-bold">Selected FAQs :</mat-label>
+                                            <div class="flex flex-col flex-auto overflow-hidden" *ngFor="let item of selectedFaqs[faqsIndex]; let i = index">
+                                                <mat-label class="flex items-center justify-between">{{i+1}} : {{item.heading}}</mat-label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1  gap-6 px-6 pt-1 gap-y-0 w-full min-w-0 pb-0">
+                                    <div class="flex overflow-hidden justify-end">
+                                        <button *ngIf="faqsIndex >= 1" class="" mat-icon-button  (click)="removeItem(faqsArrayData,faqsIndex)">
+                                            <mat-icon  class="icon-size-5 text-red-600">delete</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6  gap-y-0 w-full min-w-0">
+                    <div class="flex items-center flex-auto overflow-hidden justify-start ">
+                        <button class="fuse-mat-button-rounded mr-3" mat-flat-button [color]="'primary'"
+                        (click)="addItem()">Add More
+                        </button>
+                    </div>
+                    <div class="flex items-center flex-auto overflow-hidden justify-end ">
+                        <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updateFaqsDetails()">
+                            <span  *ngIf="!addLoader">Submit</span>
+                            <div *ngIf="addLoader" class="wrapper-loader">
+                                <img class="img-fluid"
+                                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                            </div>
+                        </button>
+                        <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updateFaqsDetails()">
+                            <span  *ngIf="!updateLoader">Update</span>
+                            <div *ngIf="updateLoader" class="wrapper-loader">
+                                <img class="img-fluid"
+                                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>

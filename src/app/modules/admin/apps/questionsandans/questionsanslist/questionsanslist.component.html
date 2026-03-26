@@ -1,0 +1,191 @@
+<div class="sm:col-span-2 md:col-span-4 flex flex-col flex-auto bg-card m-6 shadow rounded-1xl overflow-hidden">
+    <div class="xl:col-span-2 flex flex-col flex-auto  overflow-hidden">
+
+      <div *ngIf="listLoader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+     </div>
+    <div  *ngIf="!listLoader" >
+      <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+        <span class="text-white font-medium" style="font-size: 17px;">Q&A</span>
+        <!-- <button  class="rounded  bg-white" mat-stroked-button   >Add Cut-Off</button> -->
+      </div>
+      <form [formGroup]="questionandanswerList"  >
+      <div class="flex justify-end mt-2" style="align-items: center;">
+            <mat-form-field class="example-full-width mr-6 " style="width: 200px;">
+            <input matInput type="search" formControlName="search" placeholder="Search" (keyup)="applyFilter($event.target.value)">
+            <div *ngIf="searchLoader" class="wrapper-loader">
+              <img class="img-fluid"
+                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+            </div>
+          </mat-form-field>
+      </div>
+      <div class="mat-elevation-z8 mx-6 mb-6" style="overflow-x: auto;">
+
+      <div *ngIf="questionandanswerListData?.length != 0">
+      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)">
+
+        <ng-container matColumnDef="Sr.No">
+          <th mat-header-cell *matHeaderCellDef > Sr.No </th>
+          <td mat-cell *matCellDef="let element; let i = index" style="width: 80px;">
+              {{ (page - 1) * pageSize + i + 1 }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="collegename">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Collegename </th>
+            <td mat-cell *matCellDef="let element"> {{element.collegename}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="course_type">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Type </th>
+            <td mat-cell *matCellDef="let element"> {{element.course_type}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="coursename">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Course Name</th>
+            <td mat-cell *matCellDef="let element"> {{element.coursename}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="question">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Question</th>
+            <td mat-cell *matCellDef="let element"> {{element.question}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="question_asked_by">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Question Asked By </th>
+            <td mat-cell *matCellDef="let element"> {{element.question_asked_by}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="question_view">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Question View </th>
+            <td mat-cell *matCellDef="let element"> {{element.question_view}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="replied">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Replied </th>
+            <td mat-cell *matCellDef="let element"> {{element.replied}} </td>
+        </ng-container>
+
+
+
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let element" style="width: 180px;">
+            <button  mat-icon-button (click)="getQADataByQueId(element.questionid,element.college_id)"> <mat-icon svgIcon="mat_solid:person_add_alt_1" class="icon-size-5 text-yellow-500" matTooltip="Add Ans"></mat-icon></button>
+            <button  class="mx-1" mat-icon-button  (click)="getDetailsById(element.questionid,element.college_id)"><mat-icon svgIcon="mat_solid:question_answer" class="icon-size-5 text-blue-500" matTooltip="Add Comment"></mat-icon></button>
+            <button mat-icon-button (click)="deleteQuestion(element.questionid)" ><mat-icon class="icon-size-5 text-red-600">delete</mat-icon></button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns ; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <div class="flex justify-end" style="align-items: center;">
+        <mat-paginator [pageSize]="pageSize" (page)="onPageChange($event)" [pageSizeOptions]="[5,10,25,100]"  [length]="recordsFiltered"  showFirstLastButtons>
+        </mat-paginator>
+      </div>
+      </div>
+      <div *ngIf="questionandanswerListData?.length === 0 " class="text-center py-3">No records found</div>
+    </div>
+    </form>
+    </div>
+    </div>
+</div>
+
+<!-- popup -->
+
+<div class="popcenter">
+    <ng-template #callAPIDialog>
+        <div class="p-6 overflow-y-auto max-w-full relative" style="width: 50vw;">
+            <mat-icon svgIcon="mat_outline:close" style="color: red; cursor: pointer; position: absolute; z-index: 111; top: 0px; right:2px"
+                matDialogClose="yes" (click)="close()"></mat-icon>
+            <div class="max-w-10xl">
+            <div class="flex-auto">
+                <div class="w-full mx-auto border rounded-lg " >
+                    <div *ngFor="let question of QAData">
+                        <div class="border-b p-2 px-4 mb-2 bg-gray-50 rounded-tl-lg rounded-tr-lg">Q : {{ question.question }}</div>
+                       <div style="height:30vh;" class="overflow-y-auto">
+                        <div class="border-b p-2 px-4 mb-2 font-medium " *ngFor="let answer of question.Answeres">Ans : {{ answer.answer }}
+                        </div>
+                    </div>
+                    <form [formGroup]="postAnswer">
+                    <mat-form-field class="w-full mt-2 px-4">
+                        <mat-label>Add Your Answer </mat-label>
+                        <textarea matInput placeholder="Type here..." formControlName="answer" ></textarea>
+                    </mat-form-field>
+                </form>
+                   <div class="text-right px-4">
+                    <button mat-flat-button color="primary" class="px-3 mb-3" (click)="postAnswere(question.question_id)"> Post Answer <mat-icon svgIcon="mat_solid:send" class="icon-size-5 ml-2"></mat-icon></button>
+                   </div>
+
+                </div>
+                </div>
+          </div>
+        </div>
+     </div>
+   </ng-template>
+</div>
+
+
+<!-- popup -->
+
+<div class="popcenter">
+    <ng-template #callAPIDialog1>
+        <div class="p-6 overflow-y-auto max-w-full relative" style="width: 50vw;">
+            <mat-icon svgIcon="mat_outline:close" style="color: red; cursor: pointer; position: absolute; z-index: 111; top: 0px; right:2px"
+                matDialogClose="yes" (click)="close()"></mat-icon>
+            <div class="max-w-10xl">
+
+            <div class="flex-auto">
+                <div class="w-full mx-auto border rounded-lg " >
+
+                    <div *ngFor="let question of CommentData">
+                        <div class="border-b p-2 px-4 mb-2 bg-gray-50 rounded-tl-lg rounded-tr-lg">Q : {{ question.question }}</div>
+                        <mat-accordion class="custom-accordion mt-4" >
+                            <mat-expansion-panel  *ngFor="let answer of question.Answeres" (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        Answer : {{ answer.answer }}
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <div style="height:20vh;" class="overflow-y-auto">
+                                <div class="w-full mt-4"  *ngFor="let cmt of answer.answere_comments">
+                                    <mat-label>Comments : {{ cmt.comment }}</mat-label>
+                                </div>
+                            </div>
+                                    <form [formGroup]="commentAnswer">
+                                        <mat-form-field class="w-full mt-4 px-2">
+                                            <mat-label>Add Your Comments </mat-label>
+                                            <textarea matInput placeholder="Type here..." formControlName="comment"></textarea>
+                                        </mat-form-field>
+                                    </form>
+                                    <div class="text-right px-4">
+                                        <button mat-flat-button color="primary" class="px-3 mb-3" (click)="postComment(answer.answer_id)"> Post Comments <mat-icon svgIcon="mat_solid:send" class="icon-size-5 ml-2"></mat-icon></button>
+                                    </div>
+
+                            </mat-expansion-panel>
+                        </mat-accordion>
+
+                       <!-- <div style="height:50vh;" class="overflow-y-auto">
+                        <div class="border-b p-2 px-4 mb-2 font-medium " *ngFor="let answer of question.Answeres">Ans : {{ answer.answer }}
+                            <div style="height:30vh;" class="overflow-y-auto">
+                                <div class="border-b p-2 px-4 mb-2 font-medium " *ngFor="let cmt of answer.answere_comments">Comments : {{ cmt.comment }}</div>
+                            </div> -->
+
+
+
+                        <!-- </div> -->
+
+                    <!-- </div> -->
+
+
+                </div>
+                </div>
+          </div>
+        </div>
+     </div>
+   </ng-template>
+</div>

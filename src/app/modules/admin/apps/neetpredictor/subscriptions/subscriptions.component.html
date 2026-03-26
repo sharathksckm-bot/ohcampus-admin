@@ -1,0 +1,224 @@
+<div class="sm:col-span-2 md:col-span-4 flex flex-col flex-auto bg-card m-6 shadow rounded-2xl overflow-hidden">
+    <div class="xl:col-span-2 flex flex-col flex-auto">
+        
+        <!-- Loader -->
+        <div *ngIf="loading" class="flex justify-center items-center py-8">
+            <mat-spinner diameter="40"></mat-spinner>
+        </div>
+
+        <div *ngIf="!loading">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-4 gap-4 p-6 bg-gray-50 border-b">
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-gray-500 text-sm">Total Revenue</div>
+                            <div class="text-2xl font-bold text-green-600">₹{{stats.total_revenue | number}}</div>
+                        </div>
+                        <mat-icon class="text-green-200" style="font-size: 40px; width: 40px; height: 40px;">account_balance</mat-icon>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-gray-500 text-sm">Active Subscriptions</div>
+                            <div class="text-2xl font-bold text-blue-600">{{stats.active_count}}</div>
+                        </div>
+                        <mat-icon class="text-blue-200" style="font-size: 40px; width: 40px; height: 40px;">verified_user</mat-icon>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-gray-500 text-sm">Total Subscriptions</div>
+                            <div class="text-2xl font-bold">{{stats.total_count}}</div>
+                        </div>
+                        <mat-icon class="text-gray-200" style="font-size: 40px; width: 40px; height: 40px;">people</mat-icon>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-gray-500 text-sm">This Month</div>
+                            <div class="text-2xl font-bold text-green-600">₹{{stats.monthly_revenue | number}}</div>
+                        </div>
+                        <mat-icon class="text-green-200" style="font-size: 40px; width: 40px; height: 40px;">trending_up</mat-icon>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header -->
+            <div class="flex justify-between bg-blue-800 p-3 px-6" style="align-items: center;">
+                <div>
+                    <span class="text-white font-medium" style="font-size: 17px;">Subscription Management</span>
+                    <span class="text-white ml-4" style="font-size: 13px; opacity: 0.8;">Manage user premium access</span>
+                </div>
+                <button class="rounded bg-white" mat-stroked-button (click)="openGrantForm()">
+                    <mat-icon>card_giftcard</mat-icon>
+                    Grant Premium Access
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-row gap-4 p-4 border-b">
+                <mat-form-field class="w-64" appearance="outline">
+                    <mat-label>Search User</mat-label>
+                    <input matInput [(ngModel)]="searchText" (keyup.enter)="search()" placeholder="Name, email or phone">
+                    <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Status</mat-label>
+                    <mat-select [(ngModel)]="filterStatus" (selectionChange)="search()">
+                        <mat-option value="">All Status</mat-option>
+                        <mat-option value="active">Active</mat-option>
+                        <mat-option value="expired">Expired</mat-option>
+                        <mat-option value="cancelled">Cancelled</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button mat-raised-button color="primary" (click)="search()">Search</button>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table mat-table [dataSource]="subscriptions" class="w-full">
+                    <ng-container matColumnDef="user">
+                        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 font-semibold">User</th>
+                        <td mat-cell *matCellDef="let row">
+                            <div class="font-medium">{{row.f_name}} {{row.l_name}}</div>
+                            <div class="text-xs text-gray-500">{{row.email}}</div>
+                            <div class="text-xs text-gray-400">{{row.mobile}}</div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="plan">
+                        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 font-semibold">Plan</th>
+                        <td mat-cell *matCellDef="let row">
+                            <span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">{{row.plan_name}}</span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="amount">
+                        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 font-semibold">Amount</th>
+                        <td mat-cell *matCellDef="let row">
+                            <span *ngIf="row.is_manual_grant" class="text-orange-500 font-medium">
+                                <mat-icon class="text-sm align-middle">card_giftcard</mat-icon> Manual Grant
+                            </span>
+                            <span *ngIf="!row.is_manual_grant" class="text-green-600 font-semibold">₹{{row.amount | number}}</span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 font-semibold">Status</th>
+                        <td mat-cell *matCellDef="let row">
+                            <span class="px-2 py-1 rounded text-xs" 
+                                  [ngClass]="{
+                                    'bg-green-100 text-green-800': row.status === 'active',
+                                    'bg-gray-100 text-gray-800': row.status === 'expired',
+                                    'bg-red-100 text-red-800': row.status === 'cancelled',
+                                    'bg-yellow-100 text-yellow-800': row.status === 'pending'
+                                  }">
+                                {{row.status | uppercase}}
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="start_date">
+                        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 font-semibold">Start Date</th>
+                        <td mat-cell *matCellDef="let row">{{row.start_date | date:'mediumDate'}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="expiry_date">
+                        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 font-semibold">Expiry Date</th>
+                        <td mat-cell *matCellDef="let row">
+                            <span [ngClass]="isExpiringSoon(row.expiry_date) ? 'text-orange-600 font-medium' : ''">
+                                {{row.expiry_date | date:'mediumDate'}}
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 font-semibold">Actions</th>
+                        <td mat-cell *matCellDef="let row">
+                            <button mat-icon-button color="primary" matTooltip="Extend" (click)="extendAccess(row)" *ngIf="row.status === 'active'">
+                                <mat-icon>add_circle</mat-icon>
+                            </button>
+                            <button mat-icon-button color="warn" matTooltip="Revoke" (click)="revokeAccess(row)" *ngIf="row.status === 'active'">
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                            <button mat-icon-button matTooltip="View Details" (click)="viewDetails(row)">
+                                <mat-icon>visibility</mat-icon>
+                            </button>
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
+                </table>
+                
+                <div *ngIf="subscriptions.length === 0" class="p-8 text-center text-gray-500">
+                    <mat-icon class="text-6xl text-gray-300">credit_card_off</mat-icon>
+                    <p class="mt-4">No subscriptions found.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grant Access Dialog -->
+    <div *ngIf="showGrantForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-lg shadow-xl">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h2 class="text-xl font-bold text-gray-800">Grant Premium Access</h2>
+                <button mat-icon-button (click)="closeGrantForm()"><mat-icon>close</mat-icon></button>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- User Search -->
+                <mat-form-field class="w-full" appearance="outline">
+                    <mat-label>Search User</mat-label>
+                    <input matInput [(ngModel)]="userSearchText" (input)="searchUser()" placeholder="Name, email or phone">
+                    <mat-icon matSuffix>person_search</mat-icon>
+                </mat-form-field>
+                <div *ngIf="searchUsers.length > 0" class="border rounded max-h-40 overflow-y-auto">
+                    <div *ngFor="let user of searchUsers" 
+                         class="p-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0"
+                         [ngClass]="{'bg-blue-100': selectedUser?.id === user.id}"
+                         (click)="selectUser(user)">
+                        <div class="font-medium">{{user.f_name}} {{user.l_name}}</div>
+                        <div class="text-sm text-gray-500">{{user.email}} | {{user.mobile}}</div>
+                    </div>
+                </div>
+                
+                <!-- Selected User Display -->
+                <div *ngIf="selectedUser" class="p-3 bg-green-50 rounded border border-green-200">
+                    <div class="text-sm text-green-600">Selected User:</div>
+                    <div class="font-medium">{{selectedUser.f_name}} {{selectedUser.l_name}} ({{selectedUser.email}})</div>
+                </div>
+                
+                <!-- Plan Selection -->
+                <mat-form-field class="w-full" appearance="outline">
+                    <mat-label>Select Plan</mat-label>
+                    <mat-select [(ngModel)]="selectedPlan">
+                        <mat-option *ngFor="let plan of plans" [value]="plan">
+                            {{plan.plan_name}} (₹{{plan.price}} - {{plan.duration_days}} days)
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- Duration Override -->
+                <mat-form-field class="w-full" appearance="outline">
+                    <mat-label>Duration (Days)</mat-label>
+                    <input matInput type="number" [(ngModel)]="grantDays" placeholder="Leave blank to use plan default">
+                    <mat-hint>Override plan duration if needed</mat-hint>
+                </mat-form-field>
+
+                <!-- Notes -->
+                <mat-form-field class="w-full" appearance="outline">
+                    <mat-label>Notes (Optional)</mat-label>
+                    <textarea matInput [(ngModel)]="grantNotes" rows="2" placeholder="Reason for manual grant"></textarea>
+                </mat-form-field>
+
+                <div class="flex justify-end gap-4 pt-4 border-t">
+                    <button mat-button (click)="closeGrantForm()">Cancel</button>
+                    <button mat-raised-button color="primary" (click)="grantAccess()" 
+                            [disabled]="loading || !selectedUser || !selectedPlan">
+                        <mat-icon *ngIf="loading" class="animate-spin">sync</mat-icon>
+                        {{loading ? 'Granting...' : 'Grant Access'}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,150 @@
+<div class="sm:col-span-2 md:col-span-4 flex flex-col flex-auto bg-card m-6 shadow rounded-1xl overflow-hidden">
+    <div class="xl:col-span-2 flex flex-col flex-auto">
+        
+        <!-- Header -->
+        <div class="flex items-center bg-purple-800 p-4 px-6">
+            <button mat-icon-button class="text-white mr-4" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <div>
+                <span class="text-white font-medium" style="font-size: 17px;">{{ isEditMode ? 'Edit' : 'Add' }} Cutoff Entry</span>
+                <p class="text-white text-sm opacity-80 mt-1">{{ isEditMode ? 'Update existing cutoff data' : 'Add new cutoff data for KCET, COMEDK, or JEE' }}</p>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="flex flex-col items-center justify-center p-12">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p class="mt-4 text-gray-500">Loading cutoff data...</p>
+        </div>
+
+        <!-- Form -->
+        <form [formGroup]="cutoffForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading" class="p-6">
+            
+            <!-- Basic Info Card -->
+            <div class="bg-white rounded shadow p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <mat-icon class="text-purple-700">info</mat-icon>
+                    Basic Information
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Exam Type *</mat-label>
+                        <mat-select formControlName="exam_type">
+                            <mat-option *ngFor="let exam of examTypes" [value]="exam.code">
+                                {{ exam.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Year *</mat-label>
+                        <mat-select formControlName="year">
+                            <mat-option *ngFor="let year of availableYears" [value]="year">
+                                {{ year }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Round *</mat-label>
+                        <mat-select formControlName="round">
+                            <mat-option *ngFor="let round of availableRounds" [value]="round">
+                                {{ round }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Category</mat-label>
+                        <mat-select formControlName="category">
+                            <mat-option value="Engineering">Engineering</mat-option>
+                            <mat-option value="Pharmacy">Pharmacy</mat-option>
+                            <mat-option value="Nursing">Nursing</mat-option>
+                            <mat-option value="Farm Sciences">Farm Sciences</mat-option>
+                            <mat-option value="Architecture">Architecture</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>College Type *</mat-label>
+                        <mat-select formControlName="college_type">
+                            <mat-option *ngFor="let type of collegeTypes" [value]="type.value">
+                                {{ type.label }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <!-- College Details Card -->
+            <div class="bg-white rounded shadow p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <mat-icon class="text-purple-700">school</mat-icon>
+                    College Details
+                </h3>
+                
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>College Name *</mat-label>
+                    <input matInput formControlName="college_name" placeholder="Enter full college name">
+                </mat-form-field>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Course/Branch *</mat-label>
+                        <input matInput formControlName="course" placeholder="e.g., CS Computers, EC Electronics">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Affiliated To</mat-label>
+                        <input matInput formControlName="affiliated_to" placeholder="e.g., VTU, Bangalore University">
+                    </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Address</mat-label>
+                        <input matInput formControlName="address" placeholder="College address">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Accreditation</mat-label>
+                        <input matInput formControlName="accreditation" placeholder="e.g., A+, A, B++">
+                    </mat-form-field>
+                </div>
+
+                <mat-form-field appearance="outline" class="w-full mt-4">
+                    <mat-label>College URL</mat-label>
+                    <input matInput formControlName="url" placeholder="https://...">
+                </mat-form-field>
+            </div>
+
+            <!-- Cutoff Ranks Card -->
+            <div class="bg-white rounded shadow p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-2 flex items-center gap-2">
+                    <mat-icon class="text-purple-700">leaderboard</mat-icon>
+                    Cutoff Ranks by Reservation
+                </h3>
+                <p class="text-gray-500 text-sm mb-4">Enter closing ranks for each reservation category</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <mat-form-field appearance="outline" *ngFor="let res of currentReservations">
+                        <mat-label>{{ getReservationLabel(res) }} ({{ res }})</mat-label>
+                        <input matInput type="number" [(ngModel)]="cutoffData[res]" [ngModelOptions]="{standalone: true}" placeholder="Rank">
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex justify-end gap-4">
+                <button mat-button type="button" (click)="goBack()">Cancel</button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="isLoading">
+                    <mat-icon>save</mat-icon>
+                    {{ isEditMode ? 'Update' : 'Save' }} Cutoff
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

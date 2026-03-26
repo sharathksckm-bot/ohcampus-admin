@@ -1,0 +1,60 @@
+<div *ngIf="userActivityData.length === 0" class="flex flex-col flex-auto min-w-0">
+
+</div>
+<div *ngIf="userActivityData.length !== 0" class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+                <div class="bg-card shadow rounded-2xl">
+
+                    <div class="flex justify-between bg-gray-800 p-2 px-6 items-center">
+                        <span class="text-white font-medium text-lg">User Activity Details</span>
+                        <button class="rounded bg-white px-4 py-2" mat-stroked-button (click)="back()">Back</button>
+                    </div>
+
+
+                    <div class="flex justify-start p-2 px-6 items-center">
+                        <mat-icon svgIcon="mat_solid:account_circle" class="flex self-center icon-size-8 mr-2 text-blue-500"></mat-icon>
+                        <span class="font-bold text-lg">{{ userName }}</span>
+                    </div>
+
+
+                    <div class="grid grid-cols-1 gap-6 p-6 pt-2 pb-1">
+                        <div class="sm:col-span-2 md:col-span-4 lg:col-span-2">
+                            <div *ngFor="let item of userActivityData" class="flex flex-col p-6 bg-card shadow rounded-2xl overflow-hidden mb-4">
+                                <div class="flex justify-start items-center">
+                                    <mat-icon svgIcon="mat_solid:brightness_1" class="icon-size-3 mr-2 text-blue-500"></mat-icon>
+                                    <span class="font-bold text-lg text-blue-500">{{ item.latest_activity }} :</span>
+                                </div>
+                                <ul class="ml-8">
+                                    <li *ngIf="item.college_name != null">
+                                        <span class="font-semibold">College Name : </span>{{ item.college_name }}
+                                    </li>
+                                    <li *ngIf="item.answer != null">
+                                        <span class="font-semibold">Answer : </span>{{ item.answer }}
+                                    </li>
+                                    <li *ngIf="item.examname != null">
+                                        <span class="font-semibold">Exam : </span>{{ item.examname }}
+                                    </li>
+                                    <li *ngIf="item.question != null">
+                                        <span class="font-semibold">Question : </span>{{ item.question }}
+                                    </li>
+                                    <li>
+                                        <span class="font-semibold">Date & Time : </span>{{ convertDate(item.created_date) }}
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+         </div>
+    </div>
+</div>
+

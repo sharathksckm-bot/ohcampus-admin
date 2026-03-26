@@ -1,0 +1,158 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <form [formGroup]="scholarshipForm" >
+                <div class=" bg-card shadow rounded-2xl">
+                        <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                            <span class="text-white font-medium" style="font-size: 17px;">Scholarship Form</span>
+                            <button  class="rounded  bg-white" mat-stroked-button (click)="back()">Back</button>
+                        </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2  gap-6 p-6 pb-1 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Provider name<span class="red">*</span></mat-label>
+                                <input matInput formControlName="provider_name" min="3">
+                                <mat-error *ngIf="scholarshipForm.get('provider_name').hasError('required')">Please enter
+                                    provider name</mat-error>
+                                <mat-error *ngIf="scholarshipForm.get('provider_name').hasError('minlength')">Enter minimum 3 character
+                                    name</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Name<span class="red">*</span></mat-label>
+                                <input matInput formControlName="name" min="3">
+                                <mat-error *ngIf="scholarshipForm.get('name').hasError('required')">Please enter
+                                    name</mat-error>
+                                <mat-error *ngIf="scholarshipForm.get('name').hasError('minlength')">Enter minimum 3 character
+                                    name</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 px-6 pb-1 gap-y-0 w-full min-w-0">
+                        <ng-container>
+                            <div class="flex flex-col flex-auto overflow-hidden w-full" >
+                                <div class="registration-label">Type<span class="red">*</span></div>
+                                <mat-radio-group formControlName="type" class="m-3"  [ngModuleChange]="typeValue()">
+                                  <mat-radio-button class="registration-radio" class="mr-8" value="link">Link</mat-radio-button>
+                                  <mat-radio-button class="registration-radio" value="file">File</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div *ngIf="scholarshipForm.value.type == 'link'" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 px-6 pb-1 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Link<span class="red">*</span></mat-label>
+                                <input matInput formControlName="linkValue" min="3">
+                                <mat-error *ngIf="scholarshipForm.get('linkValue').hasError('required')">Please enter
+                                    link</mat-error>
+                                <mat-error *ngIf="scholarshipForm.get('linkValue').hasError('minlength')">Enter minimum 3 character
+                                    link</mat-error>
+                            </mat-form-field>
+                       </div>
+                       <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                        <button *ngIf="!updateButton" class="fuse-mat-button-rounded mr-3" mat-flat-button (click)="insertScholarshipsDetails()">
+                            <span  *ngIf="!addLoader">Submit</span>
+                            <div *ngIf="addLoader" class="wrapper-loader">
+                                <img class="img-fluid"
+                                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                            </div>
+                        </button>
+                        <button *ngIf="updateButton" class="fuse-mat-button-rounded mr-3" mat-flat-button (click)="updateScholarshipsDetails()">
+                            <span  *ngIf="!updateLoader">Update</span>
+                            <div *ngIf="updateLoader" class="wrapper-loader">
+                                <img class="img-fluid"
+                                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                            </div>
+                        </button>
+                    </div>
+                    </div>
+                    <div *ngIf="scholarshipForm.value.type == 'file'" class="grid grid-cols-1 gap-6 px-6 py-3 gap-y-0 w-full min-w-0">
+                        <div>
+                            <span class="red">Note: Image must be in png or jpg format with dimension 200px x 300px and must be within 100kb</span>
+                        </div>
+                    </div>
+                    <div *ngIf="scholarshipForm.value.type == 'file'" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pt-0 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-row items-center flex-auto overflow-hidden">
+                            <div>
+                                <input id="image-file-input1"
+                                    class="absolute h-0 w-0 opacity-0 invisible pointer-events-none bg-white"
+                                    (change)="onFileChange($event,'scholarDocument',$event.target.files)"
+                                    type="file" [multiple]="false"
+                                    [accept]="'image/jpeg, image/png'" #imageFileInput1 />
+                                    <label
+                                    class="flex items-center justify-center w-28 h-10 text-black rounded cursor-pointer uplodBtn"
+                                    for="image-file-input1" matRipple>
+                                    <mat-icon svgIcon="mat_outline:add_photo_alternate"
+                                        class="text-black w-4 h-4 min-w-0"></mat-icon>
+                                    <span class="ml-1 mr-1 black">Upload<span class="red">*</span></span>
+                                </label>
+                            </div>
+                            <div *ngIf="showLoader" class="wrapper-loader ml-6">
+                                <img class="img-fluid"
+                                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                            </div>  
+                            <div *ngIf="!showLoader" class="ml-4">
+                                <div class="border rounded bg-gray-50"
+                                    *ngIf="scholarshipForm.value.scholarDocument_FrontFilePath !=''">
+                                    <img class="position-relative shadow-sm maxwh cursorpointer cover"
+                                        style="object-fit: contain; height: 50px;"
+                                        (click)="openImgDialog(scholarshipForm.value.scholarDocument_FrontFilePath)"
+                                        src="{{scholarshipForm.value.scholarDocument_FrontFilePath}}"
+                                        accept="image" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded mr-3" mat-flat-button (click)="insertScholarshipsDetails()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded mr-3" mat-flat-button (click)="updateScholarshipsDetails()">
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    </div>   
+            </form>
+         </div>
+    </div>
+</div>
+<div class="popcenter">
+    <ng-template #callAPIDialog>
+        <div class="flex flex-auto justify-between overflow-hidden relative"
+            *ngIf="showAllDocImg == 1 && ImagedocumentType=='alldocOpenImage'">
+            <h2 matDialogTitle class="font-medium text-xl">viewImage</h2>
+        </div>
+        <div class="p-6 overflow-hidden max-w-full" style="width: 50vw;">
+            <mat-icon svgIcon="mat_outline:close"
+                style="color: red; cursor: pointer; position: absolute; z-index: 111; top: 25%; left: 74%;"
+                matDialogClose="yes" (click)="close()"></mat-icon>
+            <div class="max-w-10xl">
+                <img style="height: 270px;"
+                    class="position-relative maxwh cursorpointer" title=""
+                    src="{{image}} " accept="image" />
+            </div>
+        </div>
+    </ng-template>
+</div>
+

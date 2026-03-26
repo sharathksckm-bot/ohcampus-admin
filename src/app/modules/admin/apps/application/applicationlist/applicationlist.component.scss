@@ -1,0 +1,11 @@
+.dropsearch{
+    width:-webkit-fill-available!important;
+    
+   }
+   ::ng-deep .mat-form-field.dropsearch.mat-form-field-appearance-fill .mat-form-field-wrapper{
+       margin-bottom: 0 !important;
+    }
+
+    .pointer{
+        cursor: no-drop;
+    }

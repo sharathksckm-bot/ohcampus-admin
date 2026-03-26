@@ -1,0 +1,67 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+   
+
+    <!-- Main -->
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <form [formGroup]="packageForm" >
+                <div class=" bg-card shadow rounded-2xl">
+                    <!-- <div class="flex col-span-2  text-white bg-gray-800 p-3 rounded flex-row items-center flex-auto text-lg font-semibold leading-tight tit-border">
+                        User Form</div> -->
+                        <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                            <span class="text-white font-medium" style="font-size: 17px;">Package Form</span>
+                            <button  class="rounded  bg-white" mat-stroked-button (click)="back()">Back</button>
+                        </div>
+                       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pb-1 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Name<span class="red">*</span></mat-label>
+                                <input matInput formControlName="name" (keypress)="checkValidInputData($event,7)" min="3">
+                                <mat-error *ngIf="packageForm.get('name').hasError('required')">Please Enter
+                                    Your Name</mat-error>
+                                <mat-error *ngIf="packageForm.get('name').hasError('minlength')">Enter Minimum 3 character
+                                    Title</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Price<span class="red">*</span></mat-label>
+                                <input matInput formControlName="price" (keypress)="checkValidInputData($event,1)" >
+                                <mat-error *ngIf="packageForm.get('price').hasError('required')">Please Enter
+                                    Price</mat-error>
+                            </mat-form-field>
+                        </div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-6 p-6 pt-0 gap-y-0 w-full min-w-0">
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="insertPackagesDetails()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updatePackagesDetails()">
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    </div>   
+            </form>
+         </div>
+    </div>
+</div>
+

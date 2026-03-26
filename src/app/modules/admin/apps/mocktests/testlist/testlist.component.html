@@ -1,0 +1,203 @@
+<div class="flex flex-col flex-auto">
+    <!-- Header -->
+    <div class="flex flex-wrap items-center p-6 sm:p-8 w-full">
+        <div class="flex flex-auto">
+            <h2 class="text-2xl font-semibold">Mock Tests</h2>
+        </div>
+        <div class="flex flex-wrap items-center ml-auto">
+            <button mat-raised-button color="primary" (click)="addNewTest()">
+                <mat-icon class="mr-1">add</mat-icon>
+                Create New Test
+            </button>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6 sm:p-8 pt-0">
+        <div class="bg-card shadow rounded-2xl">
+            <!-- Search -->
+            <div class="p-4 border-b">
+                <form [formGroup]="searchForm">
+                    <mat-form-field class="w-full sm:w-72" appearance="outline">
+                        <mat-icon matPrefix>search</mat-icon>
+                        <input matInput formControlName="search" placeholder="Search tests..." (keyup)="applyFilter($event.target.value)">
+                    </mat-form-field>
+                </form>
+            </div>
+
+            <!-- Loader -->
+            <div *ngIf="listLoader" class="flex justify-center items-center p-8">
+                <mat-spinner diameter="40"></mat-spinner>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto" *ngIf="!listLoader">
+                <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)" class="w-full">
+
+                    <!-- Sr.No Column -->
+                    <ng-container matColumnDef="Sr.No">
+                        <th mat-header-cell *matHeaderCellDef> # </th>
+                        <td mat-cell *matCellDef="let element; let i = index"> {{ startNum + i + 1 }} </td>
+                    </ng-container>
+
+                    <!-- Title Column -->
+                    <ng-container matColumnDef="title">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Title </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.title || '-' }} </td>
+                    </ng-container>
+
+                    <!-- Exam Type Column -->
+                    <ng-container matColumnDef="exam_type">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Exam Type </th>
+                        <td mat-cell *matCellDef="let element">
+                            <span class="px-2 py-1 rounded text-xs font-medium" 
+                                  [ngClass]="{'bg-blue-100 text-blue-800': element.exam_type === 'NEET',
+                                              'bg-green-100 text-green-800': element.exam_type === 'JEE',
+                                              'bg-purple-100 text-purple-800': element.exam_type === 'KCET',
+                                              'bg-orange-100 text-orange-800': element.exam_type === 'COMEDK',
+                                              'bg-gray-100 text-gray-800': !element.exam_type || element.exam_type === 'General'}">
+                                {{ element.exam_type || 'General' }}
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <!-- Duration Column -->
+                    <ng-container matColumnDef="duration">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Duration </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.duration }} mins </td>
+                    </ng-container>
+
+                    <!-- Total Marks Column -->
+                    <ng-container matColumnDef="total_marks">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Marks </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.total_marks || 0 }} </td>
+                    </ng-container>
+
+                    <!-- Question Count Column -->
+                    <ng-container matColumnDef="question_count">
+                        <th mat-header-cell *matHeaderCellDef> Questions </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.question_count || 0 }} </td>
+                    </ng-container>
+
+                    <!-- Status Column -->
+                    <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef> Status </th>
+                        <td mat-cell *matCellDef="let element">
+                            <span class="px-2 py-1 rounded text-xs font-medium"
+                                  [ngClass]="{'bg-green-100 text-green-800': element.status == 1, 'bg-red-100 text-red-800': element.status != 1}">
+                                {{ element.status == 1 ? 'Active' : 'Inactive' }}
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <!-- Created At Column -->
+                    <ng-container matColumnDef="created_at">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Created </th>
+                        <td mat-cell *matCellDef="let element"> {{ convertDate(element.created_at) }} </td>
+                    </ng-container>
+
+                    <!-- Actions Column -->
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef> Actions </th>
+                        <td mat-cell *matCellDef="let element">
+                            <button mat-icon-button color="primary" matTooltip="Edit Test" (click)="editTest(element)">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button color="accent" matTooltip="Manage Questions" (click)="manageQuestions(element.id)">
+                                <mat-icon>quiz</mat-icon>
+                            </button>
+                            <button mat-icon-button color="warn" matTooltip="Delete" (click)="deleteTest(element.id)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                    <!-- No Data Row -->
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell text-center p-4" [attr.colspan]="displayedColumns.length">
+                            No tests found
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Paginator -->
+            <mat-paginator [length]="recordsFiltered" [pageSize]="pageSize" [pageSizeOptions]="[10, 25, 50, 100]" (page)="onPageChange($event)" showFirstLastButtons></mat-paginator>
+        </div>
+    </div>
+</div>
+
+<!-- Edit/Add Test Dialog -->
+<ng-template #editTestDialog>
+    <h2 mat-dialog-title>{{ currentTestId ? 'Edit Test' : 'Create New Test' }}</h2>
+    <mat-dialog-content>
+        <form [formGroup]="editForm" class="grid grid-cols-2 gap-4">
+            <mat-form-field class="col-span-2" appearance="outline">
+                <mat-label>Test Title</mat-label>
+                <input matInput formControlName="title" placeholder="Enter test title">
+            </mat-form-field>
+
+            <mat-form-field class="col-span-2" appearance="outline">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="2" placeholder="Test description"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Exam Type</mat-label>
+                <mat-select formControlName="exam_type">
+                    <mat-option *ngFor="let type of examTypes" [value]="type.id">{{ type.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Difficulty</mat-label>
+                <mat-select formControlName="difficulty_level">
+                    <mat-option *ngFor="let level of difficultyLevels" [value]="level.id">{{ level.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Duration (minutes)</mat-label>
+                <input matInput type="number" formControlName="duration">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Total Marks</mat-label>
+                <input matInput type="number" formControlName="total_marks">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Passing Marks</mat-label>
+                <input matInput type="number" formControlName="passing_marks">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Negative Marks Value</mat-label>
+                <input matInput type="number" step="0.01" formControlName="negative_marks_value">
+            </mat-form-field>
+
+            <div class="flex items-center">
+                <mat-slide-toggle formControlName="negative_marking">Negative Marking</mat-slide-toggle>
+            </div>
+
+            <div class="flex items-center">
+                <mat-slide-toggle formControlName="status">Active</mat-slide-toggle>
+            </div>
+
+            <mat-form-field class="col-span-2" appearance="outline">
+                <mat-label>Instructions</mat-label>
+                <textarea matInput formControlName="instructions" rows="3" placeholder="Test instructions"></textarea>
+            </mat-form-field>
+        </form>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="close()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="saveTest()" [disabled]="editLoader">
+            <mat-spinner *ngIf="editLoader" diameter="20" class="mr-2"></mat-spinner>
+            {{ currentTestId ? 'Update' : 'Create' }}
+        </button>
+    </mat-dialog-actions>
+</ng-template>

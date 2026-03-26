@@ -1,0 +1,238 @@
+
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <form [formGroup]="courseForm" >
+                <div class=" bg-card shadow rounded-2xl">
+                        <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                            <span class="text-white font-medium" style="font-size: 17px;">Course Form</span>
+                            <button  class="rounded  bg-white" mat-stroked-button (click)="back()">Back</button>
+                        </div>
+                       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pb-0 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Name<span class="red">*</span></mat-label>
+                                <input matInput formControlName="name"  min="3">
+                                <mat-error *ngIf="courseForm.get('name').hasError('required')">Please enter
+                                    name</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Duration<span class="red">*</span></mat-label>
+                                <input matInput formControlName="duration" (keypress)="checkValidInputData($event,1)">
+                                <mat-error *ngIf="courseForm.get('duration').hasError('required')">Please
+                                enter duration</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Course Category<span class="red">*</span></mat-label>
+                                <mat-select formControlName="coursecategory" (ngModelChange)="getSubCategoryByCatId()">
+                                    <mat-option *ngFor="let item of courseList" [value]="item.category_id">
+                                        {{item.name}}
+                                      </mat-option>
+                                </mat-select>
+                              <mat-error *ngIf="courseForm.get('coursecategory').hasError('required')">Please select
+                                course category</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Category<span class="red">*</span></mat-label>
+                                <mat-select formControlName="category" (ngModelChange)="getSubCategoryByCatId()">
+                                    <mat-option *ngFor="let item of courseData" [value]="item.id">
+                                        {{item.catname}}
+                                      </mat-option>
+                                    </mat-select>
+                                <mat-error *ngIf="courseForm.get('category').hasError('required')">Please select
+                                category</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Sub Category<span class="red">*</span></mat-label>
+                                <mat-select formControlName="subcategory">
+                                    <mat-option *ngFor="let item of subCourseList" [value]="item.id">
+                                        {{item.name}}
+                                    </mat-option>
+                                    <mat-option *ngIf="subCourseList == undefined" value="0">
+                                        <span class="red" >Sub category not found.please try another.</span>
+                                    </mat-option>
+                                    </mat-select>
+                                    <div *ngIf="subLoader" class="wrapper-loader ml-6">
+                                        <img class="img-fluid"
+                                            style="width: 30px; margin-left: auto; margin-right: auto;"
+                                            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                    </div>
+                                <mat-error *ngIf="courseForm.get('subcategory').hasError('required')">Please select
+                                sub category</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Eligibility</mat-label>
+                                <textarea matInput formControlName="eligibility" rows="" cols="30" min="3"></textarea>
+                                <mat-error *ngIf="courseForm.get('eligibility').hasError('required')">Please enter
+                                    eligibility</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 px-6  gap-y-0 w-full min-w-0">
+
+
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Scope</mat-label>
+                                <textarea 
+                                    matInput 
+                                    #scopeTextarea
+                                    formControlName="scope" 
+                                    rows="4" 
+                                    cols="30" 
+                                    (keydown)="addBullet($event)" 
+                                    (focus)="addInitialBullet('scope')"
+                                    (blur)="onFocusOut()">
+                                </textarea>
+                                <mat-error *ngIf="courseForm.get('scope').hasError('required')">Please enter scope</mat-error>
+                            </mat-form-field>
+                        </div>
+                        
+                        
+                        
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Job Profile</mat-label>
+                                <textarea matInput formControlName="jobprofile" rows="4" cols="30" matInput 
+                                #jobProfileTextarea
+                                rows="4" 
+                                cols="30" 
+                                (keydown)="addBullet($event)" 
+                                (focus)="addInitialBullet('jobProfile')"
+                                (blur)="onFocusOut()"></textarea>
+                                <mat-error *ngIf="courseForm.get('jobprofile').hasError('required')">Please enter
+                                    job profile</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Certification (Name of Courses)</mat-label>
+                                <textarea matInput formControlName="certification" rows="4" cols="30" matInput 
+                                #certificationTextarea
+                                rows="4" 
+                                cols="30" 
+                                (keydown)="addBullet($event)" 
+                                (focus)="addInitialBullet('certification')"
+                                (blur)="onFocusOut()"></textarea>
+                                <mat-error *ngIf="courseForm.get('certification').hasError('required')">Please enter
+                                    certification</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden mt-6">
+                            <!-- <mat-form-field class="w-full"> -->
+                                <mat-checkbox formControlName="topmenu" (change)="updateTopMenuValue($event)">
+                                    <mat-label>Need to display on home page ?</mat-label>
+                                </mat-checkbox>
+                                  <!-- <mat-error *ngIf="courseForm.get('topmenu').hasError('required')">Please Enter Top Menu</mat-error> -->
+                            <!-- </mat-form-field> -->
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1  gap-6 px-6 pt-3 pb-2 gap-y-0 w-full min-w-0">
+                        <div>
+                            <span class="red">Note: Image must be in png or jpg format with dimension 1100px x 500px and must be within 100kb</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1  gap-6 px-6 pt-3 pb-2 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-row items-center flex-auto overflow-hidden">
+                            <div>
+                                <input id="image-file-input1"
+                                    class="absolute h-0 w-0 opacity-0 invisible pointer-events-none bg-white"
+                                    (change)="onFileChange2($event,'courseDocument',$event.target.files)"
+                                    type="file" [multiple]="false"
+                                    [accept]="'image/jpeg, image/png'" #imageFileInput1 />
+                                <label
+                                    class="flex items-center justify-center w-28 h-10 text-black rounded cursor-pointer uplodBtn"
+                                    for="image-file-input1" matRipple>
+                                    <mat-icon svgIcon="mat_outline:add_photo_alternate"
+                                        class="text-black w-4 h-4 min-w-0"></mat-icon>
+                                    <span class="ml-1 mr-1 black">Upload</span>
+                                </label>
+                            </div>
+                            <div *ngIf="showLoader" class="wrapper-loader ml-6">
+                                <img class="img-fluid"
+                                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                            </div>
+                            <div *ngIf="!showLoader" class="ml-4">
+                                <div class="border rounded bg-gray-50 relative"
+                                    *ngIf="courseForm.value.courseDocument_FrontFileName != ''">
+                                    <mat-icon class="icon-size-5 font-bold " style="color: red; cursor: pointer; position: absolute; right:2px" (click)="deleteDoc()">close</mat-icon>
+                                    <img class="position-relative shadow-sm maxwh cursorpointer cover"
+                                        style="object-fit: contain; height: 50px;"
+                                        (click)="openImgDialog(courseForm.value.courseDocument_FrontFilePath)"
+                                        src="{{courseForm.value.courseDocument_FrontFilePath}}"
+                                        accept="image" />
+                                </div>
+                            </div>
+                            </div>
+                    </div>
+
+                    <div class="grid grid-cols-1  gap-6 px-6 pt-3 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-label class="mb-1 normallabel" >Description</mat-label>
+                            <angular-editor  formControlName="description" [config]="config"></angular-editor>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-6 p-6 gap-y-0 w-full min-w-0">
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="insertCourseDetails()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updateCourseDetails()">
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+            </form>
+         </div>
+    </div>
+</div>
+<div class="popcenter">
+    <ng-template #callAPIDialog>
+        <div class="flex flex-auto justify-between overflow-hidden relative"
+            *ngIf="showAllDocImg == 1 && ImagedocumentType=='alldocOpenImage'">
+            <h2 matDialogTitle class="font-medium text-xl">viewImage</h2>
+        </div>
+        <div class="p-6 overflow-hidden max-w-full" style="width: 50vw;">
+            <mat-icon svgIcon="mat_outline:close"
+                style="color: red; cursor: pointer; position: absolute; z-index: 111; top: 25%; left: 74%;"
+                matDialogClose="yes" (click)="close()"></mat-icon>
+            <div class="max-w-10xl">
+                <img style="height: 270px;"
+                    class="position-relative maxwh cursorpointer" title=""
+                    src="{{image}} " accept="image" />
+            </div>
+        </div>
+    </ng-template>
+</div>
+
+

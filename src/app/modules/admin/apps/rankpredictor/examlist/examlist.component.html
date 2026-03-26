@@ -1,0 +1,236 @@
+<div class="flex flex-col flex-auto">
+    <!-- Header -->
+    <div class="flex flex-wrap items-center p-6 sm:p-8 w-full">
+        <div class="flex flex-auto">
+            <h2 class="text-2xl font-semibold">Rank Predictor - Exams</h2>
+        </div>
+        <div class="flex flex-wrap items-center ml-auto gap-2">
+            <button mat-stroked-button color="primary" (click)="downloadTemplate()">
+                <mat-icon class="mr-1">download</mat-icon>
+                Download CSV Template
+            </button>
+            <button mat-raised-button color="primary" (click)="addNewExam()">
+                <mat-icon class="mr-1">add</mat-icon>
+                Add New Exam
+            </button>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6 sm:p-8 pt-0">
+        <div class="bg-card shadow rounded-2xl">
+            <!-- Search -->
+            <div class="p-4 border-b">
+                <form [formGroup]="searchForm">
+                    <mat-form-field class="w-full sm:w-72" appearance="outline">
+                        <mat-icon matPrefix>search</mat-icon>
+                        <input matInput formControlName="search" placeholder="Search exams..." (keyup)="applyFilter($event.target.value)">
+                    </mat-form-field>
+                </form>
+            </div>
+
+            <!-- Loader -->
+            <div *ngIf="listLoader" class="flex justify-center items-center p-8">
+                <mat-spinner diameter="40"></mat-spinner>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto" *ngIf="!listLoader">
+                <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)" class="w-full">
+
+                    <!-- Sr.No Column -->
+                    <ng-container matColumnDef="Sr.No">
+                        <th mat-header-cell *matHeaderCellDef> # </th>
+                        <td mat-cell *matCellDef="let element; let i = index"> {{ startNum + i + 1 }} </td>
+                    </ng-container>
+
+                    <!-- Exam Name Column -->
+                    <ng-container matColumnDef="exam_name">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Exam Name </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.exam_name || '-' }} </td>
+                    </ng-container>
+
+                    <!-- Exam Code Column -->
+                    <ng-container matColumnDef="exam_code">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Code </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.exam_code || '-' }} </td>
+                    </ng-container>
+
+                    <!-- Category Column -->
+                    <ng-container matColumnDef="category">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Category </th>
+                        <td mat-cell *matCellDef="let element">
+                            <span class="px-2 py-1 rounded text-xs font-medium"
+                                  [ngClass]="{'bg-blue-100 text-blue-800': element.category === 'Medical',
+                                              'bg-green-100 text-green-800': element.category === 'Engineering',
+                                              'bg-purple-100 text-purple-800': element.category === 'Management',
+                                              'bg-orange-100 text-orange-800': element.category === 'Law',
+                                              'bg-gray-100 text-gray-800': !element.category || element.category === 'Other'}">
+                                {{ element.category || 'Other' }}
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <!-- Max Marks Column -->
+                    <ng-container matColumnDef="max_marks">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Max Marks </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.max_marks || 0 }} </td>
+                    </ng-container>
+
+                    <!-- Total Records Column -->
+                    <ng-container matColumnDef="total_records">
+                        <th mat-header-cell *matHeaderCellDef> Data Records </th>
+                        <td mat-cell *matCellDef="let element">
+                            <span class="px-2 py-1 rounded text-xs font-medium"
+                                  [ngClass]="{'bg-green-100 text-green-800': element.total_records > 0, 'bg-red-100 text-red-800': element.total_records === 0}">
+                                {{ element.total_records || 0 }} records
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <!-- Status Column -->
+                    <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef> Status </th>
+                        <td mat-cell *matCellDef="let element">
+                            <span class="px-2 py-1 rounded text-xs font-medium"
+                                  [ngClass]="{'bg-green-100 text-green-800': element.status == 1, 'bg-red-100 text-red-800': element.status != 1}">
+                                {{ element.status == 1 ? 'Active' : 'Inactive' }}
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <!-- Created At Column -->
+                    <ng-container matColumnDef="created_at">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Created </th>
+                        <td mat-cell *matCellDef="let element"> {{ convertDate(element.created_at) }} </td>
+                    </ng-container>
+
+                    <!-- Actions Column -->
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef> Actions </th>
+                        <td mat-cell *matCellDef="let element">
+                            <button mat-icon-button color="primary" matTooltip="Edit Exam" (click)="editExam(element)">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button color="accent" matTooltip="Upload CSV Data" (click)="openUploadDialog(element)">
+                                <mat-icon>upload_file</mat-icon>
+                            </button>
+                            <button mat-icon-button color="warn" matTooltip="Clear All Data" (click)="clearRankData(element)">
+                                <mat-icon>clear_all</mat-icon>
+                            </button>
+                            <button mat-icon-button color="warn" matTooltip="Delete Exam" (click)="deleteExam(element.id)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                    <!-- No Data Row -->
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell text-center p-4" [attr.colspan]="displayedColumns.length">
+                            No exams found. Click "Add New Exam" to create one.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Paginator -->
+            <mat-paginator [length]="recordsFiltered" [pageSize]="pageSize" [pageSizeOptions]="[10, 25, 50, 100]" (page)="onPageChange($event)" showFirstLastButtons></mat-paginator>
+        </div>
+    </div>
+</div>
+
+<!-- Edit/Add Exam Dialog -->
+<ng-template #editExamDialog>
+    <h2 mat-dialog-title>{{ currentExamId ? 'Edit Exam' : 'Add New Exam' }}</h2>
+    <mat-dialog-content>
+        <form [formGroup]="editForm" class="grid grid-cols-2 gap-4">
+            <mat-form-field class="col-span-2" appearance="outline">
+                <mat-label>Exam Name</mat-label>
+                <input matInput formControlName="exam_name" placeholder="e.g. NEET 2025, KCET 2025">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Exam Code</mat-label>
+                <input matInput formControlName="exam_code" placeholder="e.g. NEET_2025, KCET_2025">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Category</mat-label>
+                <mat-select formControlName="category">
+                    <mat-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Max Marks</mat-label>
+                <input matInput type="number" formControlName="max_marks">
+            </mat-form-field>
+
+            <div class="flex items-center">
+                <mat-slide-toggle formControlName="status">Active</mat-slide-toggle>
+            </div>
+
+            <!-- KCET specific fields -->
+            <ng-container *ngIf="editForm.get('category').value === 'KCET'">
+                <mat-form-field appearance="outline">
+                    <mat-label>Board Exam Weightage (%)</mat-label>
+                    <input matInput type="number" formControlName="board_weightage" placeholder="e.g. 50">
+                    <mat-hint>PCM Board Score weightage</mat-hint>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>KCET Score Weightage (%)</mat-label>
+                    <input matInput type="number" formControlName="kcet_weightage" placeholder="e.g. 50">
+                    <mat-hint>KCET Score weightage</mat-hint>
+                </mat-form-field>
+            </ng-container>
+
+            <mat-form-field class="col-span-2" appearance="outline">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="3" placeholder="Exam description (optional)"></textarea>
+            </mat-form-field>
+        </form>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="close()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="saveExam()" [disabled]="editLoader">
+            <mat-spinner *ngIf="editLoader" diameter="20" class="mr-2"></mat-spinner>
+            {{ currentExamId ? 'Update' : 'Create' }}
+        </button>
+    </mat-dialog-actions>
+</ng-template>
+
+<!-- Upload CSV Dialog -->
+<ng-template #uploadDialog>
+    <h2 mat-dialog-title>Upload Rank Data (CSV)</h2>
+    <mat-dialog-content>
+        <div class="mb-4">
+            <p class="text-sm text-gray-600 mb-2">Upload a CSV file with the following columns:</p>
+            <ul class="text-sm text-gray-500 list-disc list-inside mb-4">
+                <li><strong>marks</strong> - Student marks (e.g., 720, 650, 500)</li>
+                <li><strong>rank</strong> - Corresponding rank (e.g., 1, 100, 5000)</li>
+                <li><strong>year</strong> - Year of data (e.g., 2025)</li>
+                <li><strong>category</strong> - Category (General, OBC, SC, ST, EWS)</li>
+            </ul>
+        </div>
+        
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <input type="file" #fileInput accept=".csv" (change)="onFileSelected($event)" class="hidden">
+            <button mat-stroked-button (click)="fileInput.click()">
+                <mat-icon class="mr-2">cloud_upload</mat-icon>
+                {{ selectedFile ? selectedFile.name : 'Select CSV File' }}
+            </button>
+            <p class="text-xs text-gray-500 mt-2" *ngIf="selectedFile">{{ (selectedFile.size / 1024).toFixed(2) }} KB</p>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="close()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="uploadCSV()" [disabled]="uploadLoader || !selectedFile">
+            <mat-spinner *ngIf="uploadLoader" diameter="20" class="mr-2"></mat-spinner>
+            Upload
+        </button>
+    </mat-dialog-actions>
+</ng-template>

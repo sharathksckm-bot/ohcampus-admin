@@ -1,0 +1,199 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader" class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto" style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <form [formGroup]="eventForm">
+                <div class=" bg-card shadow rounded-2xl">
+                    <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                        <span class="text-white font-medium" style="font-size: 17px;">Event Information Form</span>
+                        <button class="rounded  bg-white" mat-stroked-button (click)="back()">Back</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pb-0 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Event Name<span class="red">*</span></mat-label>
+                                <input matInput formControlName="event" min="3">
+                                <mat-error *ngIf="eventForm.get('event').hasError('required')">Please enter
+                                    event name</mat-error>
+                                <mat-error *ngIf="eventForm.get('event').hasError('minlength')">Enter minimum 3
+                                    character
+                                    name</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Mobile Number <span class="red">*</span></mat-label>
+                                <input matInput formControlName="mobileNumber" minlength="10" maxlength="10"
+                                    (keypress)="checkValidInputData($event,1)">
+                                <mat-error *ngIf="eventForm.get('mobileNumber').hasError('required')">Please
+                                    enter mobile number</mat-error>
+                                <mat-error *ngIf="eventForm.get('mobileNumber').hasError('pattern')"> Enter
+                                    valid mobile number</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Email Address <span class="red">*</span></mat-label>
+                                <input matInput formControlName="emailAddress">
+                                <mat-error *ngIf="eventForm.get('emailAddress').hasError('required')">Please
+                                    enter email address</mat-error>
+                                <mat-error *ngIf="eventForm.get('emailAddress').hasError('pattern')"> Enter
+                                    valid email address</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Website<span class="red">*</span></mat-label>
+                                <input matInput formControlName="website" min="3">
+                                <mat-error *ngIf="eventForm.get('website').hasError('required')">Please enter
+                                    website</mat-error>
+                                <mat-error *ngIf="eventForm.get('website').hasError('minlength')">Enter minimum 3
+                                    character
+                                    website</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="example-full-width">
+                                <mat-label class="labelcss">From Date<span class="red">*</span></mat-label>
+                                <input matInput [matDatepicker]="date" (dateChange)="fromDateChange($event)"
+                                    (focus)="date.open()" formControlName="fromdate" [min]="eventMinDate"
+                                    [max]="eventMaxDate">
+                                <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                                <mat-datepicker #date></mat-datepicker>
+                                <mat-error *ngIf="eventForm.get('fromdate').hasError('required')">Please enter from
+                                    date</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="example-full-width">
+                                <mat-label class="labelcss">To Date<span class="red">*</span></mat-label>
+                                <input matInput [matDatepicker]="date2" (dateChange)="fromDateChange2($event)" (focus)="date2.open()" formControlName="todate"
+                                    [min]="eventForm.value.fromdate" [max]="eventMaxDate">
+                                <mat-datepicker-toggle matSuffix [for]="date2"></mat-datepicker-toggle>
+                                <mat-datepicker #date2></mat-datepicker>
+                                <mat-error *ngIf="eventForm.get('todate').hasError('required')">Please enter to
+                                    date</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Map Location<span class="red">*</span></mat-label>
+                                <input matInput formControlName="maplocation" min="3">
+                                <mat-error *ngIf="eventForm.get('maplocation').hasError('required')">Please enter
+                                    map location</mat-error>
+                                <mat-error *ngIf="eventForm.get('maplocation').hasError('minlength')">Enter minimum 3
+                                    character
+                                    map location</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="clggg">
+                                <mat-label>College<span class="red">*</span></mat-label>
+                                <mat-select formControlName="collegeid">
+                                    <mat-option>
+                                        <ngx-mat-select-search class="dropsearch m-1"
+                                            noEntriesFoundLabel="College not found, please enter valid college name"
+                                            formControlName="search" placeholderLabel="search college name here..."
+                                            (keypress)="searchValue()">
+                                        </ngx-mat-select-search>
+                                    </mat-option>
+                                    <mat-option *ngFor="let item of collegeListData" [value]="item.id">
+                                        {{item?.title}} , {{item?.cityname}}, {{item?.statename}}
+                                    </mat-option>
+                                    <mat-option *ngIf="collegeListData == ''" value="0">
+                                        <span class="red">College not found, please enter valid college name</span>
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="eventForm.get('collegeid').hasError('required')">Please select
+                                    college</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Status<span class="red">*</span></mat-label>
+                                <mat-select formControlName="status">
+                                    <mat-option *ngFor="let status of status" [value]="status.id">
+                                        {{status.name}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="eventForm.get('status').hasError('required')">Please select
+                                    status</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <ng-container>
+                            <div class="flex flex-col flex-auto overflow-hidden w-full">
+                                <div class="normallabel mt-5">Package Type</div>
+                                <mat-radio-group formControlName="regPkgType" class="m-3"
+                                    aria-label="Select a registration package type">
+                                    <mat-radio-button class="registration-radio" class="mr-6" value="free_listing">Free
+                                        Listing</mat-radio-button>
+                                    <mat-radio-button class="registration-radio" value="feature_listing">Feature
+                                        Listing</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="grid grid-cols-1  gap-6 px-6  gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Address<span class="red">*</span></mat-label>
+                                <textarea matInput formControlName="address" min="3" rows="5" cols="30"></textarea>
+                                <mat-error *ngIf="eventForm.get('address').hasError('required')">Please enter
+                                    address</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1  gap-6 px-6  gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-label class="mb-1 normallabel">Description<span class="red">*</span></mat-label>
+                            <angular-editor formControlName="description" [config]="config"></angular-editor>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1  gap-6 p-6 gap-y-0 w-full min-w-0">
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button
+                                (click)="insertEventDetails()">
+                                <span *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid" style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt=""
+                                        class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button
+                                (click)="updateEventDetails()">
+                                <span *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid" style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt=""
+                                        class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="popcenter">
+    <ng-template #callAPIDialog>
+        <div class="flex flex-auto justify-between overflow-hidden relative"
+            *ngIf="showAllDocImg == 1 && ImagedocumentType=='alldocOpenImage'">
+            <h2 matDialogTitle class="font-medium text-xl">viewImage</h2>
+        </div>
+        <div class="p-6 overflow-hidden max-w-full" style="width: 50vw;">
+            <mat-icon svgIcon="mat_outline:close"
+                style="color: red; cursor: pointer; position: absolute; z-index: 111; top: 25%; left: 74%;"
+                matDialogClose="yes" (click)="close()"></mat-icon>
+            <div class="max-w-10xl">
+                <img style="height: 270px;" class="position-relative maxwh cursorpointer" title="" src="{{image}} "
+                    accept="image" />
+            </div>
+        </div>
+    </ng-template>
+</div>

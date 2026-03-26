@@ -1,0 +1,111 @@
+<div class="flex flex-col flex-auto">
+    <!-- Header -->
+    <div class="flex flex-wrap items-center p-6 sm:p-8 w-full">
+        <div class="flex flex-auto">
+            <h2 class="text-2xl font-semibold">Test Results</h2>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6 sm:p-8 pt-0">
+        <div class="bg-card shadow rounded-2xl">
+            <!-- Search -->
+            <div class="p-4 border-b">
+                <form [formGroup]="searchForm">
+                    <mat-form-field class="w-full sm:w-72" appearance="outline">
+                        <mat-icon matPrefix>search</mat-icon>
+                        <input matInput formControlName="search" placeholder="Search results..." (keyup)="applyFilter($event.target.value)">
+                    </mat-form-field>
+                </form>
+            </div>
+
+            <!-- Loader -->
+            <div *ngIf="listLoader" class="flex justify-center items-center p-8">
+                <mat-spinner diameter="40"></mat-spinner>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto" *ngIf="!listLoader">
+                <table mat-table [dataSource]="dataSource" class="w-full">
+
+                    <!-- Sr.No Column -->
+                    <ng-container matColumnDef="Sr.No">
+                        <th mat-header-cell *matHeaderCellDef> # </th>
+                        <td mat-cell *matCellDef="let element; let i = index"> {{ startNum + i + 1 }} </td>
+                    </ng-container>
+
+                    <!-- User Name Column -->
+                    <ng-container matColumnDef="user_name">
+                        <th mat-header-cell *matHeaderCellDef> Student </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.user_name || 'Anonymous' }} </td>
+                    </ng-container>
+
+                    <!-- Test Title Column -->
+                    <ng-container matColumnDef="test_title">
+                        <th mat-header-cell *matHeaderCellDef> Test </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.test_title || '-' }} </td>
+                    </ng-container>
+
+                    <!-- Score Column -->
+                    <ng-container matColumnDef="score">
+                        <th mat-header-cell *matHeaderCellDef> Score </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.score || 0 }} / {{ element.total_marks || 0 }} </td>
+                    </ng-container>
+
+                    <!-- Percentage Column -->
+                    <ng-container matColumnDef="percentage">
+                        <th mat-header-cell *matHeaderCellDef> Percentage </th>
+                        <td mat-cell *matCellDef="let element">
+                            <span [class]="getPercentageColor(element.percentage)" class="font-semibold">
+                                {{ element.percentage || 0 }}%
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <!-- Correct Column -->
+                    <ng-container matColumnDef="correct">
+                        <th mat-header-cell *matHeaderCellDef> Correct </th>
+                        <td mat-cell *matCellDef="let element" class="text-green-600"> {{ element.correct_answers || 0 }} </td>
+                    </ng-container>
+
+                    <!-- Wrong Column -->
+                    <ng-container matColumnDef="wrong">
+                        <th mat-header-cell *matHeaderCellDef> Wrong </th>
+                        <td mat-cell *matCellDef="let element" class="text-red-600"> {{ element.wrong_answers || 0 }} </td>
+                    </ng-container>
+
+                    <!-- Unanswered Column -->
+                    <ng-container matColumnDef="unanswered">
+                        <th mat-header-cell *matHeaderCellDef> Skipped </th>
+                        <td mat-cell *matCellDef="let element" class="text-gray-500"> {{ element.unanswered || 0 }} </td>
+                    </ng-container>
+
+                    <!-- Time Taken Column -->
+                    <ng-container matColumnDef="time_taken">
+                        <th mat-header-cell *matHeaderCellDef> Time Taken </th>
+                        <td mat-cell *matCellDef="let element"> {{ formatTime(element.time_taken) }} </td>
+                    </ng-container>
+
+                    <!-- Completed At Column -->
+                    <ng-container matColumnDef="completed_at">
+                        <th mat-header-cell *matHeaderCellDef> Completed </th>
+                        <td mat-cell *matCellDef="let element"> {{ convertDate(element.completed_at) }} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                    <!-- No Data Row -->
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell text-center p-4" [attr.colspan]="displayedColumns.length">
+                            No results found
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Paginator -->
+            <mat-paginator [length]="recordsFiltered" [pageSize]="pageSize" [pageSizeOptions]="[10, 25, 50, 100]" (page)="onPageChange($event)" showFirstLastButtons></mat-paginator>
+        </div>
+    </div>
+</div>

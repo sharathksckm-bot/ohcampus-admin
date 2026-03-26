@@ -1,0 +1,129 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <form [formGroup]="highlightForm" >
+                <div class=" bg-card shadow rounded-2xl">
+                        <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                            <span class="text-white font-medium" style="font-size: 17px;">Course Highlight Form</span>
+                            <button  class="rounded  bg-white" mat-stroked-button (click)="back()">Back</button>
+                        </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pb-0 gap-y-0 w-full min-w-0">
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Annual Fees<span class="red">*</span></mat-label>
+                                <input matInput formControlName="totalFees"  min="3" (keypress)="checkValidInputData($event,1)">
+                                <!-- <mat-error *ngIf="highlightForm.get('totalFees').hasError('required')">Please enter
+                                    total fees</mat-error>
+                                <mat-error *ngIf="highlightForm.get('totalFees').hasError('minlength')">Enter minimum 3 character
+                                    name</mat-error> -->
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>total Intake<span class="red">*</span></mat-label>
+                                <input matInput formControlName="total_intake"  min="3" (keypress)="checkValidInputData($event,1)">
+                                <!-- <mat-error *ngIf="highlightForm.get('total_intake').hasError('required')">Please enter
+                                    total intake</mat-error>
+                                <mat-error *ngIf="highlightForm.get('total_intake').hasError('minlength')">Enter minimum 3 character
+                                    name</mat-error> -->
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Median Salary<span class="red">*</span></mat-label>
+                                <input matInput formControlName="median_salary"  min="3" (keypress)="checkValidInputData($event,1)">
+                                <!-- <mat-error *ngIf="highlightForm.get('median_salary').hasError('required')">Please enter
+                                    median salary</mat-error>
+                                <mat-error *ngIf="highlightForm.get('median_salary').hasError('minlength')">Enter minimum 3 character
+                                    name</mat-error> -->
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Rank<span class="red">*</span></mat-label>
+                                <input matInput formControlName="ranking"  min="3" (keypress)="checkValidInputData($event,1)">
+                                <!-- <mat-error *ngIf="highlightForm.get('ranking').hasError('required')">Please enter
+                                    ranking</mat-error>
+                                <mat-error *ngIf="highlightForm.get('ranking').hasError('minlength')">Enter minimum 3 character
+                                    name</mat-error> -->
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Duration<span class="red">*</span></mat-label>
+                                <input matInput formControlName="duration" (keypress)="checkValidInputData($event,1)">
+                        <!-- <mat-error *ngIf="highlightForm.get('duration').hasError('required')">Please
+                            enter duration</mat-error> -->
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full" >
+                                <mat-label>Level <span class="red">*</span></mat-label>
+                                <mat-select formControlName="level" >
+                                    <mat-option *ngFor="let item of courses" [value]="item.name">
+                                        {{item.name}}
+                                      </mat-option>
+                                </mat-select>
+                             </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Website<span class="red">*</span></mat-label>
+                                <input matInput formControlName="website" min="3">
+                                <!-- <mat-error *ngIf="highlightForm.get('website').hasError('required')">Please enter
+                                    website</mat-error>
+                                <mat-error *ngIf="highlightForm.get('website').hasError('minlength')">Enter minimum 3 character
+                                    website</mat-error> -->
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Slug (like: ga-mba-master)</mat-label>
+                                <input matInput formControlName="slug" min="3">
+                                <!-- <mat-error *ngIf="highlightForm.get('slug').hasError('required')">Please enter
+                                    slug</mat-error>
+                                <mat-error *ngIf="highlightForm.get('slug').hasError('minlength')">Enter minimum 3 character
+                                    slug</mat-error> -->
+                            </mat-form-field>
+                        </div>
+                    </div>
+                        <div class="grid grid-cols-1  gap-6 px-6  gap-y-0 w-full min-w-0">
+                            <div class="flex flex-col flex-auto overflow-hidden">
+                                <mat-label class="mb-1 normallabel" >Description<span class="red">*</span></mat-label>
+                                <angular-editor  formControlName="description" [config]="config"></angular-editor>
+                            </div>
+                        </div>
+
+
+                    <div class="grid grid-cols-1  gap-6 p-6 gap-y-0 w-full min-w-0">
+                        <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updateHighlightsDetails()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded" mat-flat-button (click)="updateHighlightsDetails()">
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+         </div>
+    </div>
+</div>
+
+

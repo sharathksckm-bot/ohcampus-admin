@@ -1,0 +1,98 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div *ngIf="Loader"  class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto ">
+        <div class=" bg-card shadow rounded-2xl">
+            <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                <span class="text-white font-medium" style="font-size: 17px;">Course Brochure Form</span>
+                <button  class="rounded bg-white" mat-stroked-button (click)="back()">Back</button>
+            </div>
+            <div class="grid grid-cols-1 gap-6 px-6 pt-3 gap-y-0 w-full min-w-0">
+                <div>
+                    <span class="red">Note: Provide proper dimension and size (Max. File size should be within 300KB And Support Files only pdf)</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 px-6 pt-2  gap-y-0 w-full min-w-0">
+                <div class="flex flex-col flex-auto overflow-hidden">
+                    <mat-label class="normallabel mb-1">Brochure<span class="red">*</span></mat-label>
+                </div>
+            </div>
+            <form [formGroup]="broucherForm" > 
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pt-0 gap-y-0 w-full min-w-0">
+                    <div class="flex flex-row items-center flex-auto overflow-hidden">
+                       
+                        <div>
+                            <input id="image-file-input1"
+                                class="absolute h-0 w-0 opacity-0 invisible pointer-events-none bg-white"
+                                (change)="onFileChange($event,'broucherDoc',$event.target.files)"
+                                type="file" [multiple]="false"
+                                [accept]="'image/jpg,image/jpeg,image/png,application/pdf'" #imageFileInput1 />
+                            <label
+                                class="flex items-center justify-center w-28 h-10 text-black rounded cursor-pointer uplodBtn"
+                                for="image-file-input1" matRipple>
+                                <mat-icon svgIcon="mat_outline:picture_as_pdf"
+                                    class="text-black w-5 h-5 min-w-0"></mat-icon>
+                                <span class="ml-1 mr-1 black">Upload</span>
+                            </label>
+                        </div>
+                        <div *ngIf="showLoader" class="wrapper-loader ml-6">
+                            <img class="img-fluid"
+                                style="width: 30px; margin-left: auto; margin-right: auto;"
+                                src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                        </div>  
+                        <div *ngIf="!showLoader" class="ml-4">
+                            <div class="imgcss w-14"
+                                *ngIf="broucherForm.value.broucherDoc_FrontFilePath !=''" >
+                                <a href="{{broucherForm.value.broucherDoc_FrontFilePath}}"
+                                                        target="_blank">
+                                                        <mat-icon  class="w-10 h-10 text-red-500" svgIcon="mat_solid:picture_as_pdf"></mat-icon></a>
+                            </div>
+                        </div>
+                        </div>
+                    <div class="flex  items-center flex-auto overflow-hidden justify-end ">
+                        <button *ngIf="!updateButton" class="fuse-mat-button-rounded " mat-flat-button (click)="updateBroucherDetails()">
+                            <span  *ngIf="!addLoader">Submit</span>
+                            <div *ngIf="addLoader" class="wrapper-loader">
+                                <img class="img-fluid"
+                                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                            </div>
+                        </button>
+                        <button *ngIf="updateButton" class="fuse-mat-button-rounded " mat-flat-button (click)="updateBroucherDetails()">
+                            <span  *ngIf="!updateLoader">Update</span>
+                            <div *ngIf="updateLoader" class="wrapper-loader">
+                                <img class="img-fluid"
+                                    style="width: 30px; margin-left: auto; margin-right: auto;"
+                                    src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        </div>
+    </div>
+</div>
+<div class="popcenter">
+    <ng-template #callAPIDialog>
+        <div class="flex flex-auto justify-between overflow-hidden relative"
+            *ngIf="showAllDocImg == 1 && ImagedocumentType=='alldocOpenImage'">
+            <h2 matDialogTitle class="font-medium text-xl">viewImage</h2>
+        </div>
+        <div class="p-6 overflow-hidden max-w-full" style="width: 50vw;">
+            <mat-icon svgIcon="mat_outline:close"
+                style="color: red; cursor: pointer; position: absolute; z-index: 111; top: 25%; left: 74%;"
+                matDialogClose="yes" (click)="close()"></mat-icon>
+            <div class="max-w-10xl">
+                <img style="height: 270px;"
+                    class="position-relative maxwh cursorpointer" title=""
+                    src="{{image}} " accept="image" />
+            </div>
+        </div>
+    </ng-template>
+</div>
+

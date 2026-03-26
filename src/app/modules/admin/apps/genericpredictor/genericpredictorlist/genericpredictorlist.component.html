@@ -1,0 +1,329 @@
+<div class="sm:col-span-2 md:col-span-4 flex flex-col flex-auto bg-card m-6 shadow rounded-1xl overflow-hidden">
+    <div class="xl:col-span-2 flex flex-col flex-auto">
+        
+        <!-- Loader -->
+        <div *ngIf="listLoader" class="wrapper-loader mx-auto mt-6">
+            <img class="wrapper-loader mx-auto"
+                style="width: 100px; margin-left: auto; margin-right: auto;"
+                src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+        </div>
+
+        <div *ngIf="!listLoader">
+            <!-- Header -->
+            <div class="flex justify-between bg-purple-800 p-2 px-6" style="align-items: center;">
+                <div>
+                    <span class="text-white font-medium" style="font-size: 17px;">KCET / COMEDK / JEE Predictor - Cutoff Data</span>
+                    <span class="text-white ml-4" style="font-size: 13px; opacity: 0.8;">Total: {{recordsTotal || 0}} records</span>
+                </div>
+                <div class="flex gap-2">
+                    <button class="rounded bg-green-500 text-white" mat-stroked-button (click)="openImportDialog()">
+                        <mat-icon class="text-white">upload_file</mat-icon>
+                        Import Excel/CSV
+                    </button>
+                    <button class="rounded bg-yellow-500 text-white" mat-stroked-button (click)="exportToExcel()">
+                        <mat-icon class="text-white">file_download</mat-icon>
+                        Export
+                    </button>
+                    <button class="rounded bg-blue-500 text-white" mat-stroked-button (click)="downloadSampleCSV()">
+                        <mat-icon class="text-white">download</mat-icon>
+                        Sample CSV
+                    </button>
+                    <button class="rounded bg-red-600 text-white" mat-stroked-button (click)="openClearDataDialog()">
+                        <mat-icon class="text-white">delete_sweep</mat-icon>
+                        Clear Data
+                    </button>
+                    <button class="rounded bg-white" mat-stroked-button (click)="addCutoff()">
+                        <mat-icon>add</mat-icon>
+                        Add Cutoff
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters Row -->
+            <div class="flex justify-between mt-2 px-6" style="align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div class="flex gap-4" style="align-items: center;">
+                    <mat-form-field appearance="outline" style="width: 200px;">
+                        <mat-label>Filter by Exam</mat-label>
+                        <mat-select [(value)]="selectedExamType" (selectionChange)="onExamTypeChange($event.value)">
+                            <mat-option value="">All Exams</mat-option>
+                            <mat-option *ngFor="let exam of examTypes" [value]="exam.code">
+                                {{ exam.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    
+                    <button mat-stroked-button color="warn" *ngIf="selectedExamType" (click)="deleteBulkCutoffs()">
+                        <mat-icon>delete_sweep</mat-icon>
+                        Delete All {{ selectedExamType }}
+                    </button>
+                </div>
+
+                <mat-form-field class="example-full-width" style="width: 250px;">
+                    <input matInput type="search" [formControl]="searchForm.get('search')" 
+                           placeholder="Search by college, course..." 
+                           (keyup)="applyFilter($event.target.value)">
+                    <div *ngIf="searchLoader" class="wrapper-loader">
+                        <img class="img-fluid"
+                            style="width: 30px; margin-left: auto; margin-right: auto;"
+                            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                    </div>
+                </mat-form-field>
+            </div>
+
+            <!-- Data Table -->
+            <div class="mat-elevation-z8 mx-6 mb-6 mt-4" style="overflow-x: auto;">
+                <div *ngIf="cutoffList?.length != 0">
+                    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)">
+                        
+                        <!-- Sr.No Column -->
+                        <ng-container matColumnDef="Sr.No">
+                            <th mat-header-cell *matHeaderCellDef> Sr.No </th>
+                            <td mat-cell *matCellDef="let element; let i = index" style="width: 60px;">
+                                {{ startNum + i + 1 }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Exam Type Column -->
+                        <ng-container matColumnDef="exam_type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Exam </th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="exam-badge" [ngClass]="getExamTypeClass(element.exam_type)">
+                                    {{ element.exam_type }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Year Column -->
+                        <ng-container matColumnDef="year">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Year </th>
+                            <td mat-cell *matCellDef="let element"> {{ element.year }} </td>
+                        </ng-container>
+
+                        <!-- Round Column -->
+                        <ng-container matColumnDef="round">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Round </th>
+                            <td mat-cell *matCellDef="let element"> {{ element.round }} </td>
+                        </ng-container>
+
+                        <!-- Category Column -->
+                        <ng-container matColumnDef="category">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Category </th>
+                            <td mat-cell *matCellDef="let element"> {{ element.category }} </td>
+                        </ng-container>
+
+                        <!-- College Name Column -->
+                        <ng-container matColumnDef="college_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> College </th>
+                            <td mat-cell *matCellDef="let element" style="max-width: 300px;">
+                                <span [matTooltip]="element.college_name">
+                                    {{ element.college_name | slice:0:40 }}{{ element.college_name?.length > 40 ? '...' : '' }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Course Column -->
+                        <ng-container matColumnDef="course">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Course </th>
+                            <td mat-cell *matCellDef="let element"> {{ element.course }} </td>
+                        </ng-container>
+
+                        <!-- College Type Column -->
+                        <ng-container matColumnDef="college_type">
+                            <th mat-header-cell *matHeaderCellDef> Type </th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="type-badge" [ngClass]="getCollegeTypeClass(element.college_type)">
+                                    {{ getCollegeTypeLabel(element.college_type) }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Action Column -->
+                        <ng-container matColumnDef="action">
+                            <th mat-header-cell *matHeaderCellDef> Actions </th>
+                            <td mat-cell *matCellDef="let element">
+                                <button mat-icon-button color="primary" matTooltip="View Details" (click)="viewMore(element)">
+                                    <mat-icon>visibility</mat-icon>
+                                </button>
+                                <button mat-icon-button color="accent" matTooltip="Edit" (click)="editCutoff(element.id)">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                                <button mat-icon-button color="warn" matTooltip="Delete" (click)="deleteCutoff(element.id)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+
+                    <mat-paginator [length]="recordsFiltered"
+                                   [pageSize]="pageSize"
+                                   [pageSizeOptions]="[10, 25, 50, 100]"
+                                   (page)="onPageChange($event)"
+                                   showFirstLastButtons>
+                    </mat-paginator>
+                </div>
+
+                <!-- No Data -->
+                <div *ngIf="!cutoffList || cutoffList.length === 0" class="text-center p-12">
+                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: #ccc;">inbox</mat-icon>
+                    <p class="text-gray-500 mt-4">No cutoff data found. Import data using the "Import Excel/CSV" button above.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View More Dialog -->
+<ng-template #viewMoreDialog>
+    <h2 mat-dialog-title>Cutoff Details</h2>
+    <mat-dialog-content *ngIf="selectedCutoff" style="min-width: 500px;">
+        <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col">
+                <label class="text-xs text-gray-500">Exam Type</label>
+                <span class="exam-badge inline-block mt-1" [ngClass]="getExamTypeClass(selectedCutoff.exam_type)" style="width: fit-content;">
+                    {{ selectedCutoff.exam_type }}
+                </span>
+            </div>
+            <div class="flex flex-col">
+                <label class="text-xs text-gray-500">Year / Round</label>
+                <span>{{ selectedCutoff.year }} - {{ selectedCutoff.round }}</span>
+            </div>
+            <div class="flex flex-col col-span-2">
+                <label class="text-xs text-gray-500">College</label>
+                <span class="font-medium">{{ selectedCutoff.college_name }}</span>
+            </div>
+            <div class="flex flex-col">
+                <label class="text-xs text-gray-500">Course</label>
+                <span>{{ selectedCutoff.course }}</span>
+            </div>
+            <div class="flex flex-col">
+                <label class="text-xs text-gray-500">Category</label>
+                <span>{{ selectedCutoff.category }}</span>
+            </div>
+            <div class="flex flex-col">
+                <label class="text-xs text-gray-500">Type</label>
+                <span class="type-badge inline-block mt-1" [ngClass]="getCollegeTypeClass(selectedCutoff.college_type)" style="width: fit-content;">
+                    {{ getCollegeTypeLabel(selectedCutoff.college_type) }}
+                </span>
+            </div>
+            <div class="flex flex-col">
+                <label class="text-xs text-gray-500">Affiliated To</label>
+                <span>{{ selectedCutoff.affiliated_to || 'N/A' }}</span>
+            </div>
+            <div class="flex flex-col col-span-2" *ngIf="selectedCutoff.cutoff_data">
+                <label class="text-xs text-gray-500 mb-2">Cutoff Ranks by Reservation</label>
+                <div class="grid grid-cols-4 gap-2">
+                    <div class="bg-gray-100 p-2 rounded text-center" *ngFor="let key of getCutoffDataKeys(selectedCutoff.cutoff_data)">
+                        <span class="text-xs text-gray-500 block">{{ key }}</span>
+                        <span class="font-semibold text-purple-700">{{ selectedCutoff.cutoff_data[key] }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="closeDialog()">Close</button>
+    </mat-dialog-actions>
+</ng-template>
+
+<!-- Import Dialog -->
+<ng-template #importDialog>
+    <h2 mat-dialog-title>Import Cutoff Data</h2>
+    <mat-dialog-content style="min-width: 400px;">
+        <form [formGroup]="importForm">
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Exam Type</mat-label>
+                <mat-select formControlName="exam_type">
+                    <mat-option *ngFor="let exam of examTypes" [value]="exam.code">
+                        {{ exam.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Year</mat-label>
+                <mat-select formControlName="year">
+                    <mat-option *ngFor="let year of availableYears" [value]="year">
+                        {{ year }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Round</mat-label>
+                <mat-select formControlName="round">
+                    <mat-option *ngFor="let round of availableRounds" [value]="round">
+                        {{ round }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <div class="bg-purple-50 p-3 rounded flex items-center gap-2 mb-4">
+                <mat-icon class="text-purple-700">info</mat-icon>
+                <span class="text-sm text-purple-800">Upload Excel (.xlsx) or CSV file with cutoff data.</span>
+            </div>
+
+            <div class="text-center p-6 border-2 border-dashed border-gray-300 rounded">
+                <input type="file" #fileInput accept=".csv,.xlsx,.xls" (change)="importCutoffFile($event)" style="display: none;">
+                <button mat-raised-button color="primary" (click)="fileInput.click()">
+                    <mat-icon>upload_file</mat-icon>
+                    Select File to Import
+                </button>
+            </div>
+        </form>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="closeDialog()">Cancel</button>
+    </mat-dialog-actions>
+</ng-template>
+
+<!-- Clear Data Dialog -->
+<ng-template #clearDataDialog>
+    <div class="p-4">
+        <h2 mat-dialog-title class="text-red-600 flex items-center gap-2">
+            <mat-icon>warning</mat-icon> Clear Cutoff Data
+        </h2>
+        <mat-dialog-content>
+            <div class="mb-4 p-4 bg-red-50 rounded border border-red-200">
+                <p class="text-red-700 font-medium">Warning: This action cannot be undone!</p>
+                <p class="text-gray-600 mt-2">You are about to delete cutoff data. Apply filters below to limit deletion.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-4 mb-4">
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Filter by Exam Type</mat-label>
+                    <mat-select [(ngModel)]="clearDataExamType">
+                        <mat-option value="">All Exams</mat-option>
+                        <mat-option value="KCET">KCET</mat-option>
+                        <mat-option value="COMEDK">COMEDK</mat-option>
+                        <mat-option value="JEE">JEE</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Filter by Year (Optional)</mat-label>
+                    <mat-select [(ngModel)]="clearDataYear">
+                        <mat-option value="">All Years</mat-option>
+                        <mat-option *ngFor="let year of availableYears" [value]="year">{{year}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            
+            <div class="mt-4 p-4 bg-gray-100 rounded">
+                <p class="font-medium text-gray-700">To confirm deletion, type <strong class="text-red-600">DELETE</strong> below:</p>
+                <mat-form-field appearance="outline" class="w-full mt-2">
+                    <input matInput [(ngModel)]="clearDataConfirmation" placeholder="Type DELETE to confirm">
+                </mat-form-field>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions align="end">
+            <button mat-button mat-dialog-close>Cancel</button>
+            <button mat-raised-button color="warn" [mat-dialog-close]="true" 
+                    [disabled]="clearDataConfirmation !== 'DELETE'">
+                Clear Data
+            </button>
+        </mat-dialog-actions>
+    </div>
+</ng-template>

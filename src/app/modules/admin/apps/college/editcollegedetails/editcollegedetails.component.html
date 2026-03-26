@@ -1,0 +1,76 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+                <div class="bg-card shadow rounded-2xl">
+
+
+
+                    <!-- <div class="flex flex-wrap py-2 px-6">
+                        <button  class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(0), 'bg-warm': !isSelected(0), 'text-black': isSelected(0)}" mat-stroked-button (click)="indexNumber(0)"><mat-icon svgIcon="mat_outline:edit" class="mr-1"></mat-icon>Details</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(1), 'bg-warm': !isSelected(1), 'text-black': isSelected(1)}"  mat-stroked-button (click)="indexNumber(1)"><mat-icon svgIcon="mat_outline:image" class="mr-1"></mat-icon>Images</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(2), 'bg-warm': !isSelected(2), 'text-black': isSelected(2)}" mat-stroked-button (click)="indexNumber(2)"><mat-icon svgIcon="mat_outline:category" class="mr-1"></mat-icon>Category</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(3), 'bg-warm': !isSelected(3), 'text-black': isSelected(3)}"  mat-stroked-button (click)="indexNumber(3)"><mat-icon svgIcon="mat_outline:perm_contact_calendar" class="mr-1"></mat-icon>Courses</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(4), 'bg-warm': !isSelected(4), 'text-black': isSelected(4)}" mat-stroked-button (click)="indexNumber(4)"><mat-icon svgIcon="mat_outline:highlight" class="mr-1"></mat-icon>Highlights</button>
+
+
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(5), 'bg-warm': !isSelected(5), 'text-black': isSelected(5)}" mat-stroked-button (click)="indexNumber(5)"><mat-icon svgIcon="mat_outline:highlight" class="mr-1"></mat-icon>Entrance Exam</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(5), 'bg-warm': !isSelected(5), 'text-black': isSelected(5)}"  mat-stroked-button (click)="indexNumber(5)"><mat-icon svgIcon="mat_outline:money" class="mr-1"></mat-icon>Fee structure</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(6), 'bg-warm': !isSelected(6), 'text-black': isSelected(6)}"  mat-stroked-button (click)="indexNumber(6)"><mat-icon svgIcon="mat_outline:fact_check" class="mr-1"></mat-icon>Facilities</button>
+                        <button  class="rounded m-2 px-5 " [ngClass]="{'bg-blue-300': isSelected(7), 'bg-warm': !isSelected(7), 'text-black': isSelected(7)}"  mat-stroked-button (click)="indexNumber(7)"><mat-icon svgIcon="mat_outline:menu_book" class="mr-1"></mat-icon>E-Brochures</button>
+                        <button  class="rounded m-2 px-5 " [ngClass]="{'bg-blue-300': isSelected(8), 'bg-warm': !isSelected(8), 'text-black': isSelected(8)}"  mat-stroked-button (click)="indexNumber(8)"><mat-icon svgIcon="mat_outline:featured_play_list" class="mr-1"></mat-icon>Placement Statistics</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(9), 'bg-warm': !isSelected(9), 'text-black': isSelected(9)}"  mat-stroked-button (click)="indexNumber(9)"><mat-icon svgIcon="mat_outline:school" class="mr-1"></mat-icon>Scholarships</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(10), 'bg-warm': !isSelected(10), 'text-black': isSelected(10)}"  mat-stroked-button (click)="indexNumber(10)"><mat-icon svgIcon="mat_outline:star" class="mr-1"></mat-icon>Ranks</button>
+
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(11), 'bg-warm': !isSelected(11), 'text-black': isSelected(11)}"  mat-stroked-button (click)="indexNumber(11)" ><mat-icon svgIcon="mat_outline:quiz" class="mr-1"></mat-icon>FAQs</button>
+                        <button  class="rounded m-2 " [ngClass]="{'bg-blue-300': isSelected(12), 'bg-warm': !isSelected(12), 'text-black': isSelected(12)}"  mat-stroked-button (click)="indexNumber(12)" ><mat-icon svgIcon="mat_outline:table_chart" class="mr-1"></mat-icon>Table Of Content</button>
+
+                    </div> -->
+                    <div class="flex flex-wrap py-2 px-6">
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(0), 'bg-warm': !isSelected(0), 'text-black': isSelected(0)}" mat-stroked-button (click)="indexNumber(0)"><mat-icon svgIcon="mat_outline:edit" class="mr-1"></mat-icon>Details</button>
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(1), 'bg-warm': !isSelected(1), 'text-black': isSelected(1)}" mat-stroked-button (click)="indexNumber(1)"><mat-icon svgIcon="mat_outline:image" class="mr-1"></mat-icon>Images</button>
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(2), 'bg-warm': !isSelected(2), 'text-black': isSelected(2)}" mat-stroked-button (click)="indexNumber(2)"><mat-icon svgIcon="mat_outline:category" class="mr-1"></mat-icon>Category</button>
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(3), 'bg-warm': !isSelected(3), 'text-black': isSelected(3)}" mat-stroked-button (click)="indexNumber(3)"><mat-icon svgIcon="mat_outline:perm_contact_calendar" class="mr-1"></mat-icon>Courses</button>
+
+
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(4), 'bg-warm': !isSelected(4), 'text-black': isSelected(4)}" mat-stroked-button (click)="indexNumber(4)"> <mat-icon svgIcon="mat_outline:edit" class="mr-1"></mat-icon>Entrance Exam</button>
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(5), 'bg-warm': !isSelected(5), 'text-black': isSelected(5)}" mat-stroked-button (click)="indexNumber(5)"><mat-icon svgIcon="mat_outline:highlight" class="mr-1"></mat-icon>Highlights</button>
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(6), 'bg-warm': !isSelected(6), 'text-black': isSelected(6)}" mat-stroked-button (click)="indexNumber(6)"><mat-icon svgIcon="mat_outline:money" class="mr-1"></mat-icon>Fee structure</button>
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(7), 'bg-warm': !isSelected(7), 'text-black': isSelected(7)}" mat-stroked-button (click)="indexNumber(7)"><mat-icon svgIcon="mat_outline:fact_check" class="mr-1"></mat-icon>Facilities</button>
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(8), 'bg-warm': !isSelected(8), 'text-black': isSelected(8)}" mat-stroked-button (click)="indexNumber(8)"><mat-icon svgIcon="mat_outline:menu_book" class="mr-1"></mat-icon>E-Brochures</button>
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(9), 'bg-warm': !isSelected(9), 'text-black': isSelected(9)}" mat-stroked-button (click)="indexNumber(9)"><mat-icon svgIcon="mat_outline:featured_play_list" class="mr-1"></mat-icon>Placement Statistics</button>
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(10), 'bg-warm': !isSelected(10), 'text-black': isSelected(10)}" mat-stroked-button (click)="indexNumber(10)"><mat-icon svgIcon="mat_outline:school" class="mr-1"></mat-icon>Scholarships</button>
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(11), 'bg-warm': !isSelected(11), 'text-black': isSelected(11)}" mat-stroked-button (click)="indexNumber(11)"><mat-icon svgIcon="mat_outline:star" class="mr-1"></mat-icon>Ranks</button>
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(12), 'bg-warm': !isSelected(12), 'text-black': isSelected(12)}" mat-stroked-button (click)="indexNumber(12)"><mat-icon svgIcon="mat_outline:quiz" class="mr-1"></mat-icon>FAQs</button>
+                        <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(13), 'bg-warm': !isSelected(13), 'text-black': isSelected(13)}" mat-stroked-button (click)="indexNumber(13)"><mat-icon svgIcon="mat_outline:table_chart" class="mr-1"></mat-icon>Table Of Content</button>
+                        <!-- <button class="rounded m-2" [ngClass]="{'bg-blue-300': isSelected(14), 'bg-warm': !isSelected(14), 'text-black': isSelected(14)}" mat-stroked-button (click)="indexNumber(14)"><mat-icon svgIcon="mat_outline:cases" class="mr-1"></mat-icon>KCET CutOff</button> -->
+                        <!-- <button class="rounded m-2"><mat-icon svgIcon="mat_outline:cases"></mat-icon>CutOff</button> -->
+                    </div>
+
+
+                    <div *ngIf="!getData" class="wrapper-loader mx-auto mt-6">
+                        <img class="wrapper-loader mx-auto"
+                            style="width: 100px; margin-left: auto; margin-right: auto;"
+                            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                    </div>
+                    <div *ngIf="getData">
+                    <app-details [collegeDetails]="retriveData" (valueChanged)="onValueChanged($event)" *ngIf="indexNum == 0"></app-details>
+                    <app-images [collegeDetails]="retriveData" [imageData]="imageData" (valueChanged)="onValueChanged($event)" *ngIf="indexNum == 1"></app-images>
+                    <app-categoryy [collegeDetails]="retriveData"  (valueChanged)="onValueChanged($event)" *ngIf="indexNum == 2"></app-categoryy>
+                    <app-coarses [collegeDetails]="retriveData" *ngIf="indexNum == 3" [course_data]="course_data" (valueChanged)="onValueChanged($event)" ></app-coarses>
+                    <app-entranceexams [collegeDetails]="retriveData"  *ngIf="indexNum == 4"   (valueChanged)="onValueChanged($event)" [entranceExam]="entranceExam" ></app-entranceexams>
+                    <app-highlights [collegeDetails]="retriveData" *ngIf="indexNum == 5" [highlights_data]="highlights_data" (valueChanged)="onValueChanged($event)" ></app-highlights>
+                    <app-feestructure [collegeDetails]="retriveData" *ngIf="indexNum == 6" [Fee_structure]="Fee_structure" (valueChanged)="onValueChanged($event)" ></app-feestructure>
+                    <app-facilitiess [collegeDetails]="retriveData" *ngIf="indexNum == 7" (valueChanged)="onValueChanged($event)" ></app-facilitiess>
+                    <app-ebrouchures [collegeDetails]="retriveData" *ngIf="indexNum == 8" [brochures]="brochures" (valueChanged)="onValueChanged($event)" ></app-ebrouchures>
+                    <app-placementstatistics [collegeDetails]="retriveData" *ngIf="indexNum == 9" [placements]="placements" (valueChanged)="onValueChanged($event)" ></app-placementstatistics>
+                    <app-scholarshipss [collegeDetails]="retriveData" *ngIf="indexNum == 10" (valueChanged)="onValueChanged($event)" ></app-scholarshipss>
+                    <app-ranks [collegeDetails]="retriveData" *ngIf="indexNum == 11" (valueChanged)="onValueChanged($event)" [Rank]="Rank" ></app-ranks>
+                    <app-faqs [collegeDetails]="retriveData" *ngIf="indexNum == 12" (valueChanged)="onValueChanged($event)" [faqsData]="faqsData" ></app-faqs>
+                    <app-tableofcontent [collegeDetails]="retriveData" *ngIf="indexNum == 13" [tableofcontent]="tableofcontent" (valueChanged)="onValueChanged($event)"   ></app-tableofcontent>
+
+
+                 </div>
+                </div>
+         </div>
+    </div>
+</div>

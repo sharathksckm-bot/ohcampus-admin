@@ -1,0 +1,61 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+   
+
+    <!-- Main -->
+    <div *ngIf="Loader" class="wrapper-loader mx-auto mt-6">
+        <img class="wrapper-loader mx-auto"
+            style="width: 100px; margin-left: auto; margin-right: auto;"
+            src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+    </div>
+    <div *ngIf="!Loader" class="flex-auto ">
+        <div class="w-full p-6 mx-auto">
+            <form [formGroup]="countryForm" >
+                <div class=" bg-card shadow rounded-2xl">
+                        <div class=" flex justify-between  bg-gray-800 p-2 px-6" style="align-items: center;">
+                            <span class="text-white font-medium" style="font-size: 17px;">Country Form</span>
+                            <button  class="rounded  bg-white" mat-stroked-button (click)="back()">Back</button>
+                        </div>
+                       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 p-6 pb-0 gap-y-0 w-full min-w-0">
+                    
+                        <div class="flex flex-col flex-auto overflow-hidden">
+                            <mat-form-field class="w-full">
+                                <mat-label>Country<span class="red">*</span></mat-label>
+                                <input matInput formControlName="country"  min="3">
+                                <mat-error *ngIf="countryForm.get('country').hasError('required')">Please enter
+                                    country name</mat-error>
+                                <mat-error *ngIf="countryForm.get('country').hasError('pattern')">Enter valid
+                                     name</mat-error>
+                                <mat-error *ngIf="countryForm.get('country').hasError('minlength')">Enter inimum 3 character
+                                    name</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                        <div class="flex  items-center flex-auto overflow-hidden justify-start px-6 pb-3">
+                            <button *ngIf="!updateButton" class="fuse-mat-button-rounded mr-3" mat-flat-button (click)="insertCountryDetails()">
+                                <span  *ngIf="!addLoader">Submit</span>
+                                <div *ngIf="addLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                            <button *ngIf="updateButton" class="fuse-mat-button-rounded mr-3" mat-flat-button (click)="updateCountryDetails()">
+                                <span  *ngIf="!updateLoader">Update</span>
+                                <div *ngIf="updateLoader" class="wrapper-loader">
+                                    <img class="img-fluid"
+                                        style="width: 30px; margin-left: auto; margin-right: auto;"
+                                        src="assets/images/icons/page_loader_default5.gif" alt="" class="w30 rounded-full" />
+                                </div>
+                            </button>
+                        </div>
+                    
+                    </div>   
+            </form>
+         </div>
+    </div>
+</div>
+
+
+

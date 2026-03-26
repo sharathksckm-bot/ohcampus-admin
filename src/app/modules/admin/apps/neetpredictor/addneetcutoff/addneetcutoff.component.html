@@ -1,0 +1,206 @@
+<div class="add-cutoff-container">
+    <!-- Header -->
+    <div class="header-section">
+        <button mat-icon-button class="back-btn" (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="title-area">
+            <h1>{{isEditMode ? 'Edit' : 'Add'}} NEET Cutoff</h1>
+            <p class="subtitle">{{isEditMode ? 'Update the cutoff details below' : 'Enter new NEET cutoff data for college prediction'}}</p>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="isLoading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading cutoff data...</p>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="cutoffForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+        <div class="form-container">
+            <!-- Basic Info Section -->
+            <mat-card class="form-card">
+                <mat-card-header>
+                    <mat-card-title>
+                        <mat-icon>info</mat-icon>
+                        Basic Information
+                    </mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="form-row">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Year</mat-label>
+                            <mat-select formControlName="year" required>
+                                <mat-option *ngFor="let year of years" [value]="year">
+                                    {{year}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="cutoffForm.get('year').invalid">
+                                {{getErrorMessage('year')}}
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>State</mat-label>
+                            <mat-select formControlName="state" required>
+                                <mat-option *ngFor="let state of states" [value]="state">
+                                    {{state}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="cutoffForm.get('state').invalid">
+                                {{getErrorMessage('state')}}
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>Counseling Type</mat-label>
+                            <mat-select formControlName="counseling_type" required>
+                                <mat-option *ngFor="let type of counselingTypes" [value]="type">
+                                    {{type}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+            <!-- College Info Section -->
+            <mat-card class="form-card">
+                <mat-card-header>
+                    <mat-card-title>
+                        <mat-icon>school</mat-icon>
+                        College Information
+                    </mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>College Name</mat-label>
+                            <input matInput formControlName="college_name" placeholder="Enter college name" required>
+                            <mat-error *ngIf="cutoffForm.get('college_name').invalid">
+                                {{getErrorMessage('college_name')}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form-row">
+                        <mat-form-field appearance="outline">
+                            <mat-label>College ID (Optional)</mat-label>
+                            <input matInput formControlName="college_id" placeholder="If linked to existing college" type="number">
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>College Type</mat-label>
+                            <mat-select formControlName="college_type" required>
+                                <mat-option *ngFor="let type of collegeTypes" [value]="type">
+                                    {{type}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>Annual Fee (₹)</mat-label>
+                            <input matInput formControlName="annual_fee" type="number" placeholder="e.g., 50000">
+                            <mat-icon matPrefix>currency_rupee</mat-icon>
+                        </mat-form-field>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+            <!-- Course & Category Section -->
+            <mat-card class="form-card">
+                <mat-card-header>
+                    <mat-card-title>
+                        <mat-icon>category</mat-icon>
+                        Course & Category
+                    </mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="form-row">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Course</mat-label>
+                            <mat-select formControlName="course" required>
+                                <mat-option *ngFor="let course of courses" [value]="course">
+                                    {{course}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>Category</mat-label>
+                            <mat-select formControlName="category" required>
+                                <mat-option *ngFor="let cat of categories" [value]="cat">
+                                    {{cat}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>Round</mat-label>
+                            <mat-select formControlName="round" required>
+                                <mat-option *ngFor="let round of rounds" [value]="round">
+                                    {{round}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+            <!-- Rank Information Section -->
+            <mat-card class="form-card rank-card">
+                <mat-card-header>
+                    <mat-card-title>
+                        <mat-icon>leaderboard</mat-icon>
+                        Rank Information
+                    </mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="form-row rank-row">
+                        <mat-form-field appearance="outline" class="rank-field">
+                            <mat-label>Opening Rank</mat-label>
+                            <input matInput formControlName="opening_rank" type="number" placeholder="e.g., 1" required>
+                            <mat-hint>First rank that got admission</mat-hint>
+                            <mat-error *ngIf="cutoffForm.get('opening_rank').invalid">
+                                {{getErrorMessage('opening_rank')}}
+                            </mat-error>
+                        </mat-form-field>
+
+                        <div class="rank-arrow">
+                            <mat-icon>arrow_forward</mat-icon>
+                        </div>
+
+                        <mat-form-field appearance="outline" class="rank-field">
+                            <mat-label>Closing Rank</mat-label>
+                            <input matInput formControlName="closing_rank" type="number" placeholder="e.g., 5000" required>
+                            <mat-hint>Last rank that got admission</mat-hint>
+                            <mat-error *ngIf="cutoffForm.get('closing_rank').invalid">
+                                {{getErrorMessage('closing_rank')}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="rank-info-note">
+                        <mat-icon>info</mat-icon>
+                        <span>Opening rank should be less than or equal to closing rank</span>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+            <!-- Action Buttons -->
+            <div class="form-actions">
+                <button mat-button type="button" (click)="goBack()" [disabled]="isSubmitting">
+                    Cancel
+                </button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="isSubmitting">
+                    <mat-spinner diameter="20" *ngIf="isSubmitting"></mat-spinner>
+                    <span *ngIf="!isSubmitting">
+                        <mat-icon>{{isEditMode ? 'save' : 'add'}}</mat-icon>
+                        {{isEditMode ? 'Update Cutoff' : 'Add Cutoff'}}
+                    </span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
