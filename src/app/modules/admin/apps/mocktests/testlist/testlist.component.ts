@@ -32,6 +32,7 @@ export class TestListComponent implements OnInit {
     recordsTotal: any = 0;
     recordsFiltered: any = 0;
     searchLoader: boolean = false;
+    statusLoading: number = null;
 
     editForm: FormGroup;
     editLoader: boolean = false;
@@ -39,7 +40,8 @@ export class TestListComponent implements OnInit {
 
     examTypes = [
         { id: 'NEET', name: 'NEET' },
-        { id: 'JEE', name: 'JEE' },
+        { id: 'JEE Main', name: 'JEE Main' },
+        { id: 'JEE Advanced', name: 'JEE Advanced' },
         { id: 'KCET', name: 'KCET' },
         { id: 'COMEDK', name: 'COMEDK' },
         { id: 'General', name: 'General' }
@@ -124,6 +126,30 @@ export class TestListComponent implements OnInit {
             this.listLoader = false;
             this.testListData = [];
             this.dataSource = new MatTableDataSource<any>([]);
+        });
+    }
+
+    toggleStatus(test) {
+        this.statusLoading = test.id;
+        const newStatus = test.status == 1 ? 0 : 1;
+        
+        this.campusService.updateMockTest({ id: test.id, status: newStatus }).subscribe((res) => {
+            this.statusLoading = null;
+            if (res.response_code === 1 || res.response_code === '1') {
+                test.status = newStatus;
+                Swal.fire({
+                    icon: 'success',
+                    title: newStatus === 1 ? 'Test Activated' : 'Test Deactivated',
+                    text: `Test has been ${newStatus === 1 ? 'published and is now active' : 'unpublished'}`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire('Error', res.response_message || 'Failed to update status', 'error');
+            }
+        }, (error) => {
+            this.statusLoading = null;
+            Swal.fire('Error', 'Failed to update test status', 'error');
         });
     }
 

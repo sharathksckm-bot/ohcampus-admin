@@ -1,0 +1,223 @@
+<div class="ai-generator-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>
+      <mat-icon>auto_awesome</mat-icon>
+      AI Mock Test Generator
+    </h1>
+    <p class="subtitle">Generate exam-quality mock tests using AI in seconds</p>
+  </div>
+
+  <!-- Generator Form -->
+  <mat-card class="generator-card" *ngIf="!previewMode">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>psychology</mat-icon>
+        Configure Test Parameters
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="generatorForm" (ngSubmit)="generateTest()">
+        
+        <!-- Exam Type Selection -->
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Select Exam Type</mat-label>
+            <mat-select formControlName="exam_type" (selectionChange)="onExamTypeChange()">
+              <mat-option *ngFor="let exam of examConfigs" [value]="exam.exam_type">
+                {{ exam.exam_type }} ({{ exam.total_questions }} questions, {{ exam.duration }} min)
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>school</mat-icon>
+          </mat-form-field>
+        </div>
+        
+        <!-- Test Title -->
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Test Title</mat-label>
+            <input matInput formControlName="title" placeholder="Enter test title">
+            <mat-icon matPrefix>title</mat-icon>
+          </mat-form-field>
+        </div>
+        
+        <!-- Subject Selection -->
+        <div class="form-row" *ngIf="selectedExam">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Subjects</mat-label>
+            <mat-select formControlName="subjects" multiple>
+              <mat-option *ngFor="let subject of selectedExam.subjects" [value]="subject">
+                {{ subject }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>menu_book</mat-icon>
+          </mat-form-field>
+        </div>
+        
+        <!-- Number of Questions -->
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Number of Questions</mat-label>
+            <input matInput type="number" formControlName="num_questions" min="5" max="200">
+            <mat-icon matPrefix>format_list_numbered</mat-icon>
+            <mat-hint *ngIf="selectedExam">Max: {{ selectedExam.total_questions }}</mat-hint>
+          </mat-form-field>
+        </div>
+        
+        <!-- Difficulty Distribution -->
+        <div class="difficulty-section">
+          <h3>
+            <mat-icon>tune</mat-icon>
+            Difficulty Distribution
+            <span class="total-badge" [class.error]="getTotalPercent() !== 100">
+              Total: {{ getTotalPercent() }}%
+            </span>
+          </h3>
+          
+          <div class="difficulty-sliders">
+            <div class="slider-group">
+              <label>
+                <span class="difficulty-badge easy">Easy</span>
+                {{ generatorForm.get('easy_percent').value }}%
+              </label>
+              <mat-slider min="0" max="100" step="5" formControlName="easy_percent" color="accent">
+                <input matSliderThumb>
+              </mat-slider>
+            </div>
+            
+            <div class="slider-group">
+              <label>
+                <span class="difficulty-badge medium">Medium</span>
+                {{ generatorForm.get('medium_percent').value }}%
+              </label>
+              <mat-slider min="0" max="100" step="5" formControlName="medium_percent" color="primary">
+                <input matSliderThumb>
+              </mat-slider>
+            </div>
+            
+            <div class="slider-group">
+              <label>
+                <span class="difficulty-badge hard">Hard</span>
+                {{ generatorForm.get('hard_percent').value }}%
+              </label>
+              <mat-slider min="0" max="100" step="5" formControlName="hard_percent" color="warn">
+                <input matSliderThumb>
+              </mat-slider>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Save as Draft Option -->
+        <div class="form-row">
+          <mat-checkbox formControlName="save_as_draft" color="primary">
+            Save as draft (review before publishing)
+          </mat-checkbox>
+        </div>
+        
+        <!-- Generate Button -->
+        <div class="actions">
+          <button mat-raised-button color="primary" type="submit" 
+                  [disabled]="isGenerating || !generatorForm.valid || getTotalPercent() !== 100">
+            <mat-icon *ngIf="!isGenerating">auto_awesome</mat-icon>
+            <mat-spinner *ngIf="isGenerating" diameter="20"></mat-spinner>
+            {{ isGenerating ? 'Generating...' : 'Generate Test' }}
+          </button>
+          
+          <button mat-button type="button" (click)="resetForm()">
+            <mat-icon>refresh</mat-icon>
+            Reset
+          </button>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-section" *ngIf="isGenerating">
+          <mat-progress-bar mode="determinate" [value]="generationProgress"></mat-progress-bar>
+          <p class="progress-text">
+            <mat-icon class="spin">sync</mat-icon>
+            AI is generating questions... {{ generationProgress }}%
+          </p>
+        </div>
+        
+      </form>
+    </mat-card-content>
+  </mat-card>
+  
+  <!-- Preview Section -->
+  <div class="preview-section" *ngIf="previewMode && generatedTest">
+    <mat-card class="preview-header-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>visibility</mat-icon>
+          Preview: {{ generatedTest.title }}
+        </mat-card-title>
+        <mat-card-subtitle>
+          {{ generatedTest.questions?.length }} Questions | 
+          {{ generatedTest.duration }} Minutes | 
+          {{ generatedTest.total_marks }} Marks
+        </mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="publishTest()">
+          <mat-icon>publish</mat-icon>
+          Publish Test
+        </button>
+        <button mat-button (click)="goToTestList()">
+          <mat-icon>list</mat-icon>
+          Go to Test List
+        </button>
+        <button mat-button (click)="resetForm()">
+          <mat-icon>add</mat-icon>
+          Generate Another
+        </button>
+      </mat-card-actions>
+    </mat-card>
+    
+    <!-- Questions List -->
+    <div class="questions-preview">
+      <mat-card class="question-card" *ngFor="let question of generatedTest.questions; let i = index">
+        <div class="question-header">
+          <span class="question-number">Q{{ i + 1 }}</span>
+          <span class="question-subject">{{ question.subject }}</span>
+          <span class="difficulty-badge" [ngClass]="question.difficulty_level">
+            {{ question.difficulty_level | titlecase }}
+          </span>
+          <span class="question-marks">{{ question.marks }} marks</span>
+          
+          <div class="question-actions">
+            <button mat-icon-button matTooltip="Edit Question" (click)="editQuestion(question, i)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Regenerate" (click)="regenerateQuestion(question.id)">
+              <mat-icon>refresh</mat-icon>
+            </button>
+          </div>
+        </div>
+        
+        <div class="question-text" [innerHTML]="question.question_text"></div>
+        
+        <div class="options-list">
+          <div class="option" *ngFor="let option of question.options; let j = index"
+               [class.correct]="option.is_correct === '1' || option.is_correct === true">
+            <span class="option-label">{{ ['A', 'B', 'C', 'D'][j] }}.</span>
+            <span class="option-text" [innerHTML]="option.text"></span>
+            <mat-icon *ngIf="option.is_correct === '1' || option.is_correct === true" class="correct-icon">
+              check_circle
+            </mat-icon>
+          </div>
+        </div>
+        
+        <mat-expansion-panel class="explanation-panel" *ngIf="question.explanation">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon>lightbulb</mat-icon>
+              Explanation
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <p class="explanation-text" [innerHTML]="question.explanation"></p>
+        </mat-expansion-panel>
+      </mat-card>
+    </div>
+  </div>
+</div>

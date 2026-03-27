@@ -15,23 +15,31 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SharedModule } from 'app/shared/shared.module';
 import { TestListComponent } from './testlist/testlist.component';
 import { ResultsComponent } from './results/results.component';
 import { QuestionsComponent } from './questions/questions.component';
+import { AiGeneratorComponent } from './ai-generator/ai-generator.component';
 
 const routes: Routes = [
     { path: '', redirectTo: 'testlist', pathMatch: 'full' },
     { path: 'testlist', component: TestListComponent },
     { path: 'results', component: ResultsComponent },
     { path: 'questions', component: QuestionsComponent },
+    { path: 'questions/:testId', component: QuestionsComponent },
+    { path: 'ai-generator', component: AiGeneratorComponent },
 ];
 
 @NgModule({
     declarations: [
         TestListComponent,
         ResultsComponent,
-        QuestionsComponent
+        QuestionsComponent,
+        AiGeneratorComponent
     ],
     imports: [
         RouterModule.forChild(routes),
@@ -50,6 +58,10 @@ const routes: Routes = [
         MatTableModule,
         MatTooltipModule,
         MatDialogModule,
+        MatCardModule,
+        MatSliderModule,
+        MatExpansionModule,
+        MatSnackBarModule,
         SharedModule
     ]
 })

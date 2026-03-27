@@ -4265,40 +4265,6 @@ public deleteexamdocsById(docId):Observable<any>{
             }
         )
     }
-
-    //--------------------------------------------  AI MOCK TEST GENERATOR APIs --------------------------------------------------//
-
-    public getAIExamConfigs(): Observable<any> {
-        return this.httpClient.post(`${this.apiurl3}AIMockTestGenerator/getExamConfigs`, {})
-    }
-
-    public generateAITest(requestData): Observable<any> {
-        return this.httpClient.post(`${this.apiurl3}AIMockTestGenerator/generateTest`, requestData)
-    }
-
-    public previewAITest(requestData): Observable<any> {
-        return this.httpClient.post(`${this.apiurl3}AIMockTestGenerator/previewTest`, requestData)
-    }
-
-    public publishAITest(requestData): Observable<any> {
-        return this.httpClient.post(`${this.apiurl3}AIMockTestGenerator/publishTest`, requestData)
-    }
-
-    public regenerateAIQuestions(requestData): Observable<any> {
-        return this.httpClient.post(`${this.apiurl3}AIMockTestGenerator/regenerateQuestions`, requestData)
-    }
-
-    public getAIGenerationHistory(): Observable<any> {
-        return this.httpClient.post(`${this.apiurl3}AIMockTestGenerator/getGenerationHistory`, {})
-    }
-
-    public updateAIGeneratedQuestion(requestData): Observable<any> {
-        return this.httpClient.post(`${this.apiurl3}AIMockTestGenerator/updateGeneratedQuestion`, requestData)
-    }
-
-    public bulkGenerateAITests(requestData): Observable<any> {
-        return this.httpClient.post(`${this.apiurl3}AIMockTestGenerator/bulkGenerateTests`, requestData)
-    }
 }
 
 // apiURL    OnlineInsurancePortalAPI
