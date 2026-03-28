@@ -136,14 +136,20 @@ export class QuestionsComponent implements OnInit {
             topic: '',
             image_url: ''
         });
-        this.dialog.open(this.editQuestionDialog, { width: '700px' });
+        this.dialog.open(this.editQuestionDialog, { width: '750px', maxHeight: '90vh' });
     }
 
     editQuestion(question) {
+        console.log('Editing question:', question);
+        console.log('image_url from question:', question.image_url);
+        
         this.currentQuestionId = question.id;
         this.selectedImage = null;
         this.imagePreview = null;
         this.currentImageUrl = question.image_url || null;
+        
+        console.log('currentImageUrl set to:', this.currentImageUrl);
+        
         this.editForm.patchValue({
             question: question.question,
             option_a: question.option_a,
@@ -158,7 +164,7 @@ export class QuestionsComponent implements OnInit {
             topic: question.topic,
             image_url: question.image_url || ''
         });
-        this.dialog.open(this.editQuestionDialog, { width: '700px' });
+        this.dialog.open(this.editQuestionDialog, { width: '750px', maxHeight: '90vh' });
     }
 
     onImageSelected(event: Event) {
