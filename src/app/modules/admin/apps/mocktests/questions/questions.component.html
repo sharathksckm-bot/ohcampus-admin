@@ -179,6 +179,31 @@
                 <mat-label>Explanation</mat-label>
                 <textarea matInput formControlName="explanation" rows="2" placeholder="Explanation for the answer"></textarea>
             </mat-form-field>
+
+            <!-- Question Image Upload -->
+            <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Question Image (Optional)</label>
+                <div class="flex items-center gap-4">
+                    <div class="flex-1">
+                        <input type="file" #imageInput accept="image/*" (change)="onImageSelected($event)" class="hidden">
+                        <button mat-stroked-button type="button" (click)="imageInput.click()">
+                            <mat-icon class="mr-2">image</mat-icon>
+                            {{ selectedImage ? 'Change Image' : 'Upload Image' }}
+                        </button>
+                        <span class="text-sm text-gray-500 ml-2" *ngIf="selectedImage">{{ selectedImage.name }}</span>
+                    </div>
+                    <div *ngIf="currentImageUrl || imagePreview" class="flex items-center gap-2">
+                        <img [src]="imagePreview || currentImageUrl" alt="Preview" class="w-20 h-20 object-cover rounded border">
+                        <button mat-icon-button color="warn" type="button" (click)="removeImage()" matTooltip="Remove Image">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                <mat-form-field class="w-full mt-2" appearance="outline" *ngIf="!selectedImage">
+                    <mat-label>Or paste image URL</mat-label>
+                    <input matInput formControlName="image_url" placeholder="https://example.com/image.png">
+                </mat-form-field>
+            </div>
         </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">

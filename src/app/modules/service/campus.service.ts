@@ -4061,6 +4061,9 @@ public deleteexamdocsById(docId):Observable<any>{
         return this.httpClient.post(`${this.apiurl3}MockTest/updateQuestion`, questionData)
     }
 
+    public uploadMockTestImage(formData: FormData): Observable<any> {
+        return this.httpClient.post<any>(this.apiurl3 + "MockTest/uploadImage", formData);
+    }
     public deleteMockTestQuestion(id): Observable<any> {
         return this.httpClient.post(`${this.apiurl3}MockTest/deleteQuestion`,
             {

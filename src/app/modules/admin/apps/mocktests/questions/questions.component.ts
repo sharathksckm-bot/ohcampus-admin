@@ -37,6 +37,9 @@ export class QuestionsComponent implements OnInit {
     currentQuestionId: number = null;
     uploadLoader: boolean = false;
     selectedFile: File = null;
+    selectedImage: File = null;
+    imagePreview: string = null;
+    currentImageUrl: string = null;
 
     correctAnswers = [
         { id: 'A', name: 'Option A' },
@@ -75,7 +78,8 @@ export class QuestionsComponent implements OnInit {
             negative_marks: [1],
             explanation: [''],
             subject: [''],
-            topic: ['']
+            topic: [''],
+            image_url: ['']
         });
     }
 
@@ -115,6 +119,9 @@ export class QuestionsComponent implements OnInit {
 
     addNewQuestion() {
         this.currentQuestionId = null;
+        this.selectedImage = null;
+        this.imagePreview = null;
+        this.currentImageUrl = null;
         this.editForm.reset({
             question: '',
             option_a: '',
@@ -126,13 +133,17 @@ export class QuestionsComponent implements OnInit {
             negative_marks: 1,
             explanation: '',
             subject: '',
-            topic: ''
+            topic: '',
+            image_url: ''
         });
         this.dialog.open(this.editQuestionDialog, { width: '700px' });
     }
 
     editQuestion(question) {
         this.currentQuestionId = question.id;
+        this.selectedImage = null;
+        this.imagePreview = null;
+        this.currentImageUrl = question.image_url || null;
         this.editForm.patchValue({
             question: question.question,
             option_a: question.option_a,
@@ -144,16 +155,61 @@ export class QuestionsComponent implements OnInit {
             negative_marks: question.negative_marks,
             explanation: question.explanation,
             subject: question.subject,
-            topic: question.topic
+            topic: question.topic,
+            image_url: question.image_url || ''
         });
         this.dialog.open(this.editQuestionDialog, { width: '700px' });
     }
 
-    saveQuestion() {
+    onImageSelected(event: Event) {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files[0]) {
+            this.selectedImage = input.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.imagePreview = e.target?.result as string;
+            };
+            reader.readAsDataURL(this.selectedImage);
+        }
+    }
+
+    removeImage() {
+        this.selectedImage = null;
+        this.imagePreview = null;
+        this.currentImageUrl = null;
+        this.editForm.patchValue({ image_url: '' });
+    }
+
+    async uploadImage(): Promise<string> {
+        if (!this.selectedImage) return this.editForm.value.image_url || '';
+        
+        const formData = new FormData();
+        formData.append('image', this.selectedImage);
+        
+        try {
+            const res: any = await this.campusService.uploadMockTestImage(formData).toPromise();
+            if (res.response_code === 1 || res.response_code === '1') {
+                return res.image_url;
+            }
+        } catch (error) {
+            console.error('Image upload failed:', error);
+        }
+        return '';
+    }
+
+    async saveQuestion() {
         this.editLoader = true;
+        
+        // Upload image first if selected
+        let imageUrl = this.editForm.value.image_url || '';
+        if (this.selectedImage) {
+            imageUrl = await this.uploadImage();
+        }
+        
         const questionData = {
             ...this.editForm.value,
-            test_id: this.testId
+            test_id: this.testId,
+            image_url: imageUrl
         };
 
         if (this.currentQuestionId) {
