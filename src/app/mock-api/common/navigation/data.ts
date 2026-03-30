@@ -440,9 +440,24 @@ export const defaultNavigation: FuseNavigationItem[] = [
             {
                 id   : 'apps.leadcapture',
                 title: 'Lead Capture',
-                type : 'basic',
+                type : 'collapsable',
                 icon : 'mat_outline:record_voice_over',
-                link : '/apps/leadcapture/callbacklist'
+                children: [
+                    {
+                        id   : 'apps.leadcapture.analytics',
+                        title: 'Analytics Dashboard',
+                        type : 'basic',
+                        icon : 'mat_outline:analytics',
+                        link : '/apps/leadcapture/analytics'
+                    },
+                    {
+                        id   : 'apps.leadcapture.callbacks',
+                        title: 'Callback Requests',
+                        type : 'basic',
+                        icon : 'mat_outline:phone_callback',
+                        link : '/apps/leadcapture/callbacklist'
+                    }
+                ]
             },
             {
                 id   : 'apps.predict',

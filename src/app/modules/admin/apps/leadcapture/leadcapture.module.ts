@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CallbacklistComponent } from './callbacklist/callbacklist.component';
+import { LeadAnalyticsComponent } from './analytics/lead-analytics.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRippleModule } from '@angular/material/core';
 import { MatSortModule } from '@angular/material/sort';
 import { MatSelectModule } from '@angular/material/select';
@@ -27,7 +29,8 @@ import { leadcaptureRoutes } from './leadcapture.routing';
 
 @NgModule({
   declarations: [
-    CallbacklistComponent
+    CallbacklistComponent,
+    LeadAnalyticsComponent
   ],
   imports: [
     RouterModule.forChild(leadcaptureRoutes),
@@ -38,6 +41,7 @@ import { leadcaptureRoutes } from './leadcapture.routing';
     MatInputModule,
     MatMenuModule,
     MatProgressBarModule,
+    MatProgressSpinnerModule,
     MatRippleModule,
     MatSortModule,
     MatSelectModule,

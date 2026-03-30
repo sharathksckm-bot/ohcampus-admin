@@ -4345,6 +4345,11 @@ public deleteexamdocsById(docId):Observable<any>{
     public getLeadStats(): Observable<any> {
         return this.httpClient.post(`${this.apiurl3}LeadCapture/getLeadStats`, {})
     }
+
+    // Lead Analytics Dashboard API
+    public getLeadAnalytics(dateRange: string): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}LeadCapture/getLeadAnalytics`, { dateRange: dateRange });
+    }
 }
 
 // apiURL    OnlineInsurancePortalAPI
