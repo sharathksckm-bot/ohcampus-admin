@@ -119,10 +119,21 @@
                             'bg-purple-100 text-purple-800': element.predictor_type === 'JEE',
                             'bg-orange-100 text-orange-800': element.predictor_type === 'COMEDK',
                             'bg-red-100 text-red-800': element.predictor_type === 'MCC',
-                            'bg-gray-100 text-gray-800': element.predictor_type === 'STATE_COUNSELING'
+                            'bg-teal-100 text-teal-800': element.predictor_type === 'STATE_COUNSELING'
                           }">
                         {{getPredictorTypeName(element.predictor_type)}}
                     </span>
+                </td>
+            </ng-container>
+
+            <!-- State Column (NEW) -->
+            <ng-container matColumnDef="state_code">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">State</th>
+                <td mat-cell *matCellDef="let element">
+                    <span *ngIf="element.predictor_type === 'STATE_COUNSELING'" class="px-2 py-1 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
+                        {{getStateName(element.state_code)}}
+                    </span>
+                    <span *ngIf="element.predictor_type !== 'STATE_COUNSELING'" class="text-gray-400">-</span>
                 </td>
             </ng-container>
 
@@ -203,6 +214,17 @@
                         {{type.name}}
                     </mat-option>
                 </mat-select>
+            </mat-form-field>
+
+            <!-- State Dropdown (Only for State Counseling) -->
+            <mat-form-field class="w-full mb-4" appearance="outline" *ngIf="isStateCounseling()">
+                <mat-label>Select State</mat-label>
+                <mat-select formControlName="state_code" required>
+                    <mat-option *ngFor="let state of indianStates" [value]="state.code">
+                        {{state.name}}
+                    </mat-option>
+                </mat-select>
+                <mat-hint>Choose the state for this counseling source</mat-hint>
             </mat-form-field>
 
             <mat-form-field class="w-full mb-4" appearance="outline">

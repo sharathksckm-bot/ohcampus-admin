@@ -20,6 +20,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SharedModule } from 'app/shared/shared.module';
+import { MarkdownModule } from 'ngx-markdown';
 import { TestListComponent } from './testlist/testlist.component';
 import { ResultsComponent } from './results/results.component';
 import { QuestionsComponent } from './questions/questions.component';
@@ -62,7 +63,8 @@ const routes: Routes = [
         MatSliderModule,
         MatExpansionModule,
         MatSnackBarModule,
-        SharedModule
+        SharedModule,
+        MarkdownModule
     ]
 })
 export class MockTestsModule { }

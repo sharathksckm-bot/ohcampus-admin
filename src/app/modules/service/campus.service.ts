@@ -4302,6 +4302,49 @@ public deleteexamdocsById(docId):Observable<any>{
     public bulkGenerateAITests(requestData): Observable<any> {
         return this.httpClient.post(`${this.apiurl3}AIMockTestGenerator/bulkGenerateTests`, requestData)
     }
+
+    //--------------------------------------------  LEAD CAPTURE APIs --------------------------------------------------//
+
+    public getCallbackRequests(page, pageSize, startNum, search): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}LeadCapture/getCallbackRequests`,
+            {
+                draw: page,
+                length: pageSize,
+                start: startNum,
+                search: {
+                    value: search
+                }
+            }
+        )
+    }
+
+    public updateCallbackStatus(id, status, notes, assignedTo): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}LeadCapture/updateCallbackStatus`,
+            {
+                id: id,
+                status: status,
+                notes: notes,
+                assigned_to: assignedTo
+            }
+        )
+    }
+
+    public getCourseEnquiryLeads(page, pageSize, startNum, search): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}LeadCapture/getCourseEnquiryList`,
+            {
+                draw: page,
+                length: pageSize,
+                start: startNum,
+                search: {
+                    value: search
+                }
+            }
+        )
+    }
+
+    public getLeadStats(): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}LeadCapture/getLeadStats`, {})
+    }
 }
 
 // apiURL    OnlineInsurancePortalAPI

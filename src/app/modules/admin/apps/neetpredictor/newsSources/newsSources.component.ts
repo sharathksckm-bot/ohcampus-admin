@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 })
 export class NewsSourcesComponent implements OnInit {
     sources: any[] = [];
-    displayedColumns: string[] = ['predictor_type', 'source_name', 'source_url', 'is_active', 'last_scraped_at', 'actions'];
+    displayedColumns: string[] = ['predictor_type', 'state_code', 'source_name', 'source_url', 'is_active', 'last_scraped_at', 'actions'];
     loading = false;
     showForm = false;
     editMode = false;
@@ -32,6 +32,41 @@ export class NewsSourcesComponent implements OnInit {
         { code: 'COMEDK', name: 'COMEDK UGET' },
         { code: 'MCC', name: 'MCC All India' },
         { code: 'STATE_COUNSELING', name: 'State Counseling' }
+    ];
+
+    // Indian states for State Counseling
+    indianStates = [
+        { code: 'AP', name: 'Andhra Pradesh' },
+        { code: 'AR', name: 'Arunachal Pradesh' },
+        { code: 'AS', name: 'Assam' },
+        { code: 'BR', name: 'Bihar' },
+        { code: 'CG', name: 'Chhattisgarh' },
+        { code: 'GA', name: 'Goa' },
+        { code: 'GJ', name: 'Gujarat' },
+        { code: 'HR', name: 'Haryana' },
+        { code: 'HP', name: 'Himachal Pradesh' },
+        { code: 'JH', name: 'Jharkhand' },
+        { code: 'KA', name: 'Karnataka' },
+        { code: 'KL', name: 'Kerala' },
+        { code: 'MP', name: 'Madhya Pradesh' },
+        { code: 'MH', name: 'Maharashtra' },
+        { code: 'MN', name: 'Manipur' },
+        { code: 'ML', name: 'Meghalaya' },
+        { code: 'MZ', name: 'Mizoram' },
+        { code: 'NL', name: 'Nagaland' },
+        { code: 'OD', name: 'Odisha' },
+        { code: 'PB', name: 'Punjab' },
+        { code: 'RJ', name: 'Rajasthan' },
+        { code: 'SK', name: 'Sikkim' },
+        { code: 'TN', name: 'Tamil Nadu' },
+        { code: 'TS', name: 'Telangana' },
+        { code: 'TR', name: 'Tripura' },
+        { code: 'UP', name: 'Uttar Pradesh' },
+        { code: 'UK', name: 'Uttarakhand' },
+        { code: 'WB', name: 'West Bengal' },
+        { code: 'DL', name: 'Delhi' },
+        { code: 'JK', name: 'Jammu & Kashmir' },
+        { code: 'PY', name: 'Puducherry' }
     ];
 
     intervalOptions = [
@@ -59,11 +94,32 @@ export class NewsSourcesComponent implements OnInit {
         this.form = this.fb.group({
             id: [null],
             predictor_type: ['', Validators.required],
+            state_code: [''],
             source_name: ['', Validators.required],
             source_url: ['', [Validators.required, Validators.pattern('https?://.+')]],
             scrape_selector: [''],
             is_active: [true]
         });
+
+        // Watch for predictor_type changes
+        this.form.get('predictor_type').valueChanges.subscribe(value => {
+            if (value === 'STATE_COUNSELING') {
+                this.form.get('state_code').setValidators([Validators.required]);
+            } else {
+                this.form.get('state_code').clearValidators();
+                this.form.get('state_code').setValue('');
+            }
+            this.form.get('state_code').updateValueAndValidity();
+        });
+    }
+
+    isStateCounseling(): boolean {
+        return this.form.get('predictor_type')?.value === 'STATE_COUNSELING';
+    }
+
+    getStateName(code: string): string {
+        const state = this.indianStates.find(s => s.code === code);
+        return state ? state.name : code || '-';
     }
 
     // ==================== CRON SETTINGS ====================
@@ -271,6 +327,7 @@ export class NewsSourcesComponent implements OnInit {
         this.http.post<any>(`${config.apiurlApps}PremiumPredictor/saveNewsSource`, {
             id: item.id,
             predictor_type: item.predictor_type,
+            state_code: item.state_code,
             source_name: item.source_name,
             source_url: item.source_url,
             is_active: newStatus

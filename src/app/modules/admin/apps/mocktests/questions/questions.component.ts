@@ -28,6 +28,7 @@ export class QuestionsComponent implements OnInit {
     pageSize: number = 10;
     startNum: number = 0;
     recordsTotal: any = 0;
+    showMathPreview: boolean = true;  // Toggle for LaTeX preview
 
     testId: number = null;
     testDetails: any = {};

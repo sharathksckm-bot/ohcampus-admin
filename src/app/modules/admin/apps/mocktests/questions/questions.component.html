@@ -131,6 +131,12 @@
     <h2 mat-dialog-title>{{ currentQuestionId ? 'Edit Question' : 'Add New Question' }}</h2>
     <mat-dialog-content class="max-h-[70vh] overflow-y-auto">
         <form [formGroup]="editForm" class="grid grid-cols-2 gap-4">
+            <!-- Math Preview Toggle -->
+            <div class="col-span-2 flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-700">LaTeX Math Preview</span>
+                <mat-slide-toggle [(ngModel)]="showMathPreview" [ngModelOptions]="{standalone: true}">Show Preview</mat-slide-toggle>
+            </div>
+            
             <mat-form-field class="col-span-2" appearance="outline">
                 <mat-label>Question</mat-label>
                 <textarea matInput formControlName="question" rows="3" placeholder="Enter the question"></textarea>
@@ -178,6 +184,12 @@
                 <input matInput formControlName="topic" placeholder="e.g. Mechanics, Organic">
             </mat-form-field>
 
+            <!-- Math Preview Toggle -->
+            <div class="col-span-2 flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-700">LaTeX Math Preview</span>
+                <mat-slide-toggle [(ngModel)]="showMathPreview" [ngModelOptions]="{standalone: true}">Show Preview</mat-slide-toggle>
+            </div>
+            
             <mat-form-field class="col-span-2" appearance="outline">
                 <mat-label>Explanation</mat-label>
                 <textarea matInput formControlName="explanation" rows="2" placeholder="Explanation for the answer"></textarea>

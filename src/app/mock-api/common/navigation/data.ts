@@ -438,6 +438,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 link : '/apps/courseenquiry/courseenquirylist'
             },
             {
+                id   : 'apps.leadcapture',
+                title: 'Lead Capture',
+                type : 'basic',
+                icon : 'mat_outline:record_voice_over',
+                link : '/apps/leadcapture/callbacklist'
+            },
+            {
                 id   : 'apps.predict',
                 title: 'Predict Admission',
                 type : 'basic',

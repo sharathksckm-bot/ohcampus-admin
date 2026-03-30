@@ -119,6 +119,7 @@ export const appRoutes: Route[] = [
              {path: "alerts", loadChildren: () => import("app/modules/admin/apps/alerts/alerts.module").then(m => m.AlertsModule)},
              {path: "rankpredictor", loadChildren: () => import("app/modules/admin/apps/rankpredictor/rankpredictor.module").then(m => m.RankPredictorModule)},
              {path: 'questionsandans', loadChildren: () => import('app/modules/admin/apps/questionsandans/questionsandans.module').then(m =>m.QuestionsandansModule)},
+             {path: 'leadcapture', loadChildren: () => import('app/modules/admin/apps/leadcapture/leadcapture.module').then(m => m.LeadcaptureModule)},
 
                // {path: 'kcetcutoff', loadChildren: () => import('app/modules/admin/apps/cutoff/kcetcutoff/kcetcutoff.component').then(m =>m.KcetcutoffComponent)}
 

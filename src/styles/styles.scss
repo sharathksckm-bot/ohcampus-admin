@@ -239,3 +239,52 @@ td.mat-cell{
     white-space: normal!important;
     line-height: 1!important;
 }
+/* KaTeX Math Rendering Styles for Admin Panel */
+@import "~katex/dist/katex.min.css";
+
+.katex {
+  font-size: 1.1em !important;
+  line-height: 1.6 !important;
+}
+
+.katex-display {
+  display: block !important;
+  margin: 12px 0 !important;
+  text-align: center !important;
+  overflow-x: auto;
+}
+
+.math-preview-box {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  border: 1px solid #e0e0e0;
+}
+
+.math-preview-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.math-preview-content {
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  min-height: 40px;
+}
+
+.math-error {
+  color: #cc0000;
+  background-color: #fff0f0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
