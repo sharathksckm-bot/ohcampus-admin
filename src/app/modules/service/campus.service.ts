@@ -4350,6 +4350,11 @@ public deleteexamdocsById(docId):Observable<any>{
     public getLeadAnalytics(dateRange: string): Observable<any> {
         return this.httpClient.post(`${this.apiurl3}LeadCapture/getLeadAnalytics`, { dateRange: dateRange });
     }
+
+    // SEO Tools - Meta Description Generator
+    public generateMetaDescription(data: any): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}MetaDescriptionGenerator/generate`, data);
+    }
 }
 
 // apiURL    OnlineInsurancePortalAPI

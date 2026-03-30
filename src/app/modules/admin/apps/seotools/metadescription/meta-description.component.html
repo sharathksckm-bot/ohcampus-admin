@@ -1,0 +1,196 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <!-- Header -->
+    <div class="flex flex-wrap items-center pl-6 pr-4 py-4 lg:pl-8 border-b border-gray-300 dark:border-gray-500 bg-gradient-to-r from-blue-600 to-blue-800">
+        <div class="flex flex-col flex-auto">
+            <div class="flex items-center">
+                <mat-icon class="text-white mr-3" [svgIcon]="'heroicons_outline:document-text'"></mat-icon>
+                <h1 class="text-2xl font-bold text-white">AI Meta Description Generator</h1>
+            </div>
+            <p class="mt-1 text-blue-100">Generate SEO-optimized meta descriptions using Gemini AI</p>
+        </div>
+    </div>
+
+    <div class="flex-auto p-6 lg:p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Input Form -->
+            <div class="lg:col-span-2">
+                <mat-card class="shadow-lg">
+                    <mat-card-header class="bg-gray-50 dark:bg-gray-700 -mx-4 -mt-4 px-4 py-3 mb-4 border-b">
+                        <mat-card-title class="text-lg font-semibold flex items-center">
+                            <mat-icon class="mr-2 text-blue-600" [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                            Content Details
+                        </mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <!-- Title -->
+                        <mat-form-field class="w-full mb-4" appearance="outline">
+                            <mat-label>Title / Page Name *</mat-label>
+                            <input matInput [(ngModel)]="title" placeholder="e.g., BPT Course, IIT Delhi, NEET 2025">
+                            <mat-hint>The main title of your content</mat-hint>
+                        </mat-form-field>
+
+                        <!-- Content Type -->
+                        <mat-form-field class="w-full mb-4" appearance="outline">
+                            <mat-label>Content Type *</mat-label>
+                            <mat-select [(ngModel)]="contentType">
+                                <mat-option *ngFor="let type of contentTypes" [value]="type">
+                                    {{ type }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-hint>Select the type of content for tailored suggestions</mat-hint>
+                        </mat-form-field>
+
+                        <!-- Primary Keyword -->
+                        <mat-form-field class="w-full mb-4" appearance="outline">
+                            <mat-label>Primary Keyword</mat-label>
+                            <input matInput [(ngModel)]="primaryKeyword" placeholder="e.g., BPT course details">
+                            <mat-hint>Main keyword to focus on (defaults to title if empty)</mat-hint>
+                        </mat-form-field>
+
+                        <!-- Secondary Keywords -->
+                        <mat-form-field class="w-full mb-4" appearance="outline">
+                            <mat-label>Secondary Keywords</mat-label>
+                            <input matInput [(ngModel)]="secondaryKeywords" placeholder="e.g., physiotherapy, career, eligibility">
+                            <mat-hint>Comma-separated additional keywords</mat-hint>
+                        </mat-form-field>
+
+                        <!-- Key Details -->
+                        <mat-form-field class="w-full mb-4" appearance="outline">
+                            <mat-label>Key Details</mat-label>
+                            <textarea matInput [(ngModel)]="keyDetails" rows="3" 
+                                placeholder="e.g., 4-year course, eligibility 10+2 with PCB, top colleges in India"></textarea>
+                            <mat-hint>Important facts to include in the description</mat-hint>
+                        </mat-form-field>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-wrap gap-3 mt-6">
+                            <button mat-raised-button color="primary" 
+                                (click)="generate()" 
+                                [disabled]="loading"
+                                class="flex items-center">
+                                <mat-icon *ngIf="!loading" class="mr-2">auto_awesome</mat-icon>
+                                <mat-spinner *ngIf="loading" diameter="20" class="mr-2"></mat-spinner>
+                                {{ loading ? 'Generating...' : 'Generate with AI' }}
+                            </button>
+                            <button mat-stroked-button (click)="clearForm()" [disabled]="loading">
+                                <mat-icon class="mr-1">refresh</mat-icon>
+                                Clear
+                            </button>
+                        </div>
+
+                        <!-- Error/Success Messages -->
+                        <div *ngIf="error" class="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center">
+                            <mat-icon class="mr-2 text-red-500">error</mat-icon>
+                            {{ error }}
+                        </div>
+                        <div *ngIf="success" class="mt-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg flex items-center">
+                            <mat-icon class="mr-2 text-green-500">check_circle</mat-icon>
+                            {{ success }}
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+
+                <!-- Generated Result -->
+                <mat-card *ngIf="generatedDescription" class="mt-6 shadow-lg border-2 border-green-200">
+                    <mat-card-header class="bg-green-50 dark:bg-green-900 -mx-4 -mt-4 px-4 py-3 mb-4 border-b border-green-200">
+                        <mat-card-title class="text-lg font-semibold flex items-center text-green-800">
+                            <mat-icon class="mr-2 text-green-600">auto_awesome</mat-icon>
+                            Generated Meta Description
+                        </mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4">
+                            <p class="text-lg leading-relaxed">{{ generatedDescription }}</p>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <div class="flex items-center">
+                                <span class="text-sm text-gray-600 mr-2">Character Count:</span>
+                                <span class="font-bold text-lg" [ngClass]="getCharacterCountClass()">
+                                    {{ characterCount }}
+                                </span>
+                                <span class="text-sm text-gray-500 ml-1">/160</span>
+                                <mat-icon *ngIf="characterCount >= 140 && characterCount <= 160" 
+                                    class="ml-2 text-green-500">check_circle</mat-icon>
+                                <mat-icon *ngIf="characterCount < 140 || characterCount > 160" 
+                                    class="ml-2 text-orange-500">warning</mat-icon>
+                            </div>
+                            <button mat-raised-button 
+                                [color]="copied ? 'accent' : 'primary'" 
+                                (click)="copyToClipboard()"
+                                class="flex items-center">
+                                <mat-icon class="mr-1">{{ copied ? 'check' : 'content_copy' }}</mat-icon>
+                                {{ copied ? 'Copied!' : 'Copy to Clipboard' }}
+                            </button>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+
+            <!-- History Sidebar -->
+            <div class="lg:col-span-1">
+                <mat-card class="shadow-lg">
+                    <mat-card-header class="bg-gray-50 dark:bg-gray-700 -mx-4 -mt-4 px-4 py-3 mb-4 border-b">
+                        <mat-card-title class="text-lg font-semibold flex items-center justify-between w-full">
+                            <div class="flex items-center">
+                                <mat-icon class="mr-2 text-purple-600" [svgIcon]="'heroicons_outline:clock'"></mat-icon>
+                                Recent History
+                            </div>
+                            <button *ngIf="history.length > 0" mat-icon-button matTooltip="Clear History" (click)="clearHistory()">
+                                <mat-icon class="text-red-500">delete_outline</mat-icon>
+                            </button>
+                        </mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content class="max-h-96 overflow-y-auto">
+                        <div *ngIf="history.length === 0" class="text-center text-gray-500 py-8">
+                            <mat-icon class="text-4xl text-gray-300 mb-2">history</mat-icon>
+                            <p>No history yet</p>
+                            <p class="text-sm">Generated descriptions will appear here</p>
+                        </div>
+                        <div *ngFor="let item of history; let i = index" 
+                            class="p-3 mb-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors border border-gray-200"
+                            (click)="loadFromHistory(item)">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="font-medium text-sm truncate max-w-[180px]">{{ item.title }}</span>
+                                <mat-chip class="text-xs" [color]="'primary'" selected>{{ item.contentType }}</mat-chip>
+                            </div>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">{{ item.metaDescription }}</p>
+                            <div class="flex items-center justify-between mt-2 text-xs text-gray-400">
+                                <span>{{ item.characterCount }} chars</span>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+
+                <!-- Tips Card -->
+                <mat-card class="mt-6 shadow-lg bg-blue-50 dark:bg-blue-900">
+                    <mat-card-header>
+                        <mat-card-title class="text-base font-semibold flex items-center text-blue-800 dark:text-blue-200">
+                            <mat-icon class="mr-2">lightbulb</mat-icon>
+                            SEO Tips
+                        </mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-2 mt-2">
+                            <li class="flex items-start">
+                                <mat-icon class="text-sm mr-1 mt-0.5">check</mat-icon>
+                                Keep descriptions 140-160 characters
+                            </li>
+                            <li class="flex items-start">
+                                <mat-icon class="text-sm mr-1 mt-0.5">check</mat-icon>
+                                Include primary keyword naturally
+                            </li>
+                            <li class="flex items-start">
+                                <mat-icon class="text-sm mr-1 mt-0.5">check</mat-icon>
+                                Use action words (Discover, Explore)
+                            </li>
+                            <li class="flex items-start">
+                                <mat-icon class="text-sm mr-1 mt-0.5">check</mat-icon>
+                                Make it compelling and unique
+                            </li>
+                        </ul>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+</div>

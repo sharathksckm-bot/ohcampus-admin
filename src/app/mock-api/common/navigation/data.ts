@@ -460,6 +460,21 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 ]
             },
             {
+                id   : "apps.seotools",
+                title: "SEO Tools",
+                type : "collapsable",
+                icon : "mat_outline:search",
+                children: [
+                    {
+                        id   : "apps.seotools.metadescription",
+                        title: "Meta Description Generator",
+                        type : "basic",
+                        icon : "mat_outline:auto_awesome",
+                        link : "/apps/seotools/metadescription"
+                    }
+                ]
+            },
+            {
                 id   : 'apps.predict',
                 title: 'Predict Admission',
                 type : 'basic',
