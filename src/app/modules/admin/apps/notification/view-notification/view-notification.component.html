@@ -7,8 +7,9 @@
     <div *ngIf="!listLoader">
       <div class="flex justify-between bg-gray-800 p-2 px-6" style="align-items: center;">
         <span class="text-white font-medium" style="font-size: 17px;">Notification</span>
-        <button class="rounded  bg-white" mat-stroked-button (click)="addNewNotification()">Add New
+        <button class="rounded bg-white mr-2" mat-stroked-button (click)="addNewNotification()">Single
           Notification</button>
+        <button class="rounded bg-blue-500 text-white" mat-stroked-button (click)="bulkNotification()">Bulk Notification</button>
       </div>
 
       <form [formGroup]="certicationList">

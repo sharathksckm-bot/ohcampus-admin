@@ -4378,6 +4378,24 @@ public deleteexamdocsById(docId):Observable<any>{
     public deletePredictorSettings(examId: number): Observable<any> {
         return this.httpClient.post(`${this.apiurl3}../apps/Exam/deletePredictorSettings`, { exam_id: examId });
     }
+
+    // ============== Bulk Notification APIs ==============
+    
+    public getUsersByFilter(filterData: any): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}Notification/getUsersByFilter`, filterData);
+    }
+
+    public saveBulkNotification(data: any): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}Notification/saveBulkNotification`, data);
+    }
+
+    public getCityByState(stateIds: string): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}State/getCityByState`, { state_ids: stateIds });
+    }
+
+    public getCoursesByCategory(categoryIds: string): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}Category/getCoursesByCategory`, { category_ids: categoryIds });
+    }
 }
 
 // apiURL    OnlineInsurancePortalAPI

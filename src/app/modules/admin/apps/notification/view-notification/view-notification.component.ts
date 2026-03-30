@@ -89,6 +89,10 @@ export class ViewNotificationComponent implements OnInit {
        addNewNotification(){
          this._route.navigate(['apps/notification/addNotification']);
        }
+
+       bulkNotification(){
+         this._route.navigate(["apps/notification/bulkNotification"]);
+       }
  
        applyFilter(filterValue: string) {
          this.searchLoader = true

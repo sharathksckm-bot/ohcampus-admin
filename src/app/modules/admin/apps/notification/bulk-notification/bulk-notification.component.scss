@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+
+mat-card {
+  border-radius: 12px;
+}
+
+mat-card-header {
+  padding-bottom: 0;
+}
+
+mat-card-title {
+  display: flex;
+  align-items: center;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+table {
+  border-collapse: collapse;
+  
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  
+  tbody tr {
+    transition: background-color 0.2s;
+  }
+}
+
+::ng-deep {
+  .mat-select-panel {
+    max-height: 300px !important;
+  }
+  
+  .mat-option {
+    font-size: 14px;
+  }
+}
