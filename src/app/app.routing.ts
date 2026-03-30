@@ -121,6 +121,7 @@ export const appRoutes: Route[] = [
              {path: 'questionsandans', loadChildren: () => import('app/modules/admin/apps/questionsandans/questionsandans.module').then(m =>m.QuestionsandansModule)},
              {path: 'leadcapture', loadChildren: () => import('app/modules/admin/apps/leadcapture/leadcapture.module').then(m => m.LeadcaptureModule)},
              {path: "seotools", loadChildren: () => import("app/modules/admin/apps/seotools/seotools.module").then(m => m.SeotoolsModule)},
+             {path: "predictorsettings", loadChildren: () => import("app/modules/admin/apps/predictorsettings/predictor-settings.module").then(m => m.PredictorSettingsModule)},
 
                // {path: 'kcetcutoff', loadChildren: () => import('app/modules/admin/apps/cutoff/kcetcutoff/kcetcutoff.component').then(m =>m.KcetcutoffComponent)}
 

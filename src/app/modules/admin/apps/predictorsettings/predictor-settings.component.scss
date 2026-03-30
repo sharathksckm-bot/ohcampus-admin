@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+mat-card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+mat-card:hover {
+  transform: translateY(-2px);
+}
+
+.mat-chip {
+  font-size: 11px !important;
+  min-height: 24px !important;
+}
+
+mat-slide-toggle {
+  transform: scale(0.9);
+}
+
+.snack-success {
+  background-color: #10b981;
+  color: white;
+}
+
+.snack-error {
+  background-color: #ef4444;
+  color: white;
+}

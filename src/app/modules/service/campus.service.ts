@@ -4361,6 +4361,23 @@ public deleteexamdocsById(docId):Observable<any>{
     public generateBatchMetaDescriptions(contentType: string, limit: number): Observable<any> {
         return this.httpClient.post(`${this.apiurl3}MetaDescriptionGenerator/generateBatchFromDB`, { content_type: contentType, limit: limit });
     }
+
+    // Predictor Settings APIs
+    public getAllPredictorSettings(): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}../apps/Exam/getAllPredictorSettings`, {});
+    }
+
+    public updatePredictorSettings(data: any): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}../apps/Exam/updatePredictorSettings`, data);
+    }
+
+    public createPredictorSettings(data: any): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}../apps/Exam/createPredictorSettings`, data);
+    }
+
+    public deletePredictorSettings(examId: number): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}../apps/Exam/deletePredictorSettings`, { exam_id: examId });
+    }
 }
 
 // apiURL    OnlineInsurancePortalAPI

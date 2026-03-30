@@ -475,6 +475,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 ]
             },
             {
+                id   : "apps.predictorsettings",
+                title: "Predictor Settings",
+                type : "basic",
+                icon : "mat_outline:tune",
+                link : "/apps/predictorsettings"
+            },
+            {
                 id   : 'apps.predict',
                 title: 'Predict Admission',
                 type : 'basic',

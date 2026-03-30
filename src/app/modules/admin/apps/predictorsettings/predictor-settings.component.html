@@ -1,0 +1,188 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <!-- Header -->
+    <div class="flex flex-wrap items-center pl-6 pr-4 py-4 lg:pl-8 border-b" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
+        <div class="flex flex-col flex-auto">
+            <div class="flex items-center">
+                <mat-icon class="mr-3" style="color: #ffffff;">settings</mat-icon>
+                <h1 class="text-2xl font-bold" style="color: #ffffff;">Predictor Settings</h1>
+            </div>
+            <p class="mt-1" style="color: #ddd6fe;">Manage Rank Predictor and College Predictor activation dates and messages</p>
+        </div>
+        <button mat-raised-button style="background-color: #10b981; color: white;" (click)="openAddDialog()">
+            <mat-icon class="mr-2">add</mat-icon>
+            Add New Exam
+        </button>
+    </div>
+
+    <div class="flex-auto p-6 lg:p-8">
+        <!-- Loading Spinner -->
+        <div *ngIf="loading" class="flex justify-center items-center py-16">
+            <mat-spinner diameter="40"></mat-spinner>
+        </div>
+
+        <!-- Settings Grid -->
+        <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <mat-card *ngFor="let setting of predictorSettings" class="shadow-lg hover:shadow-xl transition-shadow">
+                <mat-card-header style="background-color: #f8fafc; margin: -16px -16px 16px; padding: 16px; border-bottom: 1px solid #e2e8f0;">
+                    <mat-card-title class="flex items-center justify-between w-full">
+                        <span style="color: #1e293b; font-size: 18px;">{{ setting.exam_name }}</span>
+                        <mat-chip [color]="isExamActive(setting) ? 'primary' : 'warn'" selected>
+                            {{ isExamActive(setting) ? 'Active' : 'Upcoming' }}
+                        </mat-chip>
+                    </mat-card-title>
+                </mat-card-header>
+                
+                <mat-card-content>
+                    <!-- Dates Section -->
+                    <div class="mb-4">
+                        <div class="flex items-center mb-2">
+                            <mat-icon class="mr-2" style="color: #f97316;">event</mat-icon>
+                            <span style="color: #64748b; font-size: 14px;">Exam Date:</span>
+                            <span class="ml-auto font-medium" style="color: #1e293b;">{{ formatDate(setting.exam_date) }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <mat-icon class="mr-2" style="color: #22c55e;">fact_check</mat-icon>
+                            <span style="color: #64748b; font-size: 14px;">Result Date:</span>
+                            <span class="ml-auto font-medium" style="color: #1e293b;">{{ formatDate(setting.result_date) }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Status Toggles -->
+                    <div class="border-t pt-4" style="border-color: #e2e8f0;">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <mat-icon class="mr-2" style="color: #8b5cf6;">analytics</mat-icon>
+                                <span style="color: #475569;">Rank Predictor</span>
+                            </div>
+                            <mat-slide-toggle 
+                                [checked]="setting.rank_predictor_active == 1" 
+                                (change)="toggleRankPredictor(setting, $event)"
+                                color="primary">
+                            </mat-slide-toggle>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <mat-icon class="mr-2" style="color: #3b82f6;">school</mat-icon>
+                                <span style="color: #475569;">College Predictor</span>
+                            </div>
+                            <mat-slide-toggle 
+                                [checked]="setting.college_predictor_active == 1" 
+                                (change)="toggleCollegePredictor(setting, $event)"
+                                color="primary">
+                            </mat-slide-toggle>
+                        </div>
+                    </div>
+
+                    <!-- Messages Preview -->
+                    <div class="mt-4 p-3 rounded-lg" style="background-color: #fef3c7;" *ngIf="setting.rank_predictor_message || setting.college_predictor_message">
+                        <div class="flex items-start mb-2" *ngIf="setting.rank_predictor_message && setting.rank_predictor_active != 1">
+                            <mat-icon class="mr-2 text-sm" style="color: #d97706;">info</mat-icon>
+                            <span class="text-sm" style="color: #92400e;">{{ setting.rank_predictor_message }}</span>
+                        </div>
+                        <div class="flex items-start" *ngIf="setting.college_predictor_message && setting.college_predictor_active != 1">
+                            <mat-icon class="mr-2 text-sm" style="color: #d97706;">info</mat-icon>
+                            <span class="text-sm" style="color: #92400e;">{{ setting.college_predictor_message }}</span>
+                        </div>
+                    </div>
+                </mat-card-content>
+
+                <mat-card-actions class="flex justify-end" style="padding: 8px 16px; border-top: 1px solid #e2e8f0;">
+                    <button mat-icon-button matTooltip="Edit Settings" (click)="openEditDialog(setting)">
+                        <mat-icon style="color: #3b82f6;">edit</mat-icon>
+                    </button>
+                    <button mat-icon-button matTooltip="Delete" (click)="confirmDelete(setting)">
+                        <mat-icon style="color: #ef4444;">delete</mat-icon>
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && predictorSettings.length === 0" class="text-center py-16">
+            <mat-icon class="text-6xl mb-4" style="color: #cbd5e1;">settings_suggest</mat-icon>
+            <h3 style="color: #64748b;">No Predictor Settings Found</h3>
+            <p style="color: #94a3b8;">Click "Add New Exam" to create predictor settings for an exam.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Edit/Add Dialog Template -->
+<ng-template #editDialog>
+    <h2 mat-dialog-title style="color: #1e293b;">
+        <mat-icon class="mr-2" style="color: #7c3aed; vertical-align: middle;">{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+        {{ isEditMode ? 'Edit Predictor Settings' : 'Add New Exam Settings' }}
+    </h2>
+    <mat-dialog-content class="py-4">
+        <form [formGroup]="settingsForm">
+            <!-- Exam Selection (only for add mode) -->
+            <mat-form-field *ngIf="!isEditMode" class="w-full mb-4" appearance="outline">
+                <mat-label>Select Exam</mat-label>
+                <mat-select formControlName="exam_id" (selectionChange)="onExamSelect($event)">
+                    <mat-option *ngFor="let exam of availableExams" [value]="exam.id">
+                        {{ exam.title }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Exam Name (readonly in edit mode) -->
+            <mat-form-field class="w-full mb-4" appearance="outline">
+                <mat-label>Exam Name</mat-label>
+                <input matInput formControlName="exam_name" [readonly]="isEditMode">
+            </mat-form-field>
+
+            <!-- Dates Row -->
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <mat-form-field appearance="outline">
+                    <mat-label>Exam Date</mat-label>
+                    <input matInput [matDatepicker]="examDatePicker" formControlName="exam_date">
+                    <mat-datepicker-toggle matSuffix [for]="examDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #examDatePicker></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Result Date</mat-label>
+                    <input matInput [matDatepicker]="resultDatePicker" formControlName="result_date">
+                    <mat-datepicker-toggle matSuffix [for]="resultDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #resultDatePicker></mat-datepicker>
+                </mat-form-field>
+            </div>
+
+            <!-- Rank Predictor Settings -->
+            <div class="p-4 mb-4 rounded-lg" style="background-color: #f5f3ff; border: 1px solid #ddd6fe;">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="font-medium" style="color: #5b21b6;">Rank Predictor</span>
+                    <mat-slide-toggle formControlName="rank_predictor_active" color="primary">
+                        {{ settingsForm.get('rank_predictor_active')?.value ? 'Active' : 'Inactive' }}
+                    </mat-slide-toggle>
+                </div>
+                <mat-form-field class="w-full" appearance="outline">
+                    <mat-label>Message when inactive</mat-label>
+                    <textarea matInput formControlName="rank_predictor_message" rows="2" 
+                        placeholder="e.g., Rank Predictor will be available after exam date"></textarea>
+                </mat-form-field>
+            </div>
+
+            <!-- College Predictor Settings -->
+            <div class="p-4 rounded-lg" style="background-color: #eff6ff; border: 1px solid #bfdbfe;">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="font-medium" style="color: #1e40af;">College Predictor</span>
+                    <mat-slide-toggle formControlName="college_predictor_active" color="primary">
+                        {{ settingsForm.get('college_predictor_active')?.value ? 'Active' : 'Inactive' }}
+                    </mat-slide-toggle>
+                </div>
+                <mat-form-field class="w-full" appearance="outline">
+                    <mat-label>Message when inactive</mat-label>
+                    <textarea matInput formControlName="college_predictor_message" rows="2"
+                        placeholder="e.g., College Predictor will be available after results"></textarea>
+                </mat-form-field>
+            </div>
+        </form>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-raised-button color="primary" (click)="saveSettings()" [disabled]="settingsForm.invalid || saving">
+            <mat-spinner *ngIf="saving" diameter="20" class="mr-2"></mat-spinner>
+            {{ saving ? 'Saving...' : (isEditMode ? 'Update' : 'Create') }}
+        </button>
+    </mat-dialog-actions>
+</ng-template>
