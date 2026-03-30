@@ -4347,6 +4347,7 @@ public deleteexamdocsById(docId):Observable<any>{
     }
 
     // Lead Analytics Dashboard API
+    // Lead Analytics Dashboard API
     public getLeadAnalytics(dateRange: string): Observable<any> {
         return this.httpClient.post(`${this.apiurl3}LeadCapture/getLeadAnalytics`, { dateRange: dateRange });
     }
@@ -4354,6 +4355,11 @@ public deleteexamdocsById(docId):Observable<any>{
     // SEO Tools - Meta Description Generator
     public generateMetaDescription(data: any): Observable<any> {
         return this.httpClient.post(`${this.apiurl3}MetaDescriptionGenerator/generate`, data);
+    }
+
+    // Batch Meta Description Generation
+    public generateBatchMetaDescriptions(contentType: string, limit: number): Observable<any> {
+        return this.httpClient.post(`${this.apiurl3}MetaDescriptionGenerator/generateBatchFromDB`, { content_type: contentType, limit: limit });
     }
 }
 
