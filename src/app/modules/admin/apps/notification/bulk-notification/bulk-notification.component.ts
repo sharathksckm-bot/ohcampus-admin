@@ -31,6 +31,11 @@ export class BulkNotificationComponent implements OnInit {
   matchedUsers: any[] = [];
   isPreviewLoading: boolean = false;
   showPreview: boolean = false;
+  
+  // Loading states
+  statesLoading: boolean = false;
+  categoriesLoading: boolean = false;
+  examsLoading: boolean = false;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -53,24 +58,59 @@ export class BulkNotificationComponent implements OnInit {
   }
 
   loadFilterOptions() {
-    // Load states
-    this.campusService.getStateList(1, 100, 0, 0, 'asc', '').subscribe((res: any) => {
-      if (res.response_code === '200') {
-        this.stateList = res.response_data || res.data || [];
+    // Load states using the apps API (no auth required)
+    this.statesLoading = true;
+    this.campusService.getExamStateList().subscribe({
+      next: (res: any) => {
+        this.statesLoading = false;
+        console.log('States response:', res);
+        if (res.res_data) {
+          this.stateList = res.res_data;
+        } else if (res.response_data) {
+          this.stateList = res.response_data;
+        } else if (res.data) {
+          this.stateList = res.data;
+        }
+      },
+      error: (err) => {
+        this.statesLoading = false;
+        console.error('Error loading states:', err);
       }
     });
     
     // Load categories
-    this.campusService.getCategoryListByType('college').subscribe((res: any) => {
-      if (res.response_data) {
-        this.categoryList = res.response_data;
+    this.categoriesLoading = true;
+    this.campusService.getCategoryListByType('college').subscribe({
+      next: (res: any) => {
+        this.categoriesLoading = false;
+        console.log('Categories response:', res);
+        if (res.response_data) {
+          this.categoryList = res.response_data;
+        } else if (res.data) {
+          this.categoryList = res.data;
+        }
+      },
+      error: (err) => {
+        this.categoriesLoading = false;
+        console.error('Error loading categories:', err);
       }
     });
     
     // Load exams
-    this.campusService.getExams('', '').subscribe((res: any) => {
-      if (res.response_data) {
-        this.examList = res.response_data;
+    this.examsLoading = true;
+    this.campusService.getExams('', '').subscribe({
+      next: (res: any) => {
+        this.examsLoading = false;
+        console.log('Exams response:', res);
+        if (res.response_data) {
+          this.examList = res.response_data;
+        } else if (res.data) {
+          this.examList = res.data;
+        }
+      },
+      error: (err) => {
+        this.examsLoading = false;
+        console.error('Error loading exams:', err);
       }
     });
   }
@@ -105,9 +145,20 @@ export class BulkNotificationComponent implements OnInit {
   loadCitiesByStates() {
     if (this.selectedStates.length > 0) {
       const stateIds = this.selectedStates.map(s => s.id).join(',');
-      this.campusService.getCityByState(stateIds).subscribe((res: any) => {
-        if (res.response_data) {
-          this.cityList = res.response_data;
+      this.campusService.getCityByState(stateIds).subscribe({
+        next: (res: any) => {
+          console.log('Cities response:', res);
+          if (res.response_data) {
+            this.cityList = res.response_data;
+          } else if (res.data) {
+            this.cityList = res.data;
+          } else {
+            this.cityList = [];
+          }
+        },
+        error: (err) => {
+          console.error('Error loading cities:', err);
+          this.cityList = [];
         }
       });
     } else {
@@ -118,9 +169,20 @@ export class BulkNotificationComponent implements OnInit {
   loadCoursesByCategory() {
     if (this.selectedCategories.length > 0) {
       const catIds = this.selectedCategories.map(c => c.id).join(',');
-      this.campusService.getCoursesByCategory(catIds).subscribe((res: any) => {
-        if (res.response_data) {
-          this.courseList = res.response_data;
+      this.campusService.getCoursesByCategory(catIds).subscribe({
+        next: (res: any) => {
+          console.log('Courses response:', res);
+          if (res.response_data) {
+            this.courseList = res.response_data;
+          } else if (res.data) {
+            this.courseList = res.data;
+          } else {
+            this.courseList = [];
+          }
+        },
+        error: (err) => {
+          console.error('Error loading courses:', err);
+          this.courseList = [];
         }
       });
     } else {
@@ -140,25 +202,29 @@ export class BulkNotificationComponent implements OnInit {
     this.showPreview = true;
 
     const filterData = {
-      states: this.selectedStates,
-      categories: this.selectedCategories,
-      courses: this.selectedCourses,
-      exams: this.selectedExams,
-      cities: this.selectedCities
+      states: this.selectedStates.map(s => s.id).join(','),
+      categories: this.selectedCategories.map(c => c.id).join(','),
+      courses: this.selectedCourses.map(c => c.id).join(','),
+      exams: this.selectedExams.map(e => e.id).join(','),
+      cities: this.selectedCities.map(c => c.id).join(',')
     };
 
-    this.campusService.getUsersByFilter(filterData).subscribe(
-      (res: any) => {
+    this.campusService.getUsersByFilter(filterData).subscribe({
+      next: (res: any) => {
         this.isPreviewLoading = false;
-        if (res.response_code === '200') {
+        console.log('Users response:', res);
+        if (res.response_code === '200' || res.response_code === 200) {
           this.matchedUsers = res.response_data || [];
+        } else {
+          this.matchedUsers = [];
         }
       },
-      (error) => {
+      error: (err) => {
         this.isPreviewLoading = false;
-        console.error('Error fetching users:', error);
+        console.error('Error fetching users:', err);
+        this.matchedUsers = [];
       }
-    );
+    });
   }
 
   sendBulkNotification() {
@@ -198,18 +264,18 @@ export class BulkNotificationComponent implements OnInit {
     const payload = {
       title: this.bulkNotificationForm.value.title,
       description: this.bulkNotificationForm.value.message,
-      category: this.selectedCategories.length > 0 ? this.selectedCategories.map(c => c.id).join(',') : null,
-      subcategory: this.selectedCourses.length > 0 ? this.selectedCourses.map(c => c.id).join(',') : null,
-      exam: this.selectedExams.length > 0 ? this.selectedExams.map(e => e.id).join(',') : null,
-      state: this.selectedStates.length > 0 ? this.selectedStates.map(s => s.id).join(',') : null,
-      city: this.selectedCities.length > 0 ? this.selectedCities.map(c => c.id).join(',') : null,
+      category: this.selectedCategories.length > 0 ? this.selectedCategories.map(c => c.id).join(',') : '',
+      subcategory: this.selectedCourses.length > 0 ? this.selectedCourses.map(c => c.id).join(',') : '',
+      exam: this.selectedExams.length > 0 ? this.selectedExams.map(e => e.id).join(',') : '',
+      state: this.selectedStates.length > 0 ? this.selectedStates.map(s => s.id).join(',') : '',
+      city: this.selectedCities.length > 0 ? this.selectedCities.map(c => c.id).join(',') : '',
       created_by: 'admin'
     };
 
-    this.campusService.saveBulkNotification(payload).subscribe(
-      (res: any) => {
+    this.campusService.saveBulkNotification(payload).subscribe({
+      next: (res: any) => {
         this.addLoader = false;
-        if (res.response_code === '200') {
+        if (res.response_code === '200' || res.response_code === 200) {
           Swal.fire({
             title: 'Success!',
             text: `Bulk notification sent to ${this.matchedUsers.length} users successfully!`,
@@ -222,11 +288,12 @@ export class BulkNotificationComponent implements OnInit {
           Swal.fire('', res.response_message || 'Failed to send notification', 'error');
         }
       },
-      (error) => {
+      error: (err) => {
         this.addLoader = false;
+        console.error('Error sending notification:', err);
         Swal.fire('', 'Error sending notification. Please try again.', 'error');
       }
-    );
+    });
   }
 
   clearFilters() {
@@ -237,6 +304,8 @@ export class BulkNotificationComponent implements OnInit {
     this.selectedCities = [];
     this.matchedUsers = [];
     this.showPreview = false;
+    this.courseList = [];
+    this.cityList = [];
     this.bulkNotificationForm.patchValue({
       states: [],
       categories: [],

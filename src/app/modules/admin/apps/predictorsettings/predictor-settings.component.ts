@@ -14,6 +14,7 @@ interface PredictorSetting {
   college_predictor_active: number;
   rank_predictor_message: string;
   college_predictor_message: string;
+  premium_required: number;
 }
 
 @Component({
@@ -47,7 +48,8 @@ export class PredictorSettingsComponent implements OnInit {
       rank_predictor_active: [false],
       college_predictor_active: [false],
       rank_predictor_message: [''],
-      college_predictor_message: ['']
+      college_predictor_message: [''],
+      premium_required: [false]
     });
   }
 
@@ -99,7 +101,8 @@ export class PredictorSettingsComponent implements OnInit {
     this.currentSetting = null;
     this.settingsForm.reset({
       rank_predictor_active: false,
-      college_predictor_active: false
+      college_predictor_active: false,
+      premium_required: false
     });
     this.settingsForm.get('exam_id')?.enable();
     this.dialog.open(this.editDialog, { width: '600px' });
@@ -117,7 +120,8 @@ export class PredictorSettingsComponent implements OnInit {
       rank_predictor_active: setting.rank_predictor_active == 1,
       college_predictor_active: setting.college_predictor_active == 1,
       rank_predictor_message: setting.rank_predictor_message || '',
-      college_predictor_message: setting.college_predictor_message || ''
+      college_predictor_message: setting.college_predictor_message || '',
+      premium_required: setting.premium_required == 1
     });
     
     this.settingsForm.get('exam_id')?.disable();
@@ -148,6 +152,7 @@ export class PredictorSettingsComponent implements OnInit {
 
     formData.rank_predictor_active = formData.rank_predictor_active ? 1 : 0;
     formData.college_predictor_active = formData.college_predictor_active ? 1 : 0;
+    formData.premium_required = formData.premium_required ? 1 : 0;
 
     if (this.isEditMode) {
       this.campusService.updatePredictorSettings(formData).subscribe({
@@ -212,6 +217,22 @@ export class PredictorSettingsComponent implements OnInit {
         if (res && res.response_code === '200') {
           setting.college_predictor_active = event.checked ? 1 : 0;
           this.showSnackbar('College Predictor ' + (event.checked ? 'activated' : 'deactivated'), 'success');
+        }
+      },
+      error: () => this.showSnackbar('Update failed', 'error')
+    });
+  }
+
+  togglePremiumRequired(setting: PredictorSetting, event: any) {
+    const data = {
+      exam_id: setting.exam_id,
+      premium_required: event.checked ? 1 : 0
+    };
+    this.campusService.updatePredictorSettings(data).subscribe({
+      next: (res: any) => {
+        if (res && res.response_code === '200') {
+          setting.premium_required = event.checked ? 1 : 0;
+          this.showSnackbar('Premium Access ' + (event.checked ? 'enabled' : 'disabled') + ' for ' + setting.exam_name, 'success');
         }
       },
       error: () => this.showSnackbar('Update failed', 'error')

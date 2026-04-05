@@ -6,7 +6,7 @@
                 <mat-icon class="mr-3" style="color: #ffffff;">settings</mat-icon>
                 <h1 class="text-2xl font-bold" style="color: #ffffff;">Predictor Settings</h1>
             </div>
-            <p class="mt-1" style="color: #ddd6fe;">Manage Rank Predictor and College Predictor activation dates and messages</p>
+            <p class="mt-1" style="color: #ddd6fe;">Manage Rank Predictor, College Predictor activation and Premium Access settings</p>
         </div>
         <button mat-raised-button style="background-color: #10b981; color: white;" (click)="openAddDialog()">
             <mat-icon class="mr-2">add</mat-icon>
@@ -26,9 +26,15 @@
                 <mat-card-header style="background-color: #f8fafc; margin: -16px -16px 16px; padding: 16px; border-bottom: 1px solid #e2e8f0;">
                     <mat-card-title class="flex items-center justify-between w-full">
                         <span style="color: #1e293b; font-size: 18px;">{{ setting.exam_name }}</span>
-                        <mat-chip [color]="isExamActive(setting) ? 'primary' : 'warn'" selected>
-                            {{ isExamActive(setting) ? 'Active' : 'Upcoming' }}
-                        </mat-chip>
+                        <div class="flex items-center gap-2">
+                            <mat-chip *ngIf="setting.premium_required == 1" style="background-color: #fbbf24; color: #78350f;" selected>
+                                <mat-icon class="mr-1" style="font-size: 14px;">star</mat-icon>
+                                Premium
+                            </mat-chip>
+                            <mat-chip [color]="isExamActive(setting) ? 'primary' : 'warn'" selected>
+                                {{ isExamActive(setting) ? 'Active' : 'Upcoming' }}
+                            </mat-chip>
+                        </div>
                     </mat-card-title>
                 </mat-card-header>
                 
@@ -60,7 +66,7 @@
                                 color="primary">
                             </mat-slide-toggle>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center">
                                 <mat-icon class="mr-2" style="color: #3b82f6;">school</mat-icon>
                                 <span style="color: #475569;">College Predictor</span>
@@ -69,6 +75,18 @@
                                 [checked]="setting.college_predictor_active == 1" 
                                 (change)="toggleCollegePredictor(setting, $event)"
                                 color="primary">
+                            </mat-slide-toggle>
+                        </div>
+                        <!-- Premium Required Toggle -->
+                        <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #fef9c3; border: 1px solid #fbbf24;">
+                            <div class="flex items-center">
+                                <mat-icon class="mr-2" style="color: #d97706;">star</mat-icon>
+                                <span style="color: #78350f; font-weight: 500;">Premium Access Required</span>
+                            </div>
+                            <mat-slide-toggle 
+                                [checked]="setting.premium_required == 1" 
+                                (change)="togglePremiumRequired(setting, $event)"
+                                color="warn">
                             </mat-slide-toggle>
                         </div>
                     </div>
@@ -145,6 +163,24 @@
                     <mat-datepicker-toggle matSuffix [for]="resultDatePicker"></mat-datepicker-toggle>
                     <mat-datepicker #resultDatePicker></mat-datepicker>
                 </mat-form-field>
+            </div>
+
+            <!-- Premium Access Section -->
+            <div class="p-4 mb-4 rounded-lg" style="background-color: #fef9c3; border: 1px solid #fbbf24;">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="font-medium" style="color: #78350f;">
+                            <mat-icon style="vertical-align: middle; margin-right: 8px;">star</mat-icon>
+                            Premium Access Required for College Predictor
+                        </span>
+                        <p style="color: #a16207; font-size: 12px; margin-top: 4px;">
+                            When enabled, users must pay to access this exam's College Predictor and Simulator
+                        </p>
+                    </div>
+                    <mat-slide-toggle formControlName="premium_required" color="warn">
+                        {{ settingsForm.get('premium_required')?.value ? 'Required' : 'Free' }}
+                    </mat-slide-toggle>
+                </div>
             </div>
 
             <!-- Rank Predictor Settings -->

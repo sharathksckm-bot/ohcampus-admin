@@ -120,6 +120,8 @@ export const appRoutes: Route[] = [
              {path: "rankpredictor", loadChildren: () => import("app/modules/admin/apps/rankpredictor/rankpredictor.module").then(m => m.RankPredictorModule)},
              {path: 'questionsandans', loadChildren: () => import('app/modules/admin/apps/questionsandans/questionsandans.module').then(m =>m.QuestionsandansModule)},
              {path: 'leadcapture', loadChildren: () => import('app/modules/admin/apps/leadcapture/leadcapture.module').then(m => m.LeadcaptureModule)},
+             {path: 'chatbotleads', loadChildren: () => import('app/modules/admin/apps/chatbotleads/chatbotleads.module').then(m => m.ChatbotleadsModule)},
+             {path: 'chatbotsourcelinks', loadChildren: () => import('app/modules/admin/apps/chatbotsourcelinks/chatbotsourcelinks.module').then(m => m.ChatbotsourcelinksModule)},
              {path: "seotools", loadChildren: () => import("app/modules/admin/apps/seotools/seotools.module").then(m => m.SeotoolsModule)},
              {path: "predictorsettings", loadChildren: () => import("app/modules/admin/apps/predictorsettings/predictor-settings.module").then(m => m.PredictorSettingsModule)},
 

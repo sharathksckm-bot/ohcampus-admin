@@ -1,0 +1,288 @@
+<div class="chatbot-leads-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="title-section">
+      <h1>AI Chatbot Leads</h1>
+      <p>Manage leads captured by the AI chatbot</p>
+    </div>
+    <div class="actions">
+      <button mat-stroked-button [color]="notificationEnabled ? 'primary' : ''" (click)="toggleNotifications()">
+        <mat-icon>{{ notificationEnabled ? 'notifications_active' : 'notifications_off' }}</mat-icon>
+        {{ notificationEnabled ? 'Live' : 'Paused' }}
+      </button>
+      <button mat-stroked-button [color]="showAnalytics ? 'accent' : ''" (click)="toggleAnalytics()">
+        <mat-icon>analytics</mat-icon>
+        Analytics
+      </button>
+      <button mat-flat-button color="primary" (click)="refresh()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Analytics Panel -->
+  <div class="analytics-panel" *ngIf="showAnalytics && analytics">
+    <h3><mat-icon>pie_chart</mat-icon> Conversation Analytics</h3>
+    <div class="analytics-grid">
+      <div class="analytics-card">
+        <div class="card-header">
+          <span>Conversion Rate</span>
+          <mat-icon>track_changes</mat-icon>
+        </div>
+        <p class="card-value purple">{{ analytics.conversion_rate }}%</p>
+      </div>
+      <div class="analytics-card">
+        <div class="card-header">
+          <span>Avg Messages</span>
+          <mat-icon>chat</mat-icon>
+        </div>
+        <p class="card-value blue">{{ analytics.avg_messages }}</p>
+      </div>
+      <div class="analytics-card">
+        <div class="card-header">
+          <span>This Week</span>
+          <mat-icon [class.up]="analytics.weekly_growth >= 0" [class.down]="analytics.weekly_growth < 0">
+            {{ analytics.weekly_growth >= 0 ? 'trending_up' : 'trending_down' }}
+          </mat-icon>
+        </div>
+        <p class="card-value">{{ analytics.this_week }}</p>
+        <span [class.growth-up]="analytics.weekly_growth >= 0" [class.growth-down]="analytics.weekly_growth < 0">
+          {{ analytics.weekly_growth >= 0 ? '+' : '' }}{{ analytics.weekly_growth }}% vs last week
+        </span>
+      </div>
+      <div class="analytics-card">
+        <div class="card-header">
+          <span>Hot Pending</span>
+          <mat-icon class="hot">local_fire_department</mat-icon>
+        </div>
+        <p class="card-value red">{{ analytics.hot_pending }}</p>
+        <span class="muted">Need action</span>
+      </div>
+    </div>
+    <div class="analytics-details">
+      <div class="detail-card">
+        <h4>Top Interests</h4>
+        <div class="interest-item" *ngFor="let item of analytics.by_course">
+          <span>{{ item.interested_course || 'General' }}</span>
+          <div class="bar-container">
+            <div class="bar" [style.width.%]="(item.count / (analytics.by_course[0]?.count || 1)) * 100"></div>
+          </div>
+          <span class="count">{{ item.count }}</span>
+        </div>
+      </div>
+      <div class="detail-card">
+        <h4>Lead Sources</h4>
+        <div class="source-item" *ngFor="let item of analytics.by_source">
+          <span>{{ item.source || 'Unknown' }}</span>
+          <span class="count">{{ item.count }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid" *ngIf="stats">
+    <div class="stat-card">
+      <div class="stat-icon blue"><mat-icon>people</mat-icon></div>
+      <div class="stat-info">
+        <p class="stat-value">{{ stats.total }}</p>
+        <p class="stat-label">Total Leads</p>
+      </div>
+    </div>
+    <div class="stat-card clickable" (click)="filterLeadType = 'hot'; applyFilter()">
+      <div class="stat-icon red"><mat-icon>local_fire_department</mat-icon></div>
+      <div class="stat-info">
+        <p class="stat-value">{{ stats.by_type?.hot || 0 }}</p>
+        <p class="stat-label">Hot Leads</p>
+      </div>
+    </div>
+    <div class="stat-card clickable" (click)="filterLeadType = 'warm'; applyFilter()">
+      <div class="stat-icon orange"><mat-icon>whatshot</mat-icon></div>
+      <div class="stat-info">
+        <p class="stat-value">{{ stats.by_type?.warm || 0 }}</p>
+        <p class="stat-label">Warm Leads</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><mat-icon>today</mat-icon></div>
+      <div class="stat-info">
+        <p class="stat-value">{{ stats.today }}</p>
+        <p class="stat-label">Today</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Lead Type</mat-label>
+      <mat-select [(ngModel)]="filterLeadType" (selectionChange)="applyFilter()">
+        <mat-option value="">All Types</mat-option>
+        <mat-option value="hot">🔥 Hot</mat-option>
+        <mat-option value="warm">🌡️ Warm</mat-option>
+        <mat-option value="cold">❄️ Cold</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select [(ngModel)]="filterStatus" (selectionChange)="applyFilter()">
+        <mat-option value="">All Status</mat-option>
+        <mat-option value="new">🆕 New</mat-option>
+        <mat-option value="contacted">📞 Contacted</mat-option>
+        <mat-option value="converted">✅ Converted</mat-option>
+        <mat-option value="lost">❌ Lost</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button mat-button color="warn" *ngIf="filterLeadType || filterStatus" (click)="clearFilters()">
+      Clear Filters
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
+
+  <!-- Leads Table -->
+  <div class="table-container">
+    <table mat-table [dataSource]="dataSource" matSort>
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Lead</th>
+        <td mat-cell *matCellDef="let lead">
+          <div class="lead-name">{{ lead.name || 'Unknown' }}</div>
+          <div class="lead-place">{{ lead.place || '-' }}</div>
+        </td>
+      </ng-container>
+
+      <!-- Contact Column -->
+      <ng-container matColumnDef="contact">
+        <th mat-header-cell *matHeaderCellDef>Contact</th>
+        <td mat-cell *matCellDef="let lead">
+          <div *ngIf="lead.phone" class="contact-item">
+            <mat-icon>phone</mat-icon> {{ lead.phone }}
+          </div>
+          <div *ngIf="lead.email" class="contact-item">
+            <mat-icon>email</mat-icon> {{ lead.email | slice:0:20 }}...
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Interest Column -->
+      <ng-container matColumnDef="interest">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Interest</th>
+        <td mat-cell *matCellDef="let lead">{{ lead.interested_course || '-' }}</td>
+      </ng-container>
+
+      <!-- Lead Type Column -->
+      <!-- Remark Column -->
+      <ng-container matColumnDef="remark">
+        <th mat-header-cell *matHeaderCellDef>Remark</th>
+        <td mat-cell *matCellDef="let lead">
+          <span class="remark-text">{{ lead.remark || "-" }}</span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="lead_type">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+        <td mat-cell *matCellDef="let lead">
+          <span class="lead-badge" [ngClass]="getLeadTypeClass(lead.lead_type)">
+            {{ lead.lead_type === 'hot' ? '🔥' : lead.lead_type === 'warm' ? '🌡️' : '❄️' }}
+            {{ lead.lead_type?.toUpperCase() || 'UNKNOWN' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let lead">
+          <mat-select [(ngModel)]="lead.status" (selectionChange)="updateStatus(lead, $event.value)" [ngClass]="getStatusClass(lead.status || 'new')">
+            <mat-option value="new">🆕 New</mat-option>
+            <mat-option value="contacted">📞 Contacted</mat-option>
+            <mat-option value="converted">✅ Converted</mat-option>
+            <mat-option value="lost">❌ Lost</mat-option>
+          </mat-select>
+        </td>
+      </ng-container>
+
+      <!-- Date Column -->
+      <ng-container matColumnDef="created_at">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+        <td mat-cell *matCellDef="let lead">{{ lead.created_at | date:'dd MMM, hh:mm a' }}</td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let lead">
+          <div class="action-buttons">
+            <button mat-icon-button color="primary" (click)="viewConversation(lead)" matTooltip="View Conversation">
+              <mat-icon>chat</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" *ngIf="lead.phone" (click)="callLead(lead)" matTooltip="Call">
+              <mat-icon>phone</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" *ngIf="lead.phone" (click)="whatsappLead(lead)" matTooltip="WhatsApp">
+              <mat-icon>send</mat-icon>
+            </button>
+            <button mat-icon-button color="accent" *ngIf="lead.email" (click)="emailLead(lead)" matTooltip="Email">
+              <mat-icon>email</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" (click)="updateStatus(lead, 'converted')" matTooltip="Mark Converted">
+              <mat-icon>check_circle</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="updateStatus(lead, 'lost')" matTooltip="Mark Lost">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+          [class.hot-row]="row.lead_type === 'hot' && (!row.status || row.status === 'new')"></tr>
+    </table>
+    
+    <div class="no-data" *ngIf="!isLoading && leads.length === 0">
+      No leads found
+    </div>
+    
+    <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+  </div>
+</div>
+
+<!-- Conversation Dialog -->
+<div class="conversation-overlay" *ngIf="showConversationDialog" (click)="closeConversationDialog()">
+  <div class="conversation-dialog" (click)="$event.stopPropagation()">
+    <div class="dialog-header">
+      <h3><mat-icon>chat</mat-icon> Conversation with {{ selectedLead?.name || 'Unknown' }}</h3>
+      <button mat-icon-button (click)="closeConversationDialog()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="dialog-content">
+      <mat-progress-bar mode="indeterminate" *ngIf="loadingConversation"></mat-progress-bar>
+      <div class="messages-container" *ngIf="!loadingConversation">
+        <div *ngIf="conversationMessages.length === 0" class="no-messages">
+          No conversation history found
+        </div>
+        <div *ngFor="let msg of conversationMessages" 
+             class="message" 
+             [ngClass]="msg.role === 'user' ? 'user-message' : 'bot-message'">
+          <div class="message-header">
+            <mat-icon>{{ msg.role === 'user' ? 'person' : 'smart_toy' }}</mat-icon>
+            <span>{{ msg.role === 'user' ? (selectedLead?.name || 'User') : 'OhCampus AI' }}</span>
+          </div>
+          <div class="message-content">{{ msg.message }}</div>
+          <div class="message-time">{{ msg.created_at | date:'hh:mm a' }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <div class="lead-info" *ngIf="selectedLead">
+        <span *ngIf="selectedLead.phone"><mat-icon>phone</mat-icon> {{ selectedLead.phone }}</span>
+        <span *ngIf="selectedLead.email"><mat-icon>email</mat-icon> {{ selectedLead.email }}</span>
+        <span *ngIf="selectedLead.interested_course"><mat-icon>school</mat-icon> {{ selectedLead.interested_course }}</span>
+      </div>
+    </div>
+  </div>
+</div>

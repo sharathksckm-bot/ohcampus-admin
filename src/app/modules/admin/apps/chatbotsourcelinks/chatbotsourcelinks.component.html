@@ -1,0 +1,81 @@
+<div class="source-links-container">
+  <div class="header">
+    <div>
+      <h1>Chatbot Source Links</h1>
+      <p>Manage AI knowledge base (hidden from users, synced across admin panels)</p>
+    </div>
+    <div class="actions">
+      <button mat-stroked-button (click)="fetchLinks()"><mat-icon>refresh</mat-icon> Refresh</button>
+      <button mat-flat-button color="primary" (click)="openForm()"><mat-icon>add</mat-icon> Add Link</button>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <mat-icon>info</mat-icon>
+    <div>
+      <strong>How it works:</strong> Links provide knowledge to AI. URLs are NOT shown to users.
+      For predictor queries from website, AI recommends the Android app.
+    </div>
+  </div>
+
+  <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+
+  <div class="form-card" *ngIf="showForm">
+    <h3>{{ editingLink ? 'Edit' : 'Add' }} Source Link</h3>
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Title</mat-label>
+        <input matInput [(ngModel)]="formData.title" placeholder="e.g., KCET Colleges">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Category</mat-label>
+        <mat-select [(ngModel)]="formData.category">
+          <mat-option *ngFor="let cat of categories" [value]="cat.value">{{ cat.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>URL</mat-label>
+      <input matInput [(ngModel)]="formData.url" placeholder="https://ohcampus.com/...">
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description (for AI context)</mat-label>
+      <textarea matInput [(ngModel)]="formData.description" rows="2"></textarea>
+    </mat-form-field>
+    <mat-checkbox [(ngModel)]="formData.is_active" [checked]="formData.is_active === 1">Active</mat-checkbox>
+    <div class="form-actions">
+      <button mat-flat-button color="primary" (click)="save()"><mat-icon>save</mat-icon> Save</button>
+      <button mat-stroked-button (click)="closeForm()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="links-list" *ngIf="!loading && groupedLinks.length > 0">
+    <div class="category-group" *ngFor="let group of groupedLinks">
+      <div class="category-header">
+        <mat-icon>{{ group.value === 'predictor' ? 'analytics' : group.value === 'exam' ? 'school' : group.value === 'course' ? 'menu_book' : group.value === 'app' ? 'phone_android' : 'link' }}</mat-icon>
+        <span>{{ group.label }}</span>
+        <span class="count">{{ group.links.length }}</span>
+      </div>
+      <div class="link-item" *ngFor="let link of group.links" [class.inactive]="!isActive(link)">
+        <div class="link-info">
+          <strong>{{ link.title }}</strong>
+          <span class="url">{{ link.url }}</span>
+          <span class="desc" *ngIf="link.description">{{ link.description }}</span>
+        </div>
+        <div class="link-actions">
+          <button mat-icon-button type="button" (click)="toggleActive(link)" [color]="isActive(link) ? 'primary' : ''">
+            <mat-icon>{{ isActive(link) ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          <button mat-icon-button type="button" color="primary" (click)="openForm(link)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button type="button" color="warn" (click)="delete(link.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-data" *ngIf="!loading && groupedLinks.length === 0">No source links found</div>
+</div>

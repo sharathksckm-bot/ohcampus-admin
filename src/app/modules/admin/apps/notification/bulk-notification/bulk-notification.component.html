@@ -29,10 +29,11 @@
               <mat-label>Select States</mat-label>
               <mat-select multiple [(ngModel)]="selectedStates" (selectionChange)="onStateChange($event.value)">
                 <mat-option *ngFor="let state of stateList" [value]="state">
-                  {{state.name || state.statename}}
+                  {{state.statename || state.name}}
                 </mat-option>
               </mat-select>
-              <mat-hint>Filter users by state</mat-hint>
+              <mat-hint *ngIf="statesLoading">Loading states...</mat-hint>
+              <mat-hint *ngIf="!statesLoading && stateList.length > 0">{{stateList.length}} states available</mat-hint>
             </mat-form-field>
           </div>
 
@@ -42,7 +43,7 @@
               <mat-label>Select Cities</mat-label>
               <mat-select multiple [(ngModel)]="selectedCities" (selectionChange)="onCityChange($event.value)">
                 <mat-option *ngFor="let city of cityList" [value]="city">
-                  {{city.name || city.cityname}}
+                  {{city.cityname || city.name}}
                 </mat-option>
               </mat-select>
             </mat-form-field>
@@ -54,10 +55,11 @@
               <mat-label>Select Categories</mat-label>
               <mat-select multiple [(ngModel)]="selectedCategories" (selectionChange)="onCategoryChange($event.value)">
                 <mat-option *ngFor="let cat of categoryList" [value]="cat">
-                  {{cat.name || cat.category_name}}
+                  {{cat.catname || cat.name || cat.category_name}}
                 </mat-option>
               </mat-select>
-              <mat-hint>Filter by course category</mat-hint>
+              <mat-hint *ngIf="categoriesLoading">Loading categories...</mat-hint>
+              <mat-hint *ngIf="!categoriesLoading && categoryList.length > 0">{{categoryList.length}} categories available</mat-hint>
             </mat-form-field>
           </div>
 
@@ -67,7 +69,7 @@
               <mat-label>Select Courses</mat-label>
               <mat-select multiple [(ngModel)]="selectedCourses" (selectionChange)="onCourseChange($event.value)">
                 <mat-option *ngFor="let course of courseList" [value]="course">
-                  {{course.name || course.course_name}}
+                  {{course.coursename || course.name || course.course_name}}
                 </mat-option>
               </mat-select>
             </mat-form-field>
@@ -79,10 +81,11 @@
               <mat-label>Select Exams</mat-label>
               <mat-select multiple [(ngModel)]="selectedExams" (selectionChange)="onExamChange($event.value)">
                 <mat-option *ngFor="let exam of examList" [value]="exam">
-                  {{exam.name || exam.exam_name}}
+                  {{exam.title || exam.name || exam.exam_name}}
                 </mat-option>
               </mat-select>
-              <mat-hint>Filter by exam preference</mat-hint>
+              <mat-hint *ngIf="examsLoading">Loading exams...</mat-hint>
+              <mat-hint *ngIf="!examsLoading && examList.length > 0">{{examList.length}} exams available</mat-hint>
             </mat-form-field>
           </div>
 
@@ -165,9 +168,9 @@
                 </thead>
                 <tbody>
                   <tr *ngFor="let user of matchedUsers.slice(0, 50)" class="border-b hover:bg-gray-50">
-                    <td class="p-2 text-sm">{{user.f_name}} {{user.l_name}}</td>
+                    <td class="p-2 text-sm">{{user.f_name || user.name}} {{user.l_name || ''}}</td>
                     <td class="p-2 text-sm text-gray-600">{{user.email}}</td>
-                    <td class="p-2 text-sm text-gray-500">{{user.state}}</td>
+                    <td class="p-2 text-sm text-gray-500">{{user.state || user.statename || '-'}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -189,7 +192,8 @@
                 [disabled]="addLoader || matchedUsers.length === 0">
           <mat-spinner *ngIf="addLoader" diameter="20" class="mr-2"></mat-spinner>
           <mat-icon *ngIf="!addLoader">send</mat-icon>
-          Send to {{matchedUsers.length}} Users
+          <span *ngIf="matchedUsers.length > 0">Send to {{matchedUsers.length}} Users</span>
+          <span *ngIf="matchedUsers.length === 0">Select filters to preview users</span>
         </button>
       </div>
     </div>

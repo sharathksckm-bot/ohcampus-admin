@@ -19,7 +19,7 @@ export class TestListComponent implements OnInit {
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild('editTestDialog') editTestDialog: TemplateRef<any>;
 
-    displayedColumns: string[] = ['Sr.No', 'title', 'exam_type', 'duration', 'total_marks', 'question_count', 'status', 'created_at', 'actions'];
+    displayedColumns: string[] = ['Sr.No', 'title', 'exam_type', 'categories', 'duration', 'total_marks', 'question_count', 'status', 'created_at', 'actions'];
     testListData: any[] = [];
     dataSource: any;
     searchForm: FormGroup;
@@ -37,6 +37,10 @@ export class TestListComponent implements OnInit {
     editForm: FormGroup;
     editLoader: boolean = false;
     currentTestId: number = null;
+
+    // Categories for mapping
+    categories: any[] = [];
+    selectedCategoryIds: number[] = [];
 
     examTypes = [
         { id: 'NEET', name: 'NEET' },
@@ -75,6 +79,7 @@ export class TestListComponent implements OnInit {
             negative_marking: [1],
             negative_marks_value: [0.25],
             difficulty_level: ['medium'],
+            category_ids: [[]],
             instructions: [''],
             status: [1],
             is_free: [1],
@@ -82,7 +87,27 @@ export class TestListComponent implements OnInit {
         });
 
         this.listLoader = true;
+        this.loadCategories();
         this.getTestList();
+    }
+
+    loadCategories() {
+        this.campusService.getCategories('').subscribe((res) => {
+            if (res.response_code === '200' || res.response_code === 200) {
+                this.categories = res.coursedata || res.response_data || [];
+            }
+        });
+    }
+
+    getCategoryNames(categoryIds: string): string {
+        if (!categoryIds) return 'All Categories';
+        const ids = categoryIds.split(',').map(id => parseInt(id.trim()));
+        const names = this.categories
+            .filter(cat => ids.includes(parseInt(cat.id)))
+            .map(cat => cat.catname)
+            .slice(0, 3);
+        if (names.length === 0) return 'All Categories';
+        return names.join(', ') + (ids.length > 3 ? '...' : '');
     }
 
     convertDate(inputFormat) {
@@ -155,6 +180,7 @@ export class TestListComponent implements OnInit {
 
     addNewTest() {
         this.currentTestId = null;
+        this.selectedCategoryIds = [];
         this.editForm.reset({
             title: '',
             description: '',
@@ -165,16 +191,22 @@ export class TestListComponent implements OnInit {
             negative_marking: 1,
             negative_marks_value: 0.25,
             difficulty_level: 'medium',
+            category_ids: [],
             instructions: '',
             status: 1,
             is_free: 1,
             price: 0
         });
-        this.dialog.open(this.editTestDialog, { width: '600px' });
+        this.dialog.open(this.editTestDialog, { width: '700px', maxHeight: '90vh' });
     }
 
     editTest(test) {
         this.currentTestId = test.id;
+        // Parse category_ids string to array
+        this.selectedCategoryIds = test.category_ids 
+            ? test.category_ids.split(',').map(id => parseInt(id.trim())) 
+            : [];
+        
         this.editForm.patchValue({
             title: test.title,
             description: test.description,
@@ -185,17 +217,27 @@ export class TestListComponent implements OnInit {
             negative_marking: test.negative_marking,
             negative_marks_value: test.negative_marks_value,
             difficulty_level: test.difficulty_level,
+            category_ids: this.selectedCategoryIds,
             instructions: test.instructions,
             status: test.status,
             is_free: test.is_free,
             price: test.price
         });
-        this.dialog.open(this.editTestDialog, { width: '600px' });
+        this.dialog.open(this.editTestDialog, { width: '700px', maxHeight: '90vh' });
+    }
+
+    onCategoryChange(event) {
+        this.selectedCategoryIds = event.value;
     }
 
     saveTest() {
         this.editLoader = true;
-        const testData = this.editForm.value;
+        const testData = { ...this.editForm.value };
+        
+        // Convert category_ids array to comma-separated string
+        testData.category_ids = this.selectedCategoryIds.length > 0 
+            ? this.selectedCategoryIds.join(',') 
+            : null;
 
         if (this.currentTestId) {
             testData.id = this.currentTestId;

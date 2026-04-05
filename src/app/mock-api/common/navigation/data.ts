@@ -460,6 +460,21 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 ]
             },
             {
+                id   : 'apps.chatbotleads',
+                title: 'AI Chatbot Leads',
+                type : 'basic',
+                icon : 'mat_outline:smart_toy',
+                link : '/apps/chatbotleads'
+            },
+            {
+                id   : 'apps.chatbotsourcelinks',
+                title: 'Chatbot Source Links',
+                type : 'basic',
+                icon : 'mat_outline:link',
+                link : '/apps/chatbotsourcelinks'
+            },
+
+            {
                 id   : "apps.seotools",
                 title: "SEO Tools",
                 type : "collapsable",

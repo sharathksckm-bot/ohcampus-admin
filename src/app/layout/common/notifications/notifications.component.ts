@@ -217,6 +217,9 @@ console.log(data)
             if(name == 'Review'){
                 this._route.navigate(['apps/college/reviewlist']);
             }
+            if(name == 'AI Chatbot Leads'){
+                this._route.navigate(['apps/chatbotleads']);
+            }
             this.getNotificationCount()
             this.notificationCount = 0
             this.notificationCount = this.notificationCount - Number(data.count)
