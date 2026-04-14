@@ -1,410 +1,506 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobile Analytics - OhCampus Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0f172a;
-            color: #e2e8f0;
-            min-height: 100vh;
-        }
-        .analytics-header {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-bottom: 1px solid #1e293b;
-            padding: 20px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .analytics-header h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #f8fafc;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .analytics-header h1 i { color: #38bdf8; }
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            color: #94a3b8;
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-        .back-btn:hover { background: #334155; color: #f1f5f9; }
-        .refresh-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: #1d4ed8;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-        .refresh-btn:hover { background: #2563eb; }
-        .header-actions { display: flex; gap: 10px; align-items: center; }
-        .last-updated { font-size: 0.75rem; color: #64748b; }
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            padding: 24px 32px;
-        }
-        .stat-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 14px;
-            padding: 22px;
-            transition: transform 0.2s, border-color 0.2s;
-        }
-        .stat-card:hover { transform: translateY(-2px); border-color: #475569; }
-        .stat-card .label {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 8px;
-        }
-        .stat-card .value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #f8fafc;
-            line-height: 1;
-        }
-        .stat-card .sub {
-            font-size: 0.78rem;
-            color: #64748b;
-            margin-top: 6px;
-        }
-        .stat-card .icon-wrap {
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-        }
-        .stat-card .icon-wrap i { font-size: 18px; }
-        .blue-icon { background: #1e3a5f; }
-        .blue-icon i { color: #38bdf8; }
-        .green-icon { background: #14532d; }
-        .green-icon i { color: #4ade80; }
-        .amber-icon { background: #451a03; }
-        .amber-icon i { color: #fbbf24; }
-        .red-icon { background: #450a0a; }
-        .red-icon i { color: #f87171; }
-        .charts-section {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            padding: 0 32px 24px;
-        }
-        .chart-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 14px;
-            padding: 22px;
-        }
-        .chart-card h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #f1f5f9;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .chart-card h3 i { color: #38bdf8; font-size: 18px; }
-        .tables-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 0 32px 32px;
-        }
-        .table-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 14px;
-            padding: 22px;
-            overflow: hidden;
-        }
-        .table-card h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #f1f5f9;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .table-card h3 i { font-size: 18px; }
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.82rem;
-        }
-        .data-table th {
-            text-align: left;
-            padding: 10px 12px;
-            background: #0f172a;
-            color: #94a3b8;
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-        .data-table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #1e293b;
-            color: #cbd5e1;
-        }
-        .data-table tr:hover td { background: rgba(56,189,248,0.04); }
-        .platform-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 3px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        .badge-android { background: #14532d; color: #4ade80; }
-        .badge-web { background: #1e3a5f; color: #38bdf8; }
-        .badge-unknown { background: #334155; color: #94a3b8; }
-        .status-ok { color: #4ade80; }
-        .status-fail { color: #f87171; }
-        .loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15,23,42,0.85);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .loading-overlay i { font-size: 2rem; color: #38bdf8; }
-        .loading-overlay p { color: #94a3b8; font-size: 0.9rem; }
-        .empty-state {
-            text-align: center;
-            padding: 30px;
-            color: #64748b;
-        }
-        .empty-state i { font-size: 2rem; margin-bottom: 8px; display: block; }
-        @media (max-width: 1200px) {
-            .analytics-grid { grid-template-columns: repeat(2, 1fr); }
-            .charts-section { grid-template-columns: 1fr; }
-            .tables-section { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 640px) {
-            .analytics-grid { grid-template-columns: 1fr; padding: 16px; }
-            .charts-section, .tables-section { padding: 0 16px 16px; }
-            .analytics-header { padding: 16px; flex-wrap: wrap; gap: 12px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Analytics - OhCampus Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg-primary:#0b1120;--bg-card:#111827;--bg-card-alt:#1a2332;
+--border:#1e293b;--border-hover:#334155;
+--text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;
+--accent-blue:#38bdf8;--accent-green:#4ade80;--accent-amber:#fbbf24;
+--accent-red:#f87171;--accent-purple:#a78bfa;--accent-cyan:#22d3ee;
+--accent-pink:#f472b6;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh}
+.header{background:linear-gradient(135deg,#111827,#0b1120);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.header h1{font-size:1.35rem;font-weight:700;display:flex;align-items:center;gap:10px}
+.header h1 i{color:var(--accent-blue);font-size:1.2rem}
+.header-actions{display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;border:none}
+.btn-primary{background:#1d4ed8;color:#fff}.btn-primary:hover{background:#2563eb}
+.btn-secondary{background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary)}.btn-secondary:hover{background:var(--bg-card-alt);color:var(--text-primary)}
+.btn-success{background:#059669;color:#fff}.btn-success:hover{background:#10b981}
+.btn-danger{background:#dc2626;color:#fff}.btn-danger:hover{background:#ef4444}
+.btn-notify{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff}.btn-notify:hover{background:linear-gradient(135deg,#6d28d9,#4338ca)}
+.last-updated{font-size:0.7rem;color:var(--text-muted)}
+.main{padding:20px 28px;max-width:1600px;margin:0 auto}
+
+/* Stat Cards Row */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:20px}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:18px;transition:transform 0.15s,border-color 0.15s;position:relative;overflow:hidden}
+.stat-card:hover{transform:translateY(-1px);border-color:var(--border-hover)}
+.stat-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;opacity:0.04;transform:translate(20px,-20px)}
+.stat-card .icon-wrap{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.stat-card .icon-wrap i{font-size:15px}
+.stat-card .label{font-size:0.68rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
+.stat-card .value{font-size:1.65rem;font-weight:800;line-height:1;letter-spacing:-0.02em}
+.stat-card .sub{font-size:0.7rem;color:var(--text-muted);margin-top:5px}
+.stat-card .trend{display:inline-flex;align-items:center;gap:3px;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:6px;margin-top:5px}
+.trend-up{background:rgba(74,222,128,0.12);color:#4ade80}
+.trend-down{background:rgba(248,113,113,0.12);color:#f87171}
+
+/* Grid Layouts */
+.grid-2{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
+.grid-2-equal{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+
+/* Cards */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:18px;overflow:hidden}
+.card h3{font-size:0.88rem;font-weight:600;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card h3 i{font-size:16px}
+
+/* Tables */
+.data-table{width:100%;border-collapse:collapse;font-size:0.78rem}
+.data-table th{text-align:left;padding:8px 10px;background:var(--bg-primary);color:var(--text-muted);font-weight:600;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.04em}
+.data-table td{padding:8px 10px;border-bottom:1px solid rgba(30,41,59,0.5);color:#cbd5e1}
+.data-table tr:hover td{background:rgba(56,189,248,0.03)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:5px;font-size:0.68rem;font-weight:600}
+.badge-android{background:#14532d;color:#4ade80}
+.badge-web{background:#1e3a5f;color:#38bdf8}
+.badge-unknown{background:#334155;color:#94a3b8}
+.badge-test{background:#4a1d96;color:#c4b5fd}
+.badge-article{background:#1e3a5f;color:#38bdf8}
+.status-ok{color:#4ade80}.status-fail{color:#f87171}
+
+/* Health Gauge */
+.gauge-container{display:flex;flex-direction:column;align-items:center;gap:8px}
+.gauge-ring{position:relative;width:140px;height:140px}
+.gauge-ring svg{transform:rotate(-90deg)}
+.gauge-ring .bg{stroke:#1e293b;stroke-width:10;fill:none}
+.gauge-ring .fg{stroke-width:10;fill:none;stroke-linecap:round;transition:stroke-dashoffset 1s ease}
+.gauge-value{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.6rem;font-weight:800;text-align:center}
+.gauge-value .unit{display:block;font-size:0.65rem;color:var(--text-muted);font-weight:500}
+.gauge-legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.gauge-legend span{display:flex;align-items:center;gap:5px;font-size:0.7rem;color:var(--text-secondary)}
+.gauge-legend .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Heatmap */
+.heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.heatmap-cell{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;transition:transform 0.15s}
+.heatmap-cell:hover{transform:scale(1.05)}
+.heatmap-cell .day-label{font-size:0.6rem;color:var(--text-muted);margin-bottom:3px;font-weight:500}
+.heatmap-cell .day-count{font-size:1rem;font-weight:800}
+
+/* Hourly */
+.hourly-bars{display:flex;gap:2px;align-items:flex-end;height:80px}
+.hourly-bar{flex:1;border-radius:3px 3px 0 0;min-width:4px;transition:all 0.2s;position:relative}
+.hourly-bar:hover{opacity:0.8}
+
+/* Notification Test Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}
+.modal-overlay.active{display:flex}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,0.4)}
+.modal h3{font-size:1.05rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.modal h3 i{color:var(--accent-purple)}
+.modal-field{margin-bottom:14px}
+.modal-field label{display:block;font-size:0.75rem;color:var(--text-secondary);margin-bottom:5px;font-weight:600}
+.modal-field input,.modal-field textarea{width:100%;padding:10px 14px;background:var(--bg-primary);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-size:0.85rem;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s}
+.modal-field input:focus,.modal-field textarea:focus{border-color:var(--accent-blue)}
+.modal-field textarea{resize:vertical;min-height:60px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.modal-result{margin-top:14px;padding:12px;border-radius:8px;font-size:0.82rem;display:none}
+.modal-result.success{display:block;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.2);color:#4ade80}
+.modal-result.error{display:block;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);color:#f87171}
+
+/* Delivery Rate Bar */
+.delivery-bar{height:10px;background:var(--bg-primary);border-radius:5px;overflow:hidden;margin:8px 0}
+.delivery-bar-fill{height:100%;border-radius:5px;transition:width 0.8s ease}
+.delivery-stats{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text-muted)}
+
+/* Loading */
+.loading-overlay{position:fixed;inset:0;background:rgba(11,17,32,0.9);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:14px}
+.loading-overlay i{font-size:1.8rem;color:var(--accent-blue)}
+.loading-overlay p{color:var(--text-secondary);font-size:0.85rem}
+.empty-state{text-align:center;padding:24px;color:var(--text-muted)}
+.empty-state i{font-size:1.5rem;margin-bottom:6px;display:block}
+
+@media(max-width:1200px){.stats-row{grid-template-columns:repeat(3,1fr)}.grid-2,.grid-2-equal,.grid-3{grid-template-columns:1fr}}
+@media(max-width:640px){.stats-row{grid-template-columns:1fr 1fr}.main{padding:14px}.header{padding:12px 16px;flex-wrap:wrap;gap:10px}}
+</style>
 </head>
 <body>
-    <div id="loading" class="loading-overlay">
-        <i class="fas fa-circle-notch fa-spin"></i>
-        <p>Loading analytics data...</p>
-    </div>
-    <header class="analytics-header">
-        <h1><i class="fas fa-chart-bar"></i> Mobile Analytics</h1>
-        <div class="header-actions">
-            <span class="last-updated" id="lastUpdated"></span>
-            <button class="refresh-btn" onclick="loadData()">
-                <i class="fas fa-sync-alt"></i> Refresh
-            </button>
-            <a href="/" class="back-btn">
-                <i class="fas fa-arrow-left"></i> Back to Admin
-            </a>
-        </div>
-    </header>
-    <div class="analytics-grid">
-        <div class="stat-card">
-            <div class="icon-wrap blue-icon"><i class="fas fa-users"></i></div>
-            <div class="label">Total Users</div>
-            <div class="value" id="totalUsers">--</div>
-            <div class="sub" id="recentReg">--</div>
-        </div>
-        <div class="stat-card">
-            <div class="icon-wrap green-icon"><i class="fab fa-android"></i></div>
-            <div class="label">Android Users</div>
-            <div class="value" id="androidUsers">--</div>
-            <div class="sub">Registered via Android app</div>
-        </div>
-        <div class="stat-card">
-            <div class="icon-wrap amber-icon"><i class="fas fa-bell"></i></div>
-            <div class="label">FCM Tokens</div>
-            <div class="value" id="fcmTokens">--</div>
-            <div class="sub" id="fcmSub">--</div>
-        </div>
-        <div class="stat-card">
-            <div class="icon-wrap red-icon"><i class="fas fa-exclamation-triangle"></i></div>
-            <div class="label">Failed Tokens</div>
-            <div class="value" id="failedTokens">--</div>
-            <div class="sub" id="failSub">--</div>
-        </div>
-    </div>
-    <div class="charts-section">
-        <div class="chart-card">
-            <h3><i class="fas fa-chart-area"></i> User Registration Trend (Last 30 Days)</h3>
-            <canvas id="regChart" height="120"></canvas>
-        </div>
-        <div class="chart-card">
-            <h3><i class="fas fa-chart-pie"></i> Platform Distribution</h3>
-            <canvas id="platformChart" height="200"></canvas>
-        </div>
-    </div>
-    <div class="tables-section">
-        <div class="table-card">
-            <h3><i class="fas fa-user-plus" style="color:#4ade80"></i> Recent Registrations</h3>
-            <div style="overflow-x:auto">
-                <table class="data-table" id="recentUsersTable">
-                    <thead><tr><th>Name</th><th>Email</th><th>Platform</th><th>Date</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-        <div class="table-card">
-            <h3><i class="fas fa-paper-plane" style="color:#fbbf24"></i> Push Notification Logs</h3>
-            <div style="overflow-x:auto">
-                <table class="data-table" id="notifLogsTable">
-                    <thead><tr><th>Title</th><th>Sent</th><th>Failed</th><th>Date</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <script>
-    var API = 'https://campusapi.ohcampus.com';
-    var regChartInstance = null;
-    var platformChartInstance = null;
-    function getAuthToken() {
-        try {
-            var raw = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-            if (raw) return raw.replace(/^"|"$/g, '');
-            var fuseStr = localStorage.getItem('fuse-user-data');
-            if (fuseStr) {
-                var fuseData = JSON.parse(fuseStr);
-                if (fuseData && fuseData.accessToken) return fuseData.accessToken;
-            }
-            for (var i = 0; i < localStorage.length; i++) {
-                var key = localStorage.key(i);
-                var val = localStorage.getItem(key);
-                if (val && val.length > 50 && val.indexOf('eyJ') === 0) return val.replace(/^"|"$/g, '');
-            }
-        } catch (e) {}
-        return null;
-    }
-    function loadData() {
-        var token = getAuthToken();
-        if (!token) {
-            document.getElementById('loading').innerHTML = '<i class="fas fa-lock" style="color:#f87171"></i><p>Please log in to the Admin Panel first, then navigate here.</p><a href="/" class="back-btn" style="margin-top:12px"><i class="fas fa-arrow-left"></i> Go to Login</a>';
-            return;
-        }
-        document.getElementById('loading').style.display = 'flex';
-        fetch(API + '/admin/Analytics/getDashboardData', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-            body: JSON.stringify({})
-        })
-        .then(function(r) { return r.json(); })
-        .then(function(d) {
-            document.getElementById('loading').style.display = 'none';
-            if (d.response_code !== '200') {
-                alert('Error: ' + (d.response_message || 'Failed to load analytics'));
-                return;
-            }
-            renderStats(d);
-            renderRegChart(d.registration_trends || []);
-            renderPlatformChart(d.platform_breakdown || {});
-            renderRecentUsers(d.recent_users || []);
-            renderNotifLogs(d.notification_logs || []);
-            document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
-        })
-        .catch(function(e) {
-            document.getElementById('loading').style.display = 'none';
-            console.error('Analytics load error:', e);
-            alert('Failed to load analytics data.');
-        });
-    }
-    function renderStats(d) {
-        document.getElementById('totalUsers').textContent = (d.total_users || 0).toLocaleString();
-        document.getElementById('recentReg').textContent = '+' + (d.registrations_last_7_days || 0) + ' this week / +' + (d.registrations_last_30_days || 0) + ' this month';
-        var platforms = d.platform_breakdown || {};
-        document.getElementById('androidUsers').textContent = (platforms.android || 0).toLocaleString();
-        var fcm = d.fcm_tokens || {};
-        document.getElementById('fcmTokens').textContent = (fcm.total_with_token || 0).toLocaleString();
-        document.getElementById('fcmSub').textContent = fcm.total_without_token + ' users without push token';
-        var failures = d.fcm_failures || {};
-        document.getElementById('failedTokens').textContent = (failures.unique_tokens_failed || 0).toLocaleString();
-        document.getElementById('failSub').textContent = (failures.uncleaned_tokens || 0) + ' uncleaned tokens';
-    }
-    function renderRegChart(trends) {
-        var ctx = document.getElementById('regChart').getContext('2d');
-        if (regChartInstance) regChartInstance.destroy();
-        var labels = trends.map(function(t) { var d = new Date(t.date); return d.getDate() + '/' + (d.getMonth()+1); });
-        var data = trends.map(function(t) { return t.count; });
-        regChartInstance = new Chart(ctx, {
-            type: 'line',
-            data: { labels: labels, datasets: [{ label: 'New Users', data: data, borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,0.1)', borderWidth: 2, tension: 0.4, fill: true, pointBackgroundColor: '#38bdf8', pointRadius: 3, pointHoverRadius: 6 }] },
-            options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b', font: { size: 11 } }, grid: { color: 'rgba(51,65,85,0.3)' } }, y: { beginAtZero: true, ticks: { color: '#64748b', stepSize: 1, font: { size: 11 } }, grid: { color: 'rgba(51,65,85,0.3)' } } } }
-        });
-    }
-    function renderPlatformChart(platforms) {
-        var ctx = document.getElementById('platformChart').getContext('2d');
-        if (platformChartInstance) platformChartInstance.destroy();
-        var labels = Object.keys(platforms).map(function(k) { return k.charAt(0).toUpperCase() + k.slice(1); });
-        var data = Object.values(platforms);
-        var colors = ['#38bdf8', '#4ade80', '#fbbf24', '#f87171', '#a78bfa'];
-        platformChartInstance = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: labels, datasets: [{ data: data, backgroundColor: colors.slice(0, labels.length), borderColor: '#1e293b', borderWidth: 3 }] },
-            options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 15, font: { size: 12 } } } } }
-        });
-    }
-    function renderRecentUsers(users) {
-        var tbody = document.querySelector('#recentUsersTable tbody');
-        if (!users.length) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="fas fa-users"></i>No recent registrations</div></td></tr>'; return; }
-        tbody.innerHTML = users.map(function(u) {
-            var pClass = u.platform === 'android' ? 'badge-android' : (u.platform === 'web' ? 'badge-web' : 'badge-unknown');
-            var pIcon = u.platform === 'android' ? 'fab fa-android' : (u.platform === 'web' ? 'fas fa-globe' : 'fas fa-question');
-            var dateStr = new Date(u.registered).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
-            return '<tr><td><strong>' + u.name + '</strong></td><td>' + u.email + '</td><td><span class="platform-badge ' + pClass + '"><i class="' + pIcon + '"></i> ' + u.platform + '</span></td><td>' + dateStr + '</td></tr>';
-        }).join('');
-    }
-    function renderNotifLogs(logs) {
-        var tbody = document.querySelector('#notifLogsTable tbody');
-        if (!logs.length) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="fas fa-bell-slash"></i>No push notifications sent yet</div></td></tr>'; return; }
-        tbody.innerHTML = logs.map(function(n) {
-            var dateStr = new Date(n.created_date).toLocaleDateString('en-IN', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-            return '<tr><td>' + n.title + '</td><td class="status-ok">' + n.success_count + '</td><td class="status-fail">' + n.fail_count + '</td><td>' + dateStr + '</td></tr>';
-        }).join('');
-    }
-    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', loadData); } else { loadData(); }
-    </script>
+<div id="loading" class="loading-overlay"><i class="fas fa-circle-notch fa-spin"></i><p>Loading analytics...</p></div>
+
+<!-- Test Notification Modal -->
+<div class="modal-overlay" id="notifModal">
+<div class="modal">
+<h3><i class="fas fa-paper-plane"></i> Send Test Notification</h3>
+<div class="modal-field">
+<label>Notification Title</label>
+<input type="text" id="notifTitle" value="OhCampus Test" placeholder="Enter notification title">
+</div>
+<div class="modal-field">
+<label>Notification Body</label>
+<textarea id="notifBody" placeholder="Enter notification message">This is a test push notification from OhCampus Admin.</textarea>
+</div>
+<div class="modal-field">
+<label>Target Audience</label>
+<div style="padding:8px 12px;background:var(--bg-primary);border-radius:8px;font-size:0.78rem;color:var(--text-secondary)">
+<i class="fas fa-users" style="color:var(--accent-blue);margin-right:6px"></i>
+All users with FCM tokens (<span id="notifTokenCount">--</span> devices)
+</div>
+</div>
+<div id="notifResult" class="modal-result"></div>
+<div class="modal-actions">
+<button class="btn btn-secondary" onclick="closeModal()"><i class="fas fa-times"></i> Cancel</button>
+<button class="btn btn-notify" id="sendNotifBtn" onclick="sendTestNotification()"><i class="fas fa-paper-plane"></i> Send Notification</button>
+</div>
+</div>
+</div>
+
+<header class="header">
+<h1><i class="fas fa-chart-bar"></i> Mobile Analytics</h1>
+<div class="header-actions">
+<span class="last-updated" id="lastUpdated"></span>
+<button class="btn btn-notify" onclick="openModal()"><i class="fas fa-bell"></i> Send Test Push</button>
+<button class="btn btn-primary" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+<a href="/" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Admin</a>
+</div>
+</header>
+
+<div class="main">
+<!-- Row 1: Key Stats -->
+<div class="stats-row">
+<div class="stat-card">
+<div class="icon-wrap" style="background:#1e3a5f"><i class="fas fa-users" style="color:var(--accent-blue)"></i></div>
+<div class="label">Total Users</div>
+<div class="value" id="totalUsers">--</div>
+<div class="sub" id="recentReg">--</div>
+</div>
+<div class="stat-card">
+<div class="icon-wrap" style="background:#14532d"><i class="fab fa-android" style="color:var(--accent-green)"></i></div>
+<div class="label">Android Users</div>
+<div class="value" id="androidUsers">--</div>
+<div class="sub">Via mobile app</div>
+</div>
+<div class="stat-card">
+<div class="icon-wrap" style="background:#451a03"><i class="fas fa-bell" style="color:var(--accent-amber)"></i></div>
+<div class="label">FCM Tokens</div>
+<div class="value" id="fcmTokens">--</div>
+<div class="sub" id="fcmSub">--</div>
+</div>
+<div class="stat-card">
+<div class="icon-wrap" style="background:#312e81"><i class="fas fa-chart-line" style="color:var(--accent-purple)"></i></div>
+<div class="label">Weekly Growth</div>
+<div class="value" id="growthWoW">--</div>
+<div id="growthWoWSub" class="sub">vs previous week</div>
+</div>
+<div class="stat-card">
+<div class="icon-wrap" style="background:#164e63"><i class="fas fa-chart-bar" style="color:var(--accent-cyan)"></i></div>
+<div class="label">Monthly Growth</div>
+<div class="value" id="growthMoM">--</div>
+<div id="growthMoMSub" class="sub">vs previous month</div>
+</div>
+</div>
+
+<!-- Row 2: Retention Metrics -->
+<div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+<div class="stat-card">
+<div class="label">Last 7 Days</div>
+<div class="value" style="color:var(--accent-green)" id="reg7">--</div>
+<div class="sub">new registrations</div>
+</div>
+<div class="stat-card">
+<div class="label">Last 30 Days</div>
+<div class="value" style="color:var(--accent-blue)" id="reg30">--</div>
+<div class="sub">new registrations</div>
+</div>
+<div class="stat-card">
+<div class="label">Last 90 Days</div>
+<div class="value" style="color:var(--accent-purple)" id="reg90">--</div>
+<div class="sub">new registrations</div>
+</div>
+</div>
+
+<!-- Row 3: Charts -->
+<div class="grid-2">
+<div class="card">
+<h3><i class="fas fa-chart-area" style="color:var(--accent-blue)"></i> Registration Trend (30 Days)</h3>
+<canvas id="regChart" height="110"></canvas>
+</div>
+<div class="card">
+<h3><i class="fas fa-chart-pie" style="color:var(--accent-green)"></i> Platform Distribution</h3>
+<canvas id="platformChart" height="180"></canvas>
+</div>
+</div>
+
+<!-- Row 4: Platform Trend + Health Gauge + Heatmap -->
+<div class="grid-3">
+<div class="card">
+<h3><i class="fas fa-layer-group" style="color:var(--accent-cyan)"></i> Platform Trend</h3>
+<canvas id="platformTrendChart" height="160"></canvas>
+</div>
+<div class="card">
+<h3><i class="fas fa-heartbeat" style="color:var(--accent-red)"></i> FCM Token Health</h3>
+<div class="gauge-container" id="healthGauge"></div>
+</div>
+<div class="card">
+<h3><i class="fas fa-calendar-week" style="color:var(--accent-amber)"></i> Registration by Day</h3>
+<div class="heatmap-grid" id="dayHeatmap"></div>
+</div>
+</div>
+
+<!-- Row 5: Hourly Pattern + Delivery Rate -->
+<div class="grid-2-equal">
+<div class="card">
+<h3><i class="fas fa-clock" style="color:var(--accent-pink)"></i> Hourly Registration Pattern</h3>
+<div id="hourlyBars" class="hourly-bars"></div>
+<div style="display:flex;justify-content:space-between;font-size:0.6rem;color:var(--text-muted);margin-top:4px;padding:0 2px">
+<span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>11pm</span>
+</div>
+</div>
+<div class="card">
+<h3><i class="fas fa-bullseye" style="color:var(--accent-green)"></i> Notification Delivery Rate</h3>
+<div id="deliverySection"></div>
+</div>
+</div>
+
+<!-- Row 6: Tables -->
+<div class="grid-2-equal">
+<div class="card">
+<h3><i class="fas fa-user-plus" style="color:var(--accent-green)"></i> Recent Registrations</h3>
+<div style="overflow-x:auto;max-height:320px;overflow-y:auto">
+<table class="data-table" id="recentUsersTable">
+<thead><tr><th>Name</th><th>Email</th><th>Platform</th><th>Date</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<h3><i class="fas fa-paper-plane" style="color:var(--accent-amber)"></i> Push Notification Logs</h3>
+<div style="overflow-x:auto;max-height:320px;overflow-y:auto">
+<table class="data-table" id="notifLogsTable">
+<thead><tr><th>Title</th><th>Type</th><th>Sent</th><th>Failed</th><th>Date</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+var API='https://campusapi.ohcampus.com';
+var charts={};
+var dashData=null;
+
+function getAuthToken(){
+try{
+var raw=localStorage.getItem('accessToken')||sessionStorage.getItem('accessToken');
+if(raw)return raw.replace(/^"|"$/g,'');
+for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);var v=localStorage.getItem(k);if(v&&v.length>50&&v.indexOf('eyJ')===0)return v.replace(/^"|"$/g,'');}
+}catch(e){}
+return null;
+}
+
+function loadData(){
+var token=getAuthToken();
+if(!token){document.getElementById('loading').innerHTML='<i class="fas fa-lock" style="color:var(--accent-red)"></i><p>Please log in to Admin Panel first.</p><a href="/" class="btn btn-secondary" style="margin-top:10px"><i class="fas fa-arrow-left"></i> Go to Login</a>';return;}
+document.getElementById('loading').style.display='flex';
+fetch(API+'/admin/Analytics/getDashboardData',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({})})
+.then(function(r){return r.json()})
+.then(function(d){
+document.getElementById('loading').style.display='none';
+if(d.response_code!=='200'){alert('Error: '+(d.response_message||'Failed'));return;}
+dashData=d;
+renderAll(d);
+document.getElementById('lastUpdated').textContent='Updated: '+new Date().toLocaleTimeString();
+}).catch(function(e){document.getElementById('loading').style.display='none';console.error(e);alert('Failed to load analytics.');});
+}
+
+function renderAll(d){
+renderStats(d);
+renderRetention(d);
+renderRegChart(d.registration_trends||[]);
+renderPlatformChart(d.platform_breakdown||{});
+renderPlatformTrend(d.platform_trends||[]);
+renderHealthGauge(d.token_health||{});
+renderDayHeatmap(d.day_of_week||[]);
+renderHourlyBars(d.hourly_pattern||[]);
+renderDelivery(d.notification_delivery||{});
+renderRecentUsers(d.recent_users||[]);
+renderNotifLogs(d.notification_logs||[]);
+if(d.fcm_tokens)document.getElementById('notifTokenCount').textContent=d.fcm_tokens.total_with_token;
+}
+
+function renderStats(d){
+document.getElementById('totalUsers').textContent=(d.total_users||0).toLocaleString();
+document.getElementById('recentReg').textContent='+'+(d.registrations_last_7_days||0)+' this week';
+var p=d.platform_breakdown||{};
+document.getElementById('androidUsers').textContent=(p.android||0).toLocaleString();
+var f=d.fcm_tokens||{};
+document.getElementById('fcmTokens').textContent=(f.total_with_token||0).toLocaleString();
+document.getElementById('fcmSub').textContent=f.total_without_token+' without token';
+var wow=d.growth_wow||0;
+document.getElementById('growthWoW').innerHTML=(wow>=0?'+':'')+wow+'%';
+document.getElementById('growthWoW').style.color=wow>=0?'var(--accent-green)':'var(--accent-red)';
+var mom=d.growth_mom||0;
+document.getElementById('growthMoM').innerHTML=(mom>=0?'+':'')+mom+'%';
+document.getElementById('growthMoM').style.color=mom>=0?'var(--accent-green)':'var(--accent-red)';
+}
+
+function renderRetention(d){
+document.getElementById('reg7').textContent=(d.registrations_last_7_days||0).toLocaleString();
+document.getElementById('reg30').textContent=(d.registrations_last_30_days||0).toLocaleString();
+document.getElementById('reg90').textContent=(d.registrations_last_90_days||0).toLocaleString();
+}
+
+function renderRegChart(trends){
+var ctx=document.getElementById('regChart').getContext('2d');
+if(charts.reg)charts.reg.destroy();
+charts.reg=new Chart(ctx,{type:'line',data:{labels:trends.map(function(t){var d=new Date(t.date);return d.getDate()+'/'+(d.getMonth()+1)}),datasets:[{label:'New Users',data:trends.map(function(t){return t.count}),borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,0.08)',borderWidth:2,tension:0.4,fill:true,pointBackgroundColor:'#38bdf8',pointRadius:2,pointHoverRadius:5}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'rgba(30,41,59,0.3)'}},y:{beginAtZero:true,ticks:{color:'#64748b',stepSize:2,font:{size:10}},grid:{color:'rgba(30,41,59,0.3)'}}}}});
+}
+
+function renderPlatformChart(platforms){
+var ctx=document.getElementById('platformChart').getContext('2d');
+if(charts.platform)charts.platform.destroy();
+var labels=Object.keys(platforms).map(function(k){return k.charAt(0).toUpperCase()+k.slice(1)});
+charts.platform=new Chart(ctx,{type:'doughnut',data:{labels:labels,datasets:[{data:Object.values(platforms),backgroundColor:['#38bdf8','#4ade80','#fbbf24','#f87171','#a78bfa'],borderColor:'#111827',borderWidth:3}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',padding:12,font:{size:11}}}}}});
+}
+
+function renderPlatformTrend(trends){
+var ctx=document.getElementById('platformTrendChart').getContext('2d');
+if(charts.platTrend)charts.platTrend.destroy();
+var dates=[...new Set(trends.map(function(t){return t.date}))].sort();
+var plats=['android','web','unknown'];
+var colors={'android':'#4ade80','web':'#38bdf8','unknown':'#64748b'};
+var datasets=plats.map(function(p){return{label:p.charAt(0).toUpperCase()+p.slice(1),data:dates.map(function(d){var found=trends.find(function(t){return t.date===d&&t.platform===p});return found?found.count:0}),borderColor:colors[p],backgroundColor:colors[p]+'18',borderWidth:2,tension:0.4,fill:true,pointRadius:1}});
+charts.platTrend=new Chart(ctx,{type:'line',data:{labels:dates.map(function(d){var dt=new Date(d);return dt.getDate()+'/'+(dt.getMonth()+1)}),datasets:datasets},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10},padding:10}}},scales:{x:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(30,41,59,0.2)'}},y:{stacked:true,beginAtZero:true,ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(30,41,59,0.2)'}}}}});
+}
+
+function renderHealthGauge(health){
+var score=health.health_score||0;
+var circumference=2*Math.PI*60;
+var offset=circumference-(score/100)*circumference;
+var color=score>=70?'#4ade80':score>=40?'#fbbf24':'#f87171';
+var el=document.getElementById('healthGauge');
+el.innerHTML='<div class="gauge-ring"><svg width="140" height="140"><circle class="bg" cx="70" cy="70" r="60"/><circle class="fg" cx="70" cy="70" r="60" style="stroke:'+color+';stroke-dasharray:'+circumference+';stroke-dashoffset:'+offset+'"/></svg><div class="gauge-value">'+score+'%<span class="unit">Health</span></div></div>'
++'<div class="gauge-legend">'
++'<span><span class="dot" style="background:#4ade80"></span>Healthy: '+(health.healthy||0)+'</span>'
++'<span><span class="dot" style="background:#fbbf24"></span>Degraded: '+(health.degraded||0)+'</span>'
++'<span><span class="dot" style="background:#f87171"></span>Missing: '+(health.missing||0)+'</span>'
++'</div>';
+}
+
+function renderDayHeatmap(data){
+var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var maxCount=Math.max.apply(null,data.map(function(d){return d.count}))||1;
+var el=document.getElementById('dayHeatmap');
+var html='';
+for(var i=1;i<=7;i++){
+var found=data.find(function(d){return d.day===i});
+var count=found?found.count:0;
+var intensity=count/maxCount;
+var bg,textColor;
+if(intensity>0.7){bg='rgba(56,189,248,0.35)';textColor='#38bdf8'}
+else if(intensity>0.4){bg='rgba(56,189,248,0.2)';textColor='#7dd3fc'}
+else if(intensity>0.15){bg='rgba(56,189,248,0.1)';textColor='#94a3b8'}
+else{bg='rgba(30,41,59,0.5)';textColor='#64748b'}
+html+='<div class="heatmap-cell" style="background:'+bg+';color:'+textColor+'"><div class="day-label">'+dayNames[i-1]+'</div><div class="day-count">'+count+'</div></div>';
+}
+el.innerHTML=html;
+}
+
+function renderHourlyBars(data){
+var maxCount=Math.max.apply(null,data.map(function(d){return d.count}))||1;
+var el=document.getElementById('hourlyBars');
+var html='';
+for(var h=0;h<24;h++){
+var found=data.find(function(d){return d.hour===h});
+var count=found?found.count:0;
+var pct=Math.max(4,(count/maxCount)*100);
+var color;
+if(h>=6&&h<12)color='#4ade80';
+else if(h>=12&&h<18)color='#38bdf8';
+else if(h>=18&&h<22)color='#fbbf24';
+else color='#64748b';
+html+='<div class="hourly-bar" style="height:'+pct+'%;background:'+color+'" title="'+h+':00 - '+count+' registrations"></div>';
+}
+el.innerHTML=html;
+}
+
+function renderDelivery(del){
+var el=document.getElementById('deliverySection');
+if(del.total_campaigns===0){
+el.innerHTML='<div class="empty-state"><i class="fas fa-bell-slash"></i><p>No notifications sent yet</p></div>';
+return;
+}
+var rate=del.delivery_rate||0;
+var barColor=rate>=80?'#4ade80':rate>=50?'#fbbf24':'#f87171';
+el.innerHTML='<div style="text-align:center;margin-bottom:14px"><div style="font-size:2.2rem;font-weight:800;color:'+barColor+'">'+rate+'%</div><div style="font-size:0.72rem;color:var(--text-muted)">Overall Delivery Rate</div></div>'
++'<div class="delivery-bar"><div class="delivery-bar-fill" style="width:'+rate+'%;background:'+barColor+'"></div></div>'
++'<div class="delivery-stats"><span><i class="fas fa-check-circle" style="color:#4ade80"></i> '+del.total_success+' delivered</span><span><i class="fas fa-times-circle" style="color:#f87171"></i> '+del.total_fail+' failed</span></div>'
++'<div style="margin-top:12px;padding:10px;background:var(--bg-primary);border-radius:8px;text-align:center"><span style="font-size:0.72rem;color:var(--text-muted)">Total Campaigns: <strong style="color:var(--text-primary)">'+del.total_campaigns+'</strong></span></div>';
+}
+
+function renderRecentUsers(users){
+var tbody=document.querySelector('#recentUsersTable tbody');
+if(!users.length){tbody.innerHTML='<tr><td colspan="4"><div class="empty-state"><i class="fas fa-users"></i>No recent registrations</div></td></tr>';return;}
+tbody.innerHTML=users.map(function(u){
+var cls=u.platform==='android'?'badge-android':(u.platform==='web'?'badge-web':'badge-unknown');
+var ico=u.platform==='android'?'fab fa-android':(u.platform==='web'?'fas fa-globe':'fas fa-question');
+var dt=new Date(u.registered);
+return '<tr><td><strong>'+u.name+'</strong></td><td>'+u.email+'</td><td><span class="badge '+cls+'"><i class="'+ico+'"></i> '+u.platform+'</span></td><td>'+dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+'</td></tr>';
+}).join('');
+}
+
+function renderNotifLogs(logs){
+var tbody=document.querySelector('#notifLogsTable tbody');
+if(!logs.length){tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><i class="fas fa-bell-slash"></i>No notifications sent yet</div></td></tr>';return;}
+tbody.innerHTML=logs.map(function(n){
+var dt=new Date(n.created_date);
+var typeCls=n.type==='test'?'badge-test':'badge-article';
+return '<tr><td>'+n.title+'</td><td><span class="badge '+typeCls+'">'+n.type+'</span></td><td class="status-ok">'+n.success_count+'</td><td class="status-fail">'+n.fail_count+'</td><td>'+dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+'</td></tr>';
+}).join('');
+}
+
+/* Modal Functions */
+function openModal(){document.getElementById('notifModal').classList.add('active');document.getElementById('notifResult').className='modal-result';document.getElementById('notifResult').style.display='none';}
+function closeModal(){document.getElementById('notifModal').classList.remove('active');}
+
+function sendTestNotification(){
+var token=getAuthToken();
+if(!token){alert('Please log in first.');return;}
+var title=document.getElementById('notifTitle').value.trim();
+var body=document.getElementById('notifBody').value.trim();
+if(!title||!body){alert('Title and body are required.');return;}
+var btn=document.getElementById('sendNotifBtn');
+btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Sending...';
+var resultEl=document.getElementById('notifResult');
+resultEl.style.display='none';
+
+fetch(API+'/admin/Analytics/sendTestNotification',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({title:title,body:body})})
+.then(function(r){return r.json()})
+.then(function(d){
+btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Send Notification';
+if(d.response_code==='200'){
+resultEl.className='modal-result success';
+resultEl.innerHTML='<i class="fas fa-check-circle"></i> Sent to <strong>'+d.total_tokens+'</strong> devices: <strong>'+d.success_count+'</strong> delivered, <strong>'+d.fail_count+'</strong> failed.';
+resultEl.style.display='block';
+setTimeout(function(){loadData()},2000);
+}else{
+resultEl.className='modal-result error';
+resultEl.innerHTML='<i class="fas fa-times-circle"></i> '+(d.response_message||'Failed to send');
+resultEl.style.display='block';
+}
+}).catch(function(e){
+btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Send Notification';
+resultEl.className='modal-result error';
+resultEl.innerHTML='<i class="fas fa-times-circle"></i> Network error';
+resultEl.style.display='block';
+});
+}
+
+// Close modal on background click
+document.getElementById('notifModal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',loadData)}else{loadData()}
+</script>
 </body>
 </html>
