@@ -155,11 +155,32 @@ All users with FCM tokens (<span id="notifTokenCount">--</span> devices)
 </div>
 </div>
 
+<!-- Token Cleanup Modal -->
+<div class="modal-overlay" id="cleanupModal">
+<div class="modal">
+<h3><i class="fas fa-broom" style="color:var(--accent-amber)"></i> Cleanup Stale FCM Tokens</h3>
+<div style="padding:12px;background:var(--bg-primary);border-radius:8px;margin-bottom:14px;font-size:0.82rem;color:var(--text-secondary);line-height:1.6">
+<p>This will <strong style="color:var(--accent-amber)">validate every FCM token</strong> by sending a silent test message to each device.</p>
+<p style="margin-top:6px">Tokens that return <code style="background:#1e293b;padding:2px 6px;border-radius:4px;color:var(--accent-red)">UNREGISTERED</code> will be removed from the database.</p>
+<p style="margin-top:6px"><strong>Tokens to validate:</strong> <span id="cleanupTokenCount">--</span> devices</p>
+</div>
+<div style="padding:10px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.15);border-radius:8px;font-size:0.78rem;color:var(--accent-red);margin-bottom:14px">
+<i class="fas fa-exclamation-triangle"></i> Users with cleaned tokens will stop receiving push notifications until they reopen the app.
+</div>
+<div id="cleanupResult" class="modal-result"></div>
+<div class="modal-actions">
+<button class="btn btn-secondary" onclick="closeCleanupModal()"><i class="fas fa-times"></i> Cancel</button>
+<button class="btn btn-danger" id="cleanupBtn" onclick="runCleanup()"><i class="fas fa-broom"></i> Run Cleanup</button>
+</div>
+</div>
+</div>
+
 <header class="header">
 <h1><i class="fas fa-chart-bar"></i> Mobile Analytics</h1>
 <div class="header-actions">
 <span class="last-updated" id="lastUpdated"></span>
 <button class="btn btn-notify" onclick="openModal()"><i class="fas fa-bell"></i> Send Test Push</button>
+<button class="btn btn-danger" onclick="openCleanupModal()" style="font-size:0.78rem"><i class="fas fa-broom"></i> Cleanup Tokens</button>
 <button class="btn btn-primary" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
 <a href="/" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Admin</a>
 </div>
@@ -499,6 +520,44 @@ resultEl.style.display='block';
 
 // Close modal on background click
 document.getElementById('notifModal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+
+
+/* Cleanup Modal */
+function openCleanupModal(){
+document.getElementById('cleanupModal').classList.add('active');
+document.getElementById('cleanupResult').style.display='none';
+if(dashData&&dashData.fcm_tokens)document.getElementById('cleanupTokenCount').textContent=dashData.fcm_tokens.total_with_token;
+}
+function closeCleanupModal(){document.getElementById('cleanupModal').classList.remove('active')}
+document.getElementById('cleanupModal').addEventListener('click',function(e){if(e.target===this)closeCleanupModal()});
+
+function runCleanup(){
+var token=getAuthToken();
+if(!token){alert('Please log in first.');return;}
+var btn=document.getElementById('cleanupBtn');
+btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Validating tokens...';
+var resultEl=document.getElementById('cleanupResult');
+resultEl.style.display='none';
+
+fetch(API+'/admin/Analytics/cleanupStaleTokens',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({})})
+.then(function(r){return r.json()})
+.then(function(d){
+btn.disabled=false;btn.innerHTML='<i class="fas fa-broom"></i> Run Cleanup';
+if(d.response_code==='200'){
+resultEl.className='modal-result success';
+resultEl.innerHTML='<i class="fas fa-check-circle"></i> Cleanup complete! <strong>'+d.total+'</strong> tokens validated: <strong>'+d.valid+' valid</strong>, <strong>'+d.cleaned+' removed</strong>';
+resultEl.style.display='block';
+setTimeout(function(){loadData()},2000);
+}else{
+resultEl.className='modal-result error';
+resultEl.innerHTML='<i class="fas fa-times-circle"></i> '+(d.response_message||'Cleanup failed');
+resultEl.style.display='block';
+}
+}).catch(function(e){
+btn.disabled=false;btn.innerHTML='<i class="fas fa-broom"></i> Run Cleanup';
+resultEl.className='modal-result error';resultEl.innerHTML='<i class="fas fa-times-circle"></i> Network error';resultEl.style.display='block';
+});
+}
 
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',loadData)}else{loadData()}
 </script>
