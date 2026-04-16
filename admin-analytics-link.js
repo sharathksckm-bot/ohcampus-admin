@@ -43,6 +43,24 @@
     } else {
       sidebar.appendChild(linkDiv);
     }
+    
+    // College Settings link
+    if(!document.getElementById('ohc-college-settings-link')){
+      var csDiv = document.createElement('div');
+      csDiv.id = 'ohc-college-settings-link';
+      csDiv.style.cssText = 'padding:4px 16px;margin:0 12px;';
+      csDiv.innerHTML = '<a href="/college-settings.html" target="_blank" style="'
+        + 'display:flex;align-items:center;gap:10px;padding:10px 14px;'
+        + 'background:linear-gradient(135deg,#14532d,#0f172a);'
+        + 'border:1px solid #1e3a5f;border-radius:10px;'
+        + 'color:#4ade80;text-decoration:none;font-size:0.85rem;font-weight:600;'
+        + 'font-family:Inter,sans-serif;transition:all 0.2s;">'
+        + '<span class="material-icons" style="font-size:20px;color:#4ade80">settings</span>'
+        + '<span>College Settings</span>'
+        + '<span class="material-icons" style="font-size:16px;margin-left:auto;color:#64748b">open_in_new</span>'
+        + '</a>';
+      linkDiv.parentNode.insertBefore(csDiv, linkDiv.nextSibling);
+    }
   }
   
   function init(){
