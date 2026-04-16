@@ -86,6 +86,7 @@ input:checked+.slider:before{transform:translateX(22px)}
 <div style="display:flex;gap:10px;margin-top:12px">
 <button class="btn btn-success" id="geocodeBtn" onclick="runGeocode()"><i class="fas fa-map-pin"></i> Geocode Batch (10)</button>
 <button class="btn btn-primary" onclick="runFetchTransport()"><i class="fas fa-train"></i> Fetch Transport Batch (3)</button>
+<button class="btn btn-primary" style="background:#7c3aed" onclick="runFeaturedGeocode()"><i class="fas fa-star"></i> Featured Colleges (Geocode + Transport)</button>
 </div>
 <div class="log" id="geoLog" style="margin-top:12px"></div>
 </div>
@@ -293,6 +294,20 @@ loadGeoStats();
 }else{res.className='result-box show error';res.innerHTML='<i class="fas fa-times-circle"></i> '+d.response_message;}
 res.style.display='block';
 }).catch(function(){});
+}
+
+
+function runFeaturedGeocode(){
+addLog('Processing featured colleges (geocode + transport)...');
+fetch(API+'/admin/CollegeSettings/geocodeFeaturedColleges',{method:'POST',headers:authHeaders(),body:JSON.stringify({batch_size:10,fetch_transport:true})})
+.then(function(r){return r.json()}).then(function(d){
+if(d.response_code==='200'){
+addLog('Featured: Geocoded '+d.batch_geocoded+', Failed '+d.batch_failed+', Transport '+d.transport_fetched);
+addLog('Featured total: '+d.featured_geocoded+'/'+d.featured_total+' geocoded, '+d.featured_remaining+' remaining');
+if(d.results){d.results.forEach(function(r){addLog('  '+r.status+': '+r.title+(r.lat?' ('+r.lat+','+r.lng+')':''));})}
+loadGeoStats();
+}else{addLog('Error: '+(d.response_message||'Failed'));}
+}).catch(function(e){addLog('Error: '+e.message);});
 }
 
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',loadData)}else{loadData()}
