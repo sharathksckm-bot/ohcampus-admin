@@ -91,6 +91,28 @@ input:checked+.slider:before{transform:translateX(22px)}
 </div>
 
 
+
+<!-- Individual College Operations -->
+<div class="section">
+<h2><i class="fas fa-search-location" style="color:var(--purple)"></i> Individual College</h2>
+<p style="font-size:0.78rem;color:var(--dim);margin-bottom:12px">Search for a specific active college to geocode or fetch transport data</p>
+<div style="position:relative">
+<input type="text" id="collegeSearch" placeholder="Search college by name..." oninput="searchCollege(this.value)" style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.85rem;font-family:'Inter'">
+<div id="searchResults" style="position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;display:none;z-index:10"></div>
+</div>
+<div id="selectedCollege" style="display:none;margin-top:12px;padding:14px;background:var(--bg);border-radius:10px">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+<div><div style="font-size:0.9rem;font-weight:700" id="selCollegeName"></div><div style="font-size:0.72rem;color:var(--dim)" id="selCollegeCoords"></div></div>
+<button class="btn btn-secondary" onclick="clearSelection()" style="font-size:0.72rem"><i class="fas fa-times"></i></button>
+</div>
+<div style="display:flex;gap:8px">
+<button class="btn btn-success" onclick="geocodeSingle()"><i class="fas fa-map-pin"></i> Geocode</button>
+<button class="btn btn-primary" onclick="fetchTransportSingle()"><i class="fas fa-train"></i> Fetch Transport</button>
+</div>
+<div class="result-box" id="singleResult" style="margin-top:10px"></div>
+</div>
+</div>
+
 </div>
 
 <script>
@@ -194,6 +216,84 @@ else{res.className='result-box show error';res.innerHTML='<i class="fas fa-times
 }
 
 function addLog(msg){var l=document.getElementById('geoLog');var d=document.createElement('div');d.textContent='['+new Date().toLocaleTimeString()+'] '+msg;l.prepend(d)}
+
+
+var searchTimer=null;
+var selectedCollegeId=null;
+
+function searchCollege(q){
+clearTimeout(searchTimer);
+if(q.length<2){document.getElementById('searchResults').style.display='none';return}
+searchTimer=setTimeout(function(){
+fetch(API+'/admin/CollegeSettings/searchColleges',{method:'POST',headers:authHeaders(),body:JSON.stringify({query:q})})
+.then(r=>r.json()).then(d=>{
+var container=document.getElementById('searchResults');
+if(d.colleges&&d.colleges.length>0){
+container.innerHTML=d.colleges.map(function(c){
+var coords=c.latitude?'('+parseFloat(c.latitude).toFixed(4)+', '+parseFloat(c.longitude).toFixed(4)+')':'No coordinates';
+return '<div style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:0.82rem;transition:background 0.1s" onmouseover="this.style.background=\'rgba(56,189,248,0.05)\'" onmouseout="this.style.background=\'\'" onclick="selectCollege('+c.id+',\''+c.title.replace(/'/g,"\\'")+'\',' + (c.latitude||'null') + ',' + (c.longitude||'null') + ')"><strong>'+c.title+'</strong><div style="font-size:0.68rem;color:var(--dim)">'+coords+'</div></div>';
+}).join('');
+container.style.display='block';
+}else{
+container.innerHTML='<div style="padding:12px;font-size:0.78rem;color:var(--dim);text-align:center">No active colleges found</div>';
+container.style.display='block';
+}
+}).catch(function(){});
+},400);
+}
+
+function selectCollege(id,name,lat,lng){
+selectedCollegeId=id;
+document.getElementById('selCollegeName').textContent=name;
+document.getElementById('selCollegeCoords').textContent=lat?'Lat: '+lat+', Lng: '+lng:'Not geocoded yet';
+document.getElementById('selectedCollege').style.display='block';
+document.getElementById('searchResults').style.display='none';
+document.getElementById('singleResult').className='result-box';
+document.getElementById('singleResult').style.display='none';
+}
+
+function clearSelection(){
+selectedCollegeId=null;
+document.getElementById('selectedCollege').style.display='none';
+document.getElementById('collegeSearch').value='';
+}
+
+function geocodeSingle(){
+if(!selectedCollegeId)return;
+var res=document.getElementById('singleResult');
+res.style.display='none';
+fetch(API+'/admin/CollegeSettings/geocodeSingleCollege',{method:'POST',headers:authHeaders(),body:JSON.stringify({college_id:selectedCollegeId})})
+.then(r=>r.json()).then(d=>{
+if(d.response_code==='200'){
+res.className='result-box show success';res.innerHTML='<i class="fas fa-check-circle"></i> Geocoded: '+d.latitude+', '+d.longitude;
+document.getElementById('selCollegeCoords').textContent='Lat: '+d.latitude+', Lng: '+d.longitude;
+addLog('Geocoded: '+d.title+' ('+d.latitude+', '+d.longitude+')');
+loadGeoStats();
+}else{res.className='result-box show error';res.innerHTML='<i class="fas fa-times-circle"></i> '+d.response_message;}
+res.style.display='block';
+}).catch(function(){});
+}
+
+function fetchTransportSingle(){
+if(!selectedCollegeId)return;
+var res=document.getElementById('singleResult');
+res.style.display='none';
+fetch(API+'/admin/CollegeSettings/fetchTransportSingle',{method:'POST',headers:authHeaders(),body:JSON.stringify({college_id:selectedCollegeId})})
+.then(r=>r.json()).then(d=>{
+if(d.response_code==='200'){
+var html='<i class="fas fa-check-circle"></i> Transport fetched:<br>';
+d.transport.forEach(function(t){
+var icon=t.type==='railway'?'train':t.type==='airport'?'plane':'bus';
+html+='<div style="margin-top:4px"><i class="fas fa-'+icon+'"></i> '+t.name+' - '+t.distance_km+' km</div>';
+});
+if(d.transport.length===0) html+='No transport found nearby.';
+res.className='result-box show success';res.innerHTML=html;
+addLog('Transport fetched for college #'+selectedCollegeId);
+loadGeoStats();
+}else{res.className='result-box show error';res.innerHTML='<i class="fas fa-times-circle"></i> '+d.response_message;}
+res.style.display='block';
+}).catch(function(){});
+}
 
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',loadData)}else{loadData()}
 </script>

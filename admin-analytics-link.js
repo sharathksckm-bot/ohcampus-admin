@@ -1,71 +1,111 @@
-/* OhCampus Admin - Sidebar Link Injections (Contextual Placement) */
+/* OhCampus Admin - Sidebar Link Injections (Inside Submenus) */
 (function(){
   'use strict';
   
-  function createLink(id, href, label, iconName, bgFrom, bgTo, borderColor, textColor) {
-    var div = document.createElement('div');
-    div.id = id;
-    div.style.cssText = 'padding:2px 16px;margin:0 0;';
-    div.innerHTML = '<a href="' + href + '" target="_blank" style="'
-      + 'display:flex;align-items:center;gap:10px;padding:9px 14px;'
-      + 'background:linear-gradient(135deg,' + bgFrom + ',' + bgTo + ');'
-      + 'border:1px solid ' + borderColor + ';border-radius:10px;'
-      + 'color:' + textColor + ';text-decoration:none;font-size:0.82rem;font-weight:600;'
-      + 'font-family:Inter,sans-serif;transition:all 0.2s;'
+  function createSubItem(id, href, label) {
+    var item = document.createElement('div');
+    item.id = id;
+    item.style.cssText = 'padding-left:0;';
+    item.innerHTML = '<div class="fuse-vertical-navigation-item-wrapper">'
+      + '<a href="' + href + '" target="_blank" class="fuse-vertical-navigation-item" style="'
+      + 'display:flex;align-items:center;padding:10px 16px 10px 56px;'
+      + 'color:currentColor;text-decoration:none;font-size:13px;'
+      + 'transition:background 0.2s;cursor:pointer;'
       + '">'
-      + '<span class="material-icons" style="font-size:18px;color:' + textColor + '">' + iconName + '</span>'
-      + '<span>' + label + '</span>'
-      + '<span class="material-icons" style="font-size:14px;margin-left:auto;color:#64748b">open_in_new</span>'
-      + '</a>';
-    return div;
+      + '<span class="fuse-vertical-navigation-item-title" style="font-size:13px">' + label + '</span>'
+      + '<span style="margin-left:auto;font-size:10px;color:#94a3b8;opacity:0.6">&#8599;</span>'
+      + '</a></div>';
+    
+    // Hover effect
+    var link = item.querySelector('a');
+    link.addEventListener('mouseenter', function(){ this.style.background = 'rgba(0,0,0,0.04)'; });
+    link.addEventListener('mouseleave', function(){ this.style.background = ''; });
+    
+    return item;
   }
   
-  function findNavItemByText(text) {
-    var items = document.querySelectorAll('fuse-vertical-navigation-basic-item, fuse-vertical-navigation-collapsable-item');
+  function findCollapsableByTitle(text) {
+    var items = document.querySelectorAll('fuse-vertical-navigation-collapsable-item');
     for (var i = 0; i < items.length; i++) {
       var titleEl = items[i].querySelector('.fuse-vertical-navigation-item-title');
-      if (titleEl && titleEl.textContent.trim().toLowerCase() === text.toLowerCase()) {
+      if (titleEl && titleEl.textContent.trim() === text) {
         return items[i];
       }
     }
     return null;
   }
   
+  function getChildrenContainer(collapsable) {
+    // Children may be in a wrapper div or direct
+    var wrapper = collapsable.querySelector('.fuse-vertical-navigation-item-children, div[class*="children"]');
+    if (wrapper) {
+      var basics = wrapper.querySelectorAll('fuse-vertical-navigation-basic-item');
+      return basics.length > 0 ? basics[basics.length - 1] : wrapper;
+    }
+    // Fallback: direct children
+    var basics = collapsable.querySelectorAll('fuse-vertical-navigation-basic-item');
+    return basics.length > 0 ? basics[basics.length - 1] : null;
+  }
+  
   function injectLinks() {
-    // 1. College Settings — after "College" nav item
-    if (!document.getElementById('ohc-college-settings-link')) {
-      var collegeNav = findNavItemByText('College');
-      if (collegeNav) {
-        var csLink = createLink('ohc-college-settings-link', '/college-settings.html', 'College Settings', 'settings', '#14532d', '#0f172a', '#1e3a5f', '#4ade80');
-        collegeNav.parentNode.insertBefore(csLink, collegeNav.nextSibling);
+    // 1. PYQ / Upload Paper — as 4th sub-item under Mock Tests
+    if (!document.getElementById('ohc-pyq-submenu')) {
+      var mockTests = findCollapsableByTitle('Mock Tests');
+      if (mockTests) {
+        var lastChild = getChildrenContainer(mockTests);
+        if (lastChild) {
+          var pyqItem = createSubItem('ohc-pyq-submenu', '/pyq-upload.html', 'PYQ / Upload Paper');
+          lastChild.parentNode.insertBefore(pyqItem, lastChild.nextSibling);
+        }
       }
     }
     
-    // 2. PYQ Upload — after "Mock Tests" nav item
-    if (!document.getElementById('ohc-pyq-upload-link')) {
-      var mockTestNav = findNavItemByText('Mock Tests');
-      if (mockTestNav) {
-        var pyqLink = createLink('ohc-pyq-upload-link', '/pyq-upload.html', 'PYQ / Upload Paper', 'upload_file', '#451a03', '#0f172a', '#92400e', '#fbbf24');
-        mockTestNav.parentNode.insertBefore(pyqLink, mockTestNav.nextSibling);
+    // 2. College Settings — as 8th sub-item under College (after Reviews which is 7th)
+    if (!document.getElementById('ohc-college-settings-submenu')) {
+      var college = findCollapsableByTitle('College');
+      if (college) {
+        var lastCollegeChild = getChildrenContainer(college);
+        if (lastCollegeChild) {
+          var csItem = createSubItem('ohc-college-settings-submenu', '/college-settings.html', 'College Settings');
+          lastCollegeChild.parentNode.insertBefore(csItem, lastCollegeChild.nextSibling);
+        }
       }
     }
     
-    // 3. Mobile Analytics — at the bottom (keep existing behavior)
+    // 3. Mobile Analytics — at the bottom of sidebar
     if (!document.getElementById('ohc-analytics-link')) {
       var sidebar = document.querySelector('fuse-vertical-navigation-aside-item, fuse-vertical-navigation, [class*="fuse-vertical-navigation"]');
       if (!sidebar) return;
       var navGroups = sidebar.querySelectorAll('fuse-vertical-navigation-group-item');
       var lastGroup = navGroups.length > 0 ? navGroups[navGroups.length - 1] : null;
       
-      var analyticsLink = createLink('ohc-analytics-link', '/mobile-analytics.html', 'Mobile Analytics', 'analytics', '#1e3a5f', '#0f172a', '#334155', '#38bdf8');
-      analyticsLink.style.cssText = 'padding:8px 16px;margin:4px 12px;';
+      var linkDiv = document.createElement('div');
+      linkDiv.id = 'ohc-analytics-link';
+      linkDiv.style.cssText = 'padding:8px 16px;margin:4px 12px;';
+      linkDiv.innerHTML = '<a href="/mobile-analytics.html" target="_blank" style="'
+        + 'display:flex;align-items:center;gap:10px;padding:10px 14px;'
+        + 'background:linear-gradient(135deg,#1e3a5f,#0f172a);'
+        + 'border:1px solid #334155;border-radius:10px;'
+        + 'color:#38bdf8;text-decoration:none;font-size:0.85rem;font-weight:600;'
+        + 'font-family:Inter,sans-serif;transition:all 0.2s;'
+        + '">'
+        + '<span class="material-icons" style="font-size:20px;color:#38bdf8">analytics</span>'
+        + '<span>Mobile Analytics</span>'
+        + '<span class="material-icons" style="font-size:16px;margin-left:auto;color:#64748b">open_in_new</span>'
+        + '</a>';
       
       if (lastGroup) {
-        lastGroup.parentNode.insertBefore(analyticsLink, lastGroup.nextSibling);
+        lastGroup.parentNode.insertBefore(linkDiv, lastGroup.nextSibling);
       } else {
-        sidebar.appendChild(analyticsLink);
+        sidebar.appendChild(linkDiv);
       }
     }
+    
+    // Remove old standalone links if they exist
+    var oldCS = document.getElementById('ohc-college-settings-link');
+    if (oldCS) oldCS.remove();
+    var oldPYQ = document.getElementById('ohc-pyq-upload-link');
+    if (oldPYQ) oldPYQ.remove();
   }
   
   function init() {
@@ -86,7 +126,7 @@
       lastUrl = location.href;
       setTimeout(injectLinks, 1500);
     }
-    if (!document.getElementById('ohc-analytics-link') || !document.getElementById('ohc-college-settings-link')) {
+    if (!document.getElementById('ohc-pyq-submenu') || !document.getElementById('ohc-college-settings-submenu')) {
       setTimeout(injectLinks, 1000);
     }
   }).observe(document.body, {childList: true, subtree: true});

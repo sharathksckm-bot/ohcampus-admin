@@ -80,6 +80,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <button class="btn btn-success" onclick="createPYQTest()"><i class="fas fa-plus-circle"></i> Create PYQ Test</button>
 <div class="result-box" id="testResult"></div>
 </div>
+
+<!-- Test List with Active/Inactive -->
+<div class="section">
+<h2><i class="fas fa-list-check" style="color:var(--green)"></i> All Mock Tests</h2>
+<p style="font-size:0.78rem;color:var(--dim);margin-bottom:12px">Manage test status. Active tests are visible in the mobile app.</p>
+<div id="testListContainer" style="max-height:400px;overflow-y:auto">
+<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+<thead><tr style="background:var(--bg)">
+<th style="padding:8px 10px;text-align:left;color:var(--muted);font-size:0.7rem;text-transform:uppercase">Title</th>
+<th style="padding:8px 10px;text-align:center;color:var(--muted);font-size:0.7rem">Questions</th>
+<th style="padding:8px 10px;text-align:center;color:var(--muted);font-size:0.7rem">Duration</th>
+<th style="padding:8px 10px;text-align:center;color:var(--muted);font-size:0.7rem">Status</th>
+<th style="padding:8px 10px;text-align:center;color:var(--muted);font-size:0.7rem">Action</th>
+</tr></thead>
+<tbody id="testListBody"></tbody>
+</table>
+</div>
+</div>
+
 </div>
 
 <script>
@@ -93,6 +112,7 @@ function init(){
 var t=getToken();
 if(!t){document.getElementById('loading').innerHTML='<i class="fas fa-lock" style="color:var(--red)"></i><p>Please log in to Admin Panel first.</p><a href="/" class="btn btn-secondary" style="margin-top:10px"><i class="fas fa-arrow-left"></i> Go to Login</a>';return}
 document.getElementById('loading').style.display='none';
+loadAllTests();
 }
 
 function handleFile(input){
@@ -162,6 +182,37 @@ res.className='result-box show error';
 res.innerHTML='<i class="fas fa-times-circle"></i> '+(d.response_message||'Failed');
 }
 }).catch(()=>{});
+}
+
+
+function loadAllTests(){
+fetch(API+'/admin/AIMockTestGenerator/getAllTests',{method:'POST',headers:authHeaders(),body:'{}'})
+.then(function(r){return r.json()}).then(function(d){
+var tbody=document.getElementById('testListBody');
+if(!d.tests||d.tests.length===0){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:20px;color:#64748b">No tests found</td></tr>';return}
+tbody.innerHTML=d.tests.map(function(t){
+var isActive=t.status==1;
+var statusColor=isActive?'#4ade80':'#f87171';
+var statusText=isActive?'Active':'Inactive';
+var btnBg=isActive?'#dc2626':'#059669';
+var btnText=isActive?'Deactivate':'Activate';
+return '<tr style="border-bottom:1px solid #1e293b">'
++'<td style="padding:8px 10px"><strong>'+t.title+'</strong><div style="font-size:0.68rem;color:#64748b">'+t.exam_type+' | '+(t.is_ai_generated==1?'AI':'PYQ/Manual')+'</div></td>'
++'<td style="padding:8px 10px;text-align:center">'+t.total_questions+'</td>'
++'<td style="padding:8px 10px;text-align:center">'+t.duration_minutes+' min</td>'
++'<td style="padding:8px 10px;text-align:center"><span style="color:'+statusColor+';font-weight:700;font-size:0.75rem">'+statusText+'</span></td>'
++'<td style="padding:8px 10px;text-align:center"><button onclick="toggleTestStatus('+t.id+','+t.status+')" style="background:'+btnBg+';color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:0.7rem;font-weight:600;cursor:pointer;font-family:Inter">'+btnText+'</button></td>'
++'</tr>';
+}).join('');
+}).catch(function(){});
+}
+
+function toggleTestStatus(testId,currentStatus){
+var newStatus=currentStatus==1?0:1;
+fetch(API+'/admin/AIMockTestGenerator/toggleTestStatus',{method:'POST',headers:authHeaders(),body:JSON.stringify({test_id:testId,status:newStatus})})
+.then(function(r){return r.json()}).then(function(d){
+if(d.response_code==='200') loadAllTests();
+}).catch(function(){});
 }
 
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init)}else{init()}
