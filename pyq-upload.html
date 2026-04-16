@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PYQ / Upload Paper - OhCampus Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0b1120;--card:#111827;--border:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--dim:#64748b;--blue:#38bdf8;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--purple:#a78bfa}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header h1{font-size:1.3rem;font-weight:700;display:flex;align-items:center;gap:10px}
+.header h1 i{color:var(--amber)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Inter';border:none}
+.btn-primary{background:#1d4ed8;color:#fff}.btn-primary:hover{background:#2563eb}
+.btn-success{background:#059669;color:#fff}.btn-success:hover{background:#10b981}
+.btn-secondary{background:var(--card);border:1px solid var(--border);color:var(--muted)}.btn-secondary:hover{background:#1e293b}
+.main{padding:20px 28px;max-width:1100px;margin:0 auto}
+.section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px}
+.section h2{font-size:1rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section h2 i{font-size:16px}
+.upload-area{border:2px dashed var(--border);border-radius:12px;padding:30px;text-align:center;cursor:pointer;transition:border-color 0.2s}
+.upload-area:hover{border-color:var(--blue)}
+.upload-area i{font-size:2rem;color:var(--amber);margin-bottom:8px}
+.upload-area p{font-size:0.82rem;color:var(--muted)}
+.form-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+.form-field label{display:block;font-size:0.72rem;color:var(--muted);margin-bottom:4px;font-weight:600}
+.form-field input,.form-field select{width:100%;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.82rem;font-family:'Inter'}
+.form-field input:focus,.form-field select:focus{border-color:var(--blue);outline:none}
+.result-box{margin-top:14px;padding:12px;border-radius:8px;font-size:0.82rem;display:none}
+.result-box.show{display:block}
+.result-box.success{background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.2);color:var(--green)}
+.result-box.error{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);color:var(--red)}
+.pyq-years{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pyq-year{padding:6px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:0.78rem;color:var(--muted);cursor:pointer;transition:all 0.2s}
+.pyq-year:hover{border-color:var(--amber);color:var(--amber)}
+.pyq-year .count{color:var(--dim);font-size:0.68rem;margin-left:4px}
+.loading-overlay{position:fixed;inset:0;background:rgba(11,17,32,0.9);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:14px}
+.loading-overlay i{font-size:1.8rem;color:var(--amber)}.loading-overlay p{color:var(--muted);font-size:0.85rem}
+@media(max-width:768px){.form-row{grid-template-columns:1fr}.main{padding:14px}}
+</style>
+</head>
+<body>
+<div id="loading" class="loading-overlay"><i class="fas fa-circle-notch fa-spin"></i><p>Loading...</p></div>
+<header class="header">
+<h1><i class="fas fa-file-alt"></i> PYQ / Upload Question Paper</h1>
+<a href="/" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Admin</a>
+</header>
+<div class="main">
+<!-- Upload Question Paper -->
+<div class="section">
+<h2><i class="fas fa-cloud-upload-alt" style="color:var(--amber)"></i> Upload Question Paper</h2>
+<p style="font-size:0.78rem;color:var(--dim);margin-bottom:14px">Upload a previous year question paper (PDF, DOC, DOCX, or TXT). Gemini AI will automatically extract questions and save them to the question bank.</p>
+<div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+<i class="fas fa-cloud-upload-alt"></i>
+<p>Click to upload PDF, DOC, DOCX, or TXT</p>
+<p style="font-size:0.68rem;margin-top:4px;color:var(--dim)">Max file size: 10MB</p>
+<input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="handleFile(this)">
+</div>
+<div class="form-row" style="margin-top:14px">
+<div class="form-field"><label>Exam Type *</label><input type="text" id="uploadExamType" placeholder="e.g. KCET, NEET, JEE"></div>
+<div class="form-field"><label>Year *</label><input type="text" id="uploadYear" placeholder="e.g. 2024"></div>
+<div class="form-field"><label>Subject (optional)</label><input type="text" id="uploadSubject" placeholder="e.g. Physics, Biology"></div>
+</div>
+<button class="btn btn-primary" id="uploadBtn" onclick="submitUpload()" disabled><i class="fas fa-magic"></i> Extract Questions with AI</button>
+<div class="result-box" id="uploadResult"></div>
+</div>
+
+<!-- Create PYQ Test -->
+<div class="section">
+<h2><i class="fas fa-clipboard-list" style="color:var(--purple)"></i> Create Test from Question Bank</h2>
+<p style="font-size:0.78rem;color:var(--dim);margin-bottom:14px">Create a mock test using previously uploaded questions from the question bank.</p>
+<div class="form-row">
+<div class="form-field"><label>Exam Type *</label><input type="text" id="testExamType" placeholder="e.g. KCET" oninput="loadPYQYears()"></div>
+<div class="form-field"><label>Year *</label><input type="text" id="testYear" placeholder="e.g. 2024"></div>
+<div class="form-field"><label>Max Questions</label><input type="number" id="testCount" value="30"></div>
+</div>
+<div id="pyqYearsContainer" style="margin-bottom:14px"></div>
+<button class="btn btn-success" onclick="createPYQTest()"><i class="fas fa-plus-circle"></i> Create PYQ Test</button>
+<div class="result-box" id="testResult"></div>
+</div>
+</div>
+
+<script>
+var API='https://campusapi.ohcampus.com';
+var selectedFile=null;
+var pyqTimer=null;
+function getToken(){try{var r=localStorage.getItem('accessToken')||sessionStorage.getItem('accessToken');if(r)return r.replace(/^"|"$/g,'');for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);var v=localStorage.getItem(k);if(v&&v.length>50&&v.indexOf('eyJ')===0)return v.replace(/^"|"$/g,'')}}catch(e){}return null}
+function authHeaders(){return{'Content-Type':'application/json','Authorization':'Bearer '+getToken()}}
+
+function init(){
+var t=getToken();
+if(!t){document.getElementById('loading').innerHTML='<i class="fas fa-lock" style="color:var(--red)"></i><p>Please log in to Admin Panel first.</p><a href="/" class="btn btn-secondary" style="margin-top:10px"><i class="fas fa-arrow-left"></i> Go to Login</a>';return}
+document.getElementById('loading').style.display='none';
+}
+
+function handleFile(input){
+if(input.files.length>0){
+selectedFile=input.files[0];
+document.getElementById('uploadArea').innerHTML='<i class="fas fa-file-check" style="color:var(--green)"></i><p style="font-weight:600;color:var(--text)">'+selectedFile.name+'</p><p style="font-size:0.68rem;margin-top:4px;color:var(--dim)">'+Math.round(selectedFile.size/1024)+' KB — Click to change</p>';
+document.getElementById('uploadBtn').disabled=false;
+}}
+
+function submitUpload(){
+if(!selectedFile)return;
+var examType=document.getElementById('uploadExamType').value.trim();
+var year=document.getElementById('uploadYear').value.trim();
+if(!examType||!year){alert('Exam type and year are required');return}
+var btn=document.getElementById('uploadBtn');
+btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Extracting with AI (this may take a minute)...';
+var fd=new FormData();
+fd.append('file',selectedFile);
+fd.append('exam_type',examType);
+fd.append('year',year);
+fd.append('subject',document.getElementById('uploadSubject').value.trim());
+fetch(API+'/admin/AIMockTestGenerator/uploadQuestionPaper',{method:'POST',headers:{'Authorization':'Bearer '+getToken()},body:fd})
+.then(r=>r.json()).then(d=>{
+btn.disabled=false;btn.innerHTML='<i class="fas fa-magic"></i> Extract Questions with AI';
+var res=document.getElementById('uploadResult');
+if(d.response_code==='200'){
+res.className='result-box show success';
+res.innerHTML='<i class="fas fa-check-circle"></i> Extracted <strong>'+d.total_extracted+'</strong> questions, saved <strong>'+d.saved_to_bank+'</strong> to question bank for '+examType+' '+year;
+}else{
+res.className='result-box show error';
+res.innerHTML='<i class="fas fa-times-circle"></i> '+(d.response_message||'Failed to extract questions');
+}
+}).catch(e=>{btn.disabled=false;btn.innerHTML='<i class="fas fa-magic"></i> Extract Questions with AI';});
+}
+
+function loadPYQYears(){
+clearTimeout(pyqTimer);
+pyqTimer=setTimeout(function(){
+var examType=document.getElementById('testExamType').value.trim();
+if(!examType)return;
+fetch(API+'/admin/AIMockTestGenerator/getPYQYears',{method:'POST',headers:authHeaders(),body:JSON.stringify({exam_type:examType})})
+.then(r=>r.json()).then(d=>{
+var container=document.getElementById('pyqYearsContainer');
+if(d.years&&d.years.length>0){
+container.innerHTML='<div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px">Available years (click to select):</div><div class="pyq-years">'+d.years.map(function(y){
+return '<div class="pyq-year" onclick="document.getElementById(\'testYear\').value=\''+y.source_year+'\'">'+y.source_year+'<span class="count">('+y.question_count+' Q)</span></div>';
+}).join('')+'</div>';
+}else{
+container.innerHTML='<div style="font-size:0.72rem;color:var(--dim)">No PYQ questions found for '+examType+'. Upload a question paper first.</div>';
+}
+}).catch(()=>{});
+},500);
+}
+
+function createPYQTest(){
+var examType=document.getElementById('testExamType').value.trim();
+var year=document.getElementById('testYear').value.trim();
+if(!examType||!year){alert('Exam type and year are required');return}
+fetch(API+'/admin/AIMockTestGenerator/createPYQTest',{method:'POST',headers:authHeaders(),body:JSON.stringify({exam_type:examType,year:year,question_count:parseInt(document.getElementById('testCount').value)||30})})
+.then(r=>r.json()).then(d=>{
+var res=document.getElementById('testResult');
+if(d.response_code==='200'){
+res.className='result-box show success';
+res.innerHTML='<i class="fas fa-check-circle"></i> Test "<strong>'+d.title+'</strong>" created with <strong>'+d.total_questions+'</strong> questions (Test ID: '+d.test_id+')';
+}else{
+res.className='result-box show error';
+res.innerHTML='<i class="fas fa-times-circle"></i> '+(d.response_message||'Failed');
+}
+}).catch(()=>{});
+}
+
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init)}else{init()}
+</script>
+</body>
+</html>

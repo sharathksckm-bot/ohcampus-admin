@@ -90,35 +90,7 @@ input:checked+.slider:before{transform:translateX(22px)}
 <div class="log" id="geoLog" style="margin-top:12px"></div>
 </div>
 
-<!-- PYQ Test Creation -->
-<div class="section">
-<h2><i class="fas fa-file-alt" style="color:var(--amber)"></i> Previous Year Question Paper</h2>
-<div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-<i class="fas fa-cloud-upload-alt"></i>
-<p>Click to upload PDF, DOC, DOCX, or TXT question paper</p>
-<p style="font-size:0.68rem;margin-top:4px">Gemini AI will auto-extract questions</p>
-<input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="handleFileUpload(this)">
-</div>
-<div class="form-row" style="margin-top:14px">
-<div class="form-field"><label>Exam Type *</label><input type="text" id="pyqExamType" placeholder="e.g. KCET, NEET, JEE"></div>
-<div class="form-field"><label>Year *</label><input type="text" id="pyqYear" placeholder="e.g. 2024"></div>
-<div class="form-field"><label>Subject (optional)</label><input type="text" id="pyqSubject" placeholder="e.g. Physics, Biology"></div>
-</div>
-<button class="btn btn-primary" id="uploadBtn" onclick="submitUpload()" disabled><i class="fas fa-magic"></i> Extract Questions with AI</button>
-<div class="result-box" id="uploadResult"></div>
-</div>
 
-<!-- Create PYQ Test -->
-<div class="section">
-<h2><i class="fas fa-clipboard-list" style="color:var(--purple)"></i> Create PYQ Test</h2>
-<div class="form-row">
-<div class="form-field"><label>Exam Type *</label><input type="text" id="testExamType" placeholder="e.g. KCET"></div>
-<div class="form-field"><label>Year *</label><input type="text" id="testYear" placeholder="e.g. 2024"></div>
-<div class="form-field"><label>Question Count</label><input type="number" id="testCount" value="30"></div>
-</div>
-<button class="btn btn-success" onclick="createPYQTest()"><i class="fas fa-plus-circle"></i> Create PYQ Test</button>
-<div class="result-box" id="testResult"></div>
-</div>
 </div>
 
 <script>

@@ -1,90 +1,93 @@
-/* OhCampus Admin - Mobile Analytics Sidebar Link Injection */
+/* OhCampus Admin - Sidebar Link Injections (Contextual Placement) */
 (function(){
   'use strict';
   
-  function injectAnalyticsLink(){
-    if(document.getElementById('ohc-analytics-link')) return;
-    
-    // Find sidebar navigation items
-    var sidebarLinks = document.querySelectorAll('fuse-vertical-navigation-basic-item, [class*="fuse-vertical-navigation"] a');
-    if(sidebarLinks.length === 0) return;
-    
-    // Try to find the sidebar container (fuse-vertical-navigation)
-    var sidebar = document.querySelector('fuse-vertical-navigation-aside-item, fuse-vertical-navigation, [class*="fuse-vertical-navigation"]');
-    if(!sidebar) return;
-    
-    // Find the last nav group or create link near existing items
-    var navGroups = sidebar.querySelectorAll('fuse-vertical-navigation-group-item');
-    var lastGroup = navGroups.length > 0 ? navGroups[navGroups.length - 1] : null;
-    
-    // Create the analytics link element
-    var linkDiv = document.createElement('div');
-    linkDiv.id = 'ohc-analytics-link';
-    linkDiv.style.cssText = 'padding:8px 16px;margin:4px 12px;';
-    linkDiv.innerHTML = '<a href="/mobile-analytics.html" target="_blank" style="'
-      + 'display:flex;align-items:center;gap:10px;padding:10px 14px;'
-      + 'background:linear-gradient(135deg,#1e3a5f,#0f172a);'
-      + 'border:1px solid #334155;border-radius:10px;'
-      + 'color:#38bdf8;text-decoration:none;font-size:0.85rem;font-weight:600;'
+  function createLink(id, href, label, iconName, bgFrom, bgTo, borderColor, textColor) {
+    var div = document.createElement('div');
+    div.id = id;
+    div.style.cssText = 'padding:2px 16px;margin:0 0;';
+    div.innerHTML = '<a href="' + href + '" target="_blank" style="'
+      + 'display:flex;align-items:center;gap:10px;padding:9px 14px;'
+      + 'background:linear-gradient(135deg,' + bgFrom + ',' + bgTo + ');'
+      + 'border:1px solid ' + borderColor + ';border-radius:10px;'
+      + 'color:' + textColor + ';text-decoration:none;font-size:0.82rem;font-weight:600;'
       + 'font-family:Inter,sans-serif;transition:all 0.2s;'
       + '">'
-      + '<span class="material-icons" style="font-size:20px;color:#38bdf8">analytics</span>'
-      + '<span>Mobile Analytics</span>'
-      + '<span class="material-icons" style="font-size:16px;margin-left:auto;color:#64748b">open_in_new</span>'
+      + '<span class="material-icons" style="font-size:18px;color:' + textColor + '">' + iconName + '</span>'
+      + '<span>' + label + '</span>'
+      + '<span class="material-icons" style="font-size:14px;margin-left:auto;color:#64748b">open_in_new</span>'
       + '</a>';
-    
-    // Add hover effect
-    var link = linkDiv.querySelector('a');
-    link.addEventListener('mouseenter', function(){ this.style.background = 'linear-gradient(135deg,#1d4ed8,#1e3a5f)'; this.style.borderColor = '#38bdf8'; });
-    link.addEventListener('mouseleave', function(){ this.style.background = 'linear-gradient(135deg,#1e3a5f,#0f172a)'; this.style.borderColor = '#334155'; });
-    
-    if(lastGroup){
-      lastGroup.parentNode.insertBefore(linkDiv, lastGroup.nextSibling);
-    } else {
-      sidebar.appendChild(linkDiv);
+    return div;
+  }
+  
+  function findNavItemByText(text) {
+    var items = document.querySelectorAll('fuse-vertical-navigation-basic-item, fuse-vertical-navigation-collapsable-item');
+    for (var i = 0; i < items.length; i++) {
+      var titleEl = items[i].querySelector('.fuse-vertical-navigation-item-title');
+      if (titleEl && titleEl.textContent.trim().toLowerCase() === text.toLowerCase()) {
+        return items[i];
+      }
+    }
+    return null;
+  }
+  
+  function injectLinks() {
+    // 1. College Settings — after "College" nav item
+    if (!document.getElementById('ohc-college-settings-link')) {
+      var collegeNav = findNavItemByText('College');
+      if (collegeNav) {
+        var csLink = createLink('ohc-college-settings-link', '/college-settings.html', 'College Settings', 'settings', '#14532d', '#0f172a', '#1e3a5f', '#4ade80');
+        collegeNav.parentNode.insertBefore(csLink, collegeNav.nextSibling);
+      }
     }
     
-    // College Settings link
-    if(!document.getElementById('ohc-college-settings-link')){
-      var csDiv = document.createElement('div');
-      csDiv.id = 'ohc-college-settings-link';
-      csDiv.style.cssText = 'padding:4px 16px;margin:0 12px;';
-      csDiv.innerHTML = '<a href="/college-settings.html" target="_blank" style="'
-        + 'display:flex;align-items:center;gap:10px;padding:10px 14px;'
-        + 'background:linear-gradient(135deg,#14532d,#0f172a);'
-        + 'border:1px solid #1e3a5f;border-radius:10px;'
-        + 'color:#4ade80;text-decoration:none;font-size:0.85rem;font-weight:600;'
-        + 'font-family:Inter,sans-serif;transition:all 0.2s;">'
-        + '<span class="material-icons" style="font-size:20px;color:#4ade80">settings</span>'
-        + '<span>College Settings</span>'
-        + '<span class="material-icons" style="font-size:16px;margin-left:auto;color:#64748b">open_in_new</span>'
-        + '</a>';
-      linkDiv.parentNode.insertBefore(csDiv, linkDiv.nextSibling);
+    // 2. PYQ Upload — after "Mock Tests" nav item
+    if (!document.getElementById('ohc-pyq-upload-link')) {
+      var mockTestNav = findNavItemByText('Mock Tests');
+      if (mockTestNav) {
+        var pyqLink = createLink('ohc-pyq-upload-link', '/pyq-upload.html', 'PYQ / Upload Paper', 'upload_file', '#451a03', '#0f172a', '#92400e', '#fbbf24');
+        mockTestNav.parentNode.insertBefore(pyqLink, mockTestNav.nextSibling);
+      }
+    }
+    
+    // 3. Mobile Analytics — at the bottom (keep existing behavior)
+    if (!document.getElementById('ohc-analytics-link')) {
+      var sidebar = document.querySelector('fuse-vertical-navigation-aside-item, fuse-vertical-navigation, [class*="fuse-vertical-navigation"]');
+      if (!sidebar) return;
+      var navGroups = sidebar.querySelectorAll('fuse-vertical-navigation-group-item');
+      var lastGroup = navGroups.length > 0 ? navGroups[navGroups.length - 1] : null;
+      
+      var analyticsLink = createLink('ohc-analytics-link', '/mobile-analytics.html', 'Mobile Analytics', 'analytics', '#1e3a5f', '#0f172a', '#334155', '#38bdf8');
+      analyticsLink.style.cssText = 'padding:8px 16px;margin:4px 12px;';
+      
+      if (lastGroup) {
+        lastGroup.parentNode.insertBefore(analyticsLink, lastGroup.nextSibling);
+      } else {
+        sidebar.appendChild(analyticsLink);
+      }
     }
   }
   
-  function init(){
-    setTimeout(injectAnalyticsLink, 2000);
-    setTimeout(injectAnalyticsLink, 4000);
-    setTimeout(injectAnalyticsLink, 7000);
+  function init() {
+    setTimeout(injectLinks, 2000);
+    setTimeout(injectLinks, 4000);
+    setTimeout(injectLinks, 7000);
   }
   
-  if(document.readyState === 'loading'){
+  if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
   
-  // Watch for SPA navigation
   var lastUrl = location.href;
-  new MutationObserver(function(){
-    if(location.href !== lastUrl){
+  new MutationObserver(function() {
+    if (location.href !== lastUrl) {
       lastUrl = location.href;
-      setTimeout(injectAnalyticsLink, 1500);
+      setTimeout(injectLinks, 1500);
     }
-    // Re-inject if sidebar was rebuilt
-    if(!document.getElementById('ohc-analytics-link')){
-      setTimeout(injectAnalyticsLink, 1000);
+    if (!document.getElementById('ohc-analytics-link') || !document.getElementById('ohc-college-settings-link')) {
+      setTimeout(injectLinks, 1000);
     }
   }).observe(document.body, {childList: true, subtree: true});
 })();
