@@ -73,8 +73,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <p style="font-size:0.78rem;color:var(--dim);margin-bottom:14px">Create a mock test using previously uploaded questions from the question bank.</p>
 <div class="form-row">
 <div class="form-field"><label>Exam Type *</label><input type="text" id="testExamType" placeholder="e.g. KCET" oninput="loadPYQYears()"></div>
-<div class="form-field"><label>Year *</label><input type="text" id="testYear" placeholder="e.g. 2024"></div>
+<div class="form-field"><label>Year *</label><input type="text" id="testYear" placeholder="e.g. 2024" oninput="loadPYQSubjects()"></div>
+<div class="form-field"><label>Subject</label><select id="testSubject" onchange="updateQuestionCount()"><option value="">All Subjects</option></select></div>
+</div>
+<div class="form-row">
 <div class="form-field"><label>Max Questions</label><input type="number" id="testCount" value="30"></div>
+<div class="form-field"><label style="visibility:hidden">.</label><div id="availableCount" style="font-size:0.75rem;color:var(--dim);padding:8px 0"></div></div>
+<div class="form-field"></div>
 </div>
 <div id="pyqYearsContainer" style="margin-bottom:14px"></div>
 <button class="btn btn-success" onclick="createPYQTest()"><i class="fas fa-plus-circle"></i> Create PYQ Test</button>
@@ -167,11 +172,42 @@ container.innerHTML='<div style="font-size:0.72rem;color:var(--dim)">No PYQ ques
 },500);
 }
 
+function loadPYQSubjects(){
+var examType=document.getElementById('testExamType').value.trim();
+var year=document.getElementById('testYear').value.trim();
+if(!examType)return;
+fetch(API+'/admin/AIMockTestGenerator/getPYQSubjects',{method:'POST',headers:authHeaders(),body:JSON.stringify({exam_type:examType,year:year})})
+.then(r=>r.json()).then(d=>{
+var sel=document.getElementById('testSubject');
+sel.innerHTML='<option value="">All Subjects</option>';
+if(d.subjects&&d.subjects.length>0){
+d.subjects.forEach(function(s){
+sel.innerHTML+='<option value="'+s.subject+'" data-count="'+s.question_count+'">'+s.subject+' ('+s.question_count+' questions)</option>';
+});
+}
+updateQuestionCount();
+}).catch(()=>{});
+}
+
+function updateQuestionCount(){
+var sel=document.getElementById('testSubject');
+var opt=sel.options[sel.selectedIndex];
+var countDiv=document.getElementById('availableCount');
+if(opt&&opt.dataset.count){
+countDiv.innerHTML='<i class="fas fa-info-circle" style="color:var(--blue)"></i> '+opt.dataset.count+' questions available for '+opt.value;
+}else{
+countDiv.innerHTML='';
+}
+}
+
 function createPYQTest(){
 var examType=document.getElementById('testExamType').value.trim();
 var year=document.getElementById('testYear').value.trim();
+var subject=document.getElementById('testSubject').value;
 if(!examType||!year){alert('Exam type and year are required');return}
-fetch(API+'/admin/AIMockTestGenerator/createPYQTest',{method:'POST',headers:authHeaders(),body:JSON.stringify({exam_type:examType,year:year,question_count:parseInt(document.getElementById('testCount').value)||30})})
+var payload={exam_type:examType,year:year,question_count:parseInt(document.getElementById('testCount').value)||30};
+if(subject)payload.subject=subject;
+fetch(API+'/admin/AIMockTestGenerator/createPYQTest',{method:'POST',headers:authHeaders(),body:JSON.stringify(payload)})
 .then(r=>r.json()).then(d=>{
 var res=document.getElementById('testResult');
 if(d.response_code==='200'){
@@ -199,7 +235,7 @@ var btnText=isActive?'Deactivate':'Activate';
 return '<tr style="border-bottom:1px solid #1e293b">'
 +'<td style="padding:8px 10px"><strong>'+t.title+'</strong><div style="font-size:0.68rem;color:#64748b">'+t.exam_type+' | '+(t.is_ai_generated==1?'AI':'PYQ/Manual')+'</div></td>'
 +'<td style="padding:8px 10px;text-align:center">'+t.total_questions+'</td>'
-+'<td style="padding:8px 10px;text-align:center">'+t.duration_minutes+' min</td>'
++'<td style="padding:8px 10px;text-align:center">'+t.duration+' min</td>'
 +'<td style="padding:8px 10px;text-align:center"><span style="color:'+statusColor+';font-weight:700;font-size:0.75rem">'+statusText+'</span></td>'
 +'<td style="padding:8px 10px;text-align:center"><button onclick="toggleTestStatus('+t.id+','+t.status+')" style="background:'+btnBg+';color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:0.7rem;font-weight:600;cursor:pointer;font-family:Inter">'+btnText+'</button></td>'
 +'</tr>';
